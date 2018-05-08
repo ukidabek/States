@@ -7,7 +7,7 @@ namespace BaseGameLogic.States
 {
     public abstract class BaseStateTransitionCondition : MonoBehaviour
     {
-        public virtual void GetConditionReferences(BaseState state, GameObject gameObject) {}
+        public virtual void GetConditionReferences(BaseState state, GameObject parent) {}
 
         public abstract bool Validate();
     }

@@ -33,6 +33,7 @@ namespace BaseGameLogic.States
         /// Stack of states.
         /// </summary>
         protected Stack<BaseState> statesStack = new Stack<BaseState>();
+        public static bool IsGamePaused = false;
 
         /// <summary>
         /// Reference to current state of the object.
@@ -94,25 +95,16 @@ namespace BaseGameLogic.States
             if(enterDefaultStateOnAwake)
                 EnterDefaultState();
 
-       //     GameManagerExist = GameManagerInstance != null;
-       //     if(GameManagerExist)
-			    //GameManagerInstance.ObjectInitializationCallBack.AddListener(InitializeObject);
         }
 
         #region MonoBehaviour methods
 
-        protected virtual void OnDestroy()
-        {
-            //    if(GameManagerExist)
-            //        GameManagerInstance.ObjectInitializationCallBack.RemoveListener(InitializeObject);
-        }
 
         protected virtual void Update ()
         {
-			//if (IsGamePaused && CurrentState != null)
-			//	return;
+            if (IsGamePaused && CurrentState != null) return;
 
-            if(_graph != null)
+            if (_graph != null)
                 _graph.HandleTransitions(this);
 
 			CurrentState.OnUpdate();
@@ -120,24 +112,22 @@ namespace BaseGameLogic.States
 
         protected virtual void LateUpdate()
         {
-			//if (IsGamePaused && CurrentState != null) 
-   //             return;
-			
-			CurrentState.OnLateUpdate();
+            if (IsGamePaused && CurrentState != null) return;
+
+            CurrentState.OnLateUpdate();
         }
 
         protected virtual void FixedUpdate()
         {
-			//if (IsGamePaused && CurrentState != null) 
-   //             return;
-			
-			CurrentState.OnFixedUpdate();
+            if (IsGamePaused && CurrentState != null) return;
+
+            CurrentState.OnFixedUpdate();
         }
 
         public virtual void OnAnimatorIK(int layerIndex)
         {
-            //if (IsGamePaused && CurrentState != null) 
-            //    return;
+            if (IsGamePaused && CurrentState != null)
+                return;
 
             CurrentState.OnAnimatorIK(layerIndex);
         }
