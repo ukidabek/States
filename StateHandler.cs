@@ -4,11 +4,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 
-using BaseGameLogic.Management;
-using BaseGameLogic.Inputs;
-using BaseGameLogic.Audio;
-using BaseGameLogic.LogicModule;
-
 namespace BaseGameLogic.States
 {
     /// <summary>
@@ -64,13 +59,13 @@ namespace BaseGameLogic.States
 
         #region Managers references
 
-        protected bool GameManagerExist { get; private set; }
-        protected BaseGameManager GameManagerInstance { get { return BaseGameManager.Instance; } }
+        //protected bool GameManagerExist { get; private set; }
+        //protected BaseGameManager GameManagerInstance { get { return BaseGameManager.Instance; } }
 
         /// <summary>
         /// Enable or disable execution of StateObject updates methods.
         /// </summary>
-		protected bool IsGamePaused { get { return GameManagerExist && GameManagerInstance.GameStatus == GameStatusEnum.Pause; } }
+		//protected bool IsGamePaused { get { return GameManagerExist && GameManagerInstance.GameStatus == GameStatusEnum.Pause; } }
 
         #endregion
 
@@ -99,32 +94,23 @@ namespace BaseGameLogic.States
             if(enterDefaultStateOnAwake)
                 EnterDefaultState();
 
-            GameManagerExist = GameManagerInstance != null;
-            if(GameManagerExist)
-			    GameManagerInstance.ObjectInitializationCallBack.AddListener(InitializeObject);
-        }
-
-		/// <summary>
-		/// This method is called by GameManager in first update of this object.
-		/// </summary>
-		protected virtual void InitializeObject(BaseGameManager gameManager)
-        {
-            if(!enterDefaultStateOnAwake)
-                EnterDefaultState();
+       //     GameManagerExist = GameManagerInstance != null;
+       //     if(GameManagerExist)
+			    //GameManagerInstance.ObjectInitializationCallBack.AddListener(InitializeObject);
         }
 
         #region MonoBehaviour methods
 
         protected virtual void OnDestroy()
         {
-            if(GameManagerExist)
-                GameManagerInstance.ObjectInitializationCallBack.RemoveListener(InitializeObject);
+            //    if(GameManagerExist)
+            //        GameManagerInstance.ObjectInitializationCallBack.RemoveListener(InitializeObject);
         }
 
         protected virtual void Update ()
         {
-			if (IsGamePaused && CurrentState != null)
-				return;
+			//if (IsGamePaused && CurrentState != null)
+			//	return;
 
             if(_graph != null)
                 _graph.HandleTransitions(this);
@@ -134,24 +120,24 @@ namespace BaseGameLogic.States
 
         protected virtual void LateUpdate()
         {
-			if (IsGamePaused && CurrentState != null) 
-                return;
+			//if (IsGamePaused && CurrentState != null) 
+   //             return;
 			
 			CurrentState.OnLateUpdate();
         }
 
         protected virtual void FixedUpdate()
         {
-			if (IsGamePaused && CurrentState != null) 
-                return;
+			//if (IsGamePaused && CurrentState != null) 
+   //             return;
 			
 			CurrentState.OnFixedUpdate();
         }
 
         public virtual void OnAnimatorIK(int layerIndex)
         {
-            if (IsGamePaused && CurrentState != null) 
-                return;
+            //if (IsGamePaused && CurrentState != null) 
+            //    return;
 
             CurrentState.OnAnimatorIK(layerIndex);
         }

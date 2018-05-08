@@ -5,6 +5,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEditor.SceneManagement;
+using BaseGameLogic.States.Assembly;
 
 namespace BaseGameLogic.States
 {
@@ -54,9 +55,9 @@ namespace BaseGameLogic.States
         {
             _stateGraph = stateGraph;
 
-            _addStateContextMenu = GenerateAddMenu(AssemblyExtension.GetDerivedTypes<BaseState>(), "Add state/{0}", AddState, GetNameFromType);
+            _addStateContextMenu = GenerateAddMenu(StatesAssemblyExtension.GetDerivedTypes<BaseState>(), "Add state/{0}", AddState, GetNameFromType);
             //_addStateContextMenu = GenerateAddMenu(_stateGraph.NodeInfo.ToArray(), "Add state reference/{0}", AddStateReference, GetNameFromNode, _addStateContextMenu);
-            _addContitionContextMenu = GenerateAddMenu(AssemblyExtension.GetDerivedTypes<BaseStateTransitionCondition>(), "{0}", AddCondition, GetNameFromType);
+            _addContitionContextMenu = GenerateAddMenu(StatesAssemblyExtension.GetDerivedTypes<BaseStateTransitionCondition>(), "{0}", AddCondition, GetNameFromType);
 
             _transitionConditionsInspector.SetData(null, null, _addContitionContextMenu);
 

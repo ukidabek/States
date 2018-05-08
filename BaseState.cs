@@ -5,9 +5,7 @@ using System.Reflection;
 using System.Collections;
 using System.Collections.Generic;
 
-using BaseGameLogic.Inputs;
-
-using BaseGameLogic.LogicModule;
+using BaseGameLogic.States.Assembly;
 
 namespace BaseGameLogic.States
 {
@@ -40,7 +38,7 @@ namespace BaseGameLogic.States
 
         protected virtual void Awake() 
 		{
-			RootParent = this.transform.GetRootTransform();
+			RootParent = GetRootTransform(this.transform);
 			requiredFieldList = GetAllRequiredFields();
 
             foreach (var tranistion in _stateTransition)
@@ -62,10 +60,17 @@ namespace BaseGameLogic.States
             }
         }
 
+        public static Transform GetRootTransform(Transform parent)
+        {
+            if (parent.parent == null)
+                return parent;
+            else
+                return GetRootTransform(parent.parent);
+        }
 
         public FieldInfo[] GetAllRequiredFields()
         {
-			return AssemblyExtension.GetAllFieldsWithAttribute(this.GetType(), typeof(RequiredReferenceAttribute), true).ToArray();
+			return StatesAssemblyExtension.GetAllFieldsWithAttribute(this.GetType(), typeof(RequiredReferenceAttribute), true).ToArray();
         }
 
 		/// <summary>
@@ -74,23 +79,65 @@ namespace BaseGameLogic.States
 		/// <param name="parent"></param>
 		public void GetAllRequiredReferences(GameObject parent = null, bool overrideReference = false)
 		{
-			parent = parent == null ? this.transform.GetRootTransform().gameObject : parent;
-			LogicModulesHandler handler = parent.GetComponentDeep<LogicModulesHandler>();
+			parent = parent == null ? GetRootTransform(this.transform).gameObject : parent;
+			//LogicModulesHandler handler = GetComponentDeep<LogicModulesHandler>(parent);
 
-            GetAllRequiredReferences(handler, overrideReference);
-        }
-
-        public void GetAllRequiredReferences(LogicModulesHandler handler, bool overrideReference = false)
-        {
-			requiredFieldList = requiredFieldList == null ? GetAllRequiredFields() : requiredFieldList;
+            requiredFieldList = requiredFieldList == null ? GetAllRequiredFields() : requiredFieldList;
 
             foreach (FieldInfo field in requiredFieldList)
             {
                 if (overrideReference || field.GetValue(this) == null)
                 {
-                    field.SetValue(this, handler.GetModule(field.FieldType));
+                    field.SetValue(this, GetComponentDeep(parent, field.FieldType));
                 }
             }
+        }
+
+        //     public void GetAllRequiredReferences(MonoBehaviour handler, bool overrideReference = false)
+        //     {
+        //requiredFieldList = requiredFieldList == null ? GetAllRequiredFields() : requiredFieldList;
+
+        //         foreach (FieldInfo field in requiredFieldList)
+        //         {
+        //             if (overrideReference || field.GetValue(this) == null)
+        //             {
+        //                 field.SetValue(this, handler.GetModule(field.FieldType));
+        //             }
+        //         }
+        //     }
+
+        protected Component GetComponentDeep(GameObject gameObject, Type type, bool includeInactive = false)
+        {
+            Component component = gameObject.GetComponent(type);
+            if (component != null)
+                return component;
+
+            component = gameObject.GetComponentInChildren(type, includeInactive);
+            if (component != null)
+                return component;
+
+            component = gameObject.GetComponentInParent(type);
+            return component;
+        }
+
+        /// <summary>
+        /// Tray get component form parent, object and it's children's.
+        /// </summary>
+        /// <typeparam name="T">Type of component to find.</typeparam>
+        /// <param name="gameObject">Reference to object.</param>
+        /// <returns>Reference to component.</returns>
+        protected T GetComponentDeep<T>(GameObject gameObject, bool includeInactive = false) where T : Component
+        {
+            T component = gameObject.GetComponent<T>();
+            if (component != null)
+                return component;
+
+            component = gameObject.GetComponentInChildren<T>(includeInactive);
+            if (component != null)
+                return component;
+
+            component = gameObject.GetComponentInParent<T>();
+            return component;
         }
 
         public virtual bool EnterConditions() { return true; }
