@@ -254,7 +254,7 @@ namespace BaseGameLogic.States
             {
                 Rect scrollArea = new Rect(_graphAreaRect);
                 scrollArea.y -= 16;
-                _scrollPositon = GUI.BeginScrollView(scrollArea, _scrollPositon, _graphAreaWorkRect, false, false, new GUIStyle(), new GUIStyle());
+                _scrollPositon = GUI.BeginScrollView(scrollArea, _scrollPositon, _graphAreaWorkRect, false, false, GUIStyle.none, GUIStyle.none);
                 {
                     DrawGrid(_graphAreaWorkRect, 10, 0.2f, Color.gray);
                     DrawGrid(_graphAreaWorkRect, 100, 0.4f, Color.gray);
