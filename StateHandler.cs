@@ -87,6 +87,9 @@ namespace BaseGameLogic.States
             if(stateGraphPrefab != null)
             {
                 _graph = Instantiate(stateGraphPrefab, this.transform, false).GetComponent<StateGraph>();
+                _graph.transform.localPosition = Vector3.zero;
+                _graph.transform.rotation = Quaternion.identity;
+                _graph.transform.localScale = Vector3.one;
             }
         }
 
@@ -94,7 +97,6 @@ namespace BaseGameLogic.States
         {
             if(enterDefaultStateOnAwake)
                 EnterDefaultState();
-
         }
 
         #region MonoBehaviour methods

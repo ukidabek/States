@@ -19,9 +19,6 @@ namespace BaseGameLogic.States
         private Dictionary<BaseState, List<Node>> _statesDictionary = new Dictionary<BaseState, List<Node>>();
         private Node _selectedNode = null;
 
-        private Vector2 offset;
-        private Vector2 drag;
-
         private Rect _graphAreaRect = new Rect();
         private Rect _graphAreaWorkRect = new Rect(Vector2.zero, new Vector2(5000, 5000));
 
@@ -333,8 +330,11 @@ namespace BaseGameLogic.States
                     StateTransition transition = _stateGraph[_selectedTransition.NodeIndex, _selectedTransition.TransitionIndex];
                     _transitionConditionsInspector.DrawInspector(transition.Conditions);
                 }
+                else if(_stateInspecotr != null)
+                {
+                    _stateInspecotr.DrawInspector(_selectedNode, _stateGraph, _addContitionContextMenu);
+                }
 
-                _stateInspecotr.DrawInspector(_selectedNode, _stateGraph, _addContitionContextMenu);
             }
             GUILayout.EndArea();
         }
