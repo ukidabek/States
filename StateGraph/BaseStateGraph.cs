@@ -51,6 +51,19 @@ namespace BaseGameLogic.States
             }
         }
 
+        private void Awake()
+        {
+            Transform root = BaseState.GetRootTransform(this.transform);
+
+            foreach (var transition in _formAnyStateTransition)
+            {
+                foreach (var condition in transition.Conditions)
+                {
+                    condition.GetConditionReferences(null, root.gameObject);
+                }
+            }
+        }
+
         public void HandleTransitions(StateHandler handler) 
 		{
             _transitionDone = false;
