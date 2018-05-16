@@ -191,5 +191,20 @@ namespace BaseGameLogic.States
             currentStateTypes.RemoveAt(0);
             #endif    
         }
+
+        public void ReserState()
+        {
+            if(_graph.Type == GraphType.Stack)
+            {
+                while(statesStack.Count > 1)
+                {
+                    ExitState();
+                }
+            }
+            else
+            {
+                EnterDefaultState();
+            }
+        }
     }
 }
