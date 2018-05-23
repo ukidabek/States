@@ -4,6 +4,8 @@ using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 
+using BaseGameLogic.States.NodeDefinition;
+
 namespace BaseGameLogic.States
 {
     public class StateInspecotr : BaseStateGraphInspector

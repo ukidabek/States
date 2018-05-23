@@ -3,6 +3,8 @@ using UnityEditor;
 
 using System;
 
+using BaseGameLogic.States.NodeDefinition;
+
 namespace BaseGameLogic.States
 {
     internal class Connector 

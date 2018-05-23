@@ -6,10 +6,17 @@ using System.Collections.Generic;
 
 namespace BaseGameLogic.States
 {
+    /// <summary>
+    /// Transition to next state.
+    /// Define conditions and state to enter.
+    /// </summary>
     [Serializable]
     public class StateTransition : BaseTransition
     { 
         [SerializeField] private BaseState _targetState = null;
+        /// <summary>
+        /// State that object will be when all conditions will be met.
+        /// </summary>
         public BaseState TargetState { get { return _targetState; } }
 
         public StateTransition() {}

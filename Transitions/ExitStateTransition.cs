@@ -5,6 +5,10 @@ using UnityEngine;
 
 namespace BaseGameLogic.States
 {
+    /// <summary>
+    /// This type of transition is used when state graph in stack mode. 
+    /// Define conditions necessary to exit current active state.
+    /// </summary>
     [Serializable]
     public class ExitStateTransition : BaseTransition
     {

@@ -2,7 +2,7 @@
 
 using System;
 
-namespace BaseGameLogic.States
+namespace BaseGameLogic.States.NodeDefinition
 {
     [Serializable]
     public class Node

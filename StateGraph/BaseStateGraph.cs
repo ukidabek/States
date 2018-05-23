@@ -1,45 +1,58 @@
 ﻿using UnityEngine;
 
+using System;
 using System.Collections;
 using System.Collections.Generic;
-using System;
+
+using BaseGameLogic.States.NodeDefinition;
 
 namespace BaseGameLogic.States
 {
-    public enum GraphType
-    {
-        Stack,
-        Free
-    }
-
+    /// <summary>
+    /// State graph.
+    /// This class contains information about states, states transitions, conditions of transitions
+    /// </summary>
     public class StateGraph : MonoBehaviour
     {
         [SerializeField] private GraphType _type = GraphType.Stack;
-        public GraphType Type
-        {
-            get { return _type; }
-            set { _type = value; }
-        }
+        /// <summary>
+        /// Type of a graph.
+        /// </summary>
+        public GraphType Type { get { return _type; } set { _type = value; } }
 
         [SerializeField] private Node _fromAnyStateNode = new Node();
+        /// <summary>
+        /// Node used to define transitions form any state.
+        /// </summary>
         public Node FromAnyStateNode { get { return _fromAnyStateNode; } }
 
-        [SerializeField] private List<Node> _nodeInfo = new List<Node>();
-        public List<Node> NodeInfo { get { return _nodeInfo; } }
-
         [SerializeField] private List<StateTransition> _formAnyStateTransition = new List<StateTransition>();
+        /// <summary>
+        /// Transition form any state.
+        /// </summary>
         public List<StateTransition> FormAnyStateTransition { get { return _formAnyStateTransition; } }
 
+        [SerializeField] private List<Node> _nodeInfo = new List<Node>();
+        /// <summary>
+        /// List of all nodes in graph.
+        /// </summary>
+        public List<Node> NodeInfo { get { return _nodeInfo; } }
+
         [SerializeField] private BaseState _rootState = null;
-        public BaseState RootState
-        {
-            get { return _rootState; }
-            set { _rootState = value; }
-        }
+        /// <summary>
+        /// Root state of graph. 
+        /// This state will be treated abut default state. Object enters it on game start.
+        /// </summary>
+        public BaseState RootState { get { return _rootState; } set { _rootState = value; } }
 
         private bool _transitionDone = false;
-        public bool TransitionDone { get { return _transitionDone; } }
-
+        
+        /// <summary>
+        /// Returns stare transition.
+        /// </summary>
+        /// <param name="i">Node containing state index</param>
+        /// <param name="y">State transition index</param>
+        /// <returns>State transition</returns>
         public StateTransition this[int i, int y]
         {
             get
@@ -64,6 +77,10 @@ namespace BaseGameLogic.States
             }
         }
 
+        /// <summary>
+        /// Check all conditions in all transitions and if conditions are meat enters a new state.
+        /// </summary>
+        /// <param name="handler">State handler object</param>
         public void HandleTransitions(StateHandler handler) 
 		{
             _transitionDone = false;
@@ -83,6 +100,11 @@ namespace BaseGameLogic.States
             }
 		}
 
+        /// <summary>
+        /// Iterate by all transitions and validate it's condition.
+        /// </summary>
+        /// <param name="handler">State handler object</param>
+        /// <param name="transitions">Transition list.</param>
         private void HandleTransitionLoop(StateHandler handler, List<StateTransition> transitions)
         {
             foreach (var item in transitions)

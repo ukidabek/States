@@ -15,7 +15,10 @@ namespace BaseGameLogic.States
     public abstract class BaseState : MonoBehaviour
     {
         private StateHandler controlledObject = null;
-		public StateHandler ControlledObject
+        /// <summary>
+        /// Object controlled by the states in graph.
+        /// </summary>
+        public StateHandler ControlledObject
         {
     		get { return this.controlledObject; }
 			set { controlledObject = value; }
@@ -26,11 +29,17 @@ namespace BaseGameLogic.States
 		public Transform RootParent { get; private set; }
 
         [SerializeField] private List<StateTransition> _stateTransition = new List<StateTransition>();
+        /// <summary>
+        /// All transitions for this state
+        /// </summary>
         public List<StateTransition> Transitions { get { return _stateTransition; } }
 
         public int SelectedExitStateTransition = 0; 
 
         [SerializeField] private List<ExitStateTransition> _exitStateTransitions = new List<ExitStateTransition>();
+        /// <summary>
+        /// All exit state transitions.
+        /// </summary>
         public List<ExitStateTransition> ExitStateTransitions { get { return _exitStateTransitions; } }
 
         protected virtual void Awake() 
@@ -57,6 +66,11 @@ namespace BaseGameLogic.States
             }
         }
 
+        /// <summary>
+        /// Returns root transform of object under control of states.
+        /// </summary>
+        /// <param name="parent">Start transform position</param>
+        /// <returns>Root transform</returns>
         public static Transform GetRootTransform(Transform parent)
         {
             if (parent.parent == null)
@@ -65,6 +79,10 @@ namespace BaseGameLogic.States
                 return GetRootTransform(parent.parent);
         }
 
+        /// <summary>
+        /// Collect information for all required references for state to work.
+        /// </summary>
+        /// <returns></returns>
         public FieldInfo[] GetAllRequiredFields()
         {
 			return StatesAssemblyExtension.GetAllFieldsWithAttribute(this.GetType(), typeof(RequiredReferenceAttribute), true).ToArray();
@@ -104,7 +122,13 @@ namespace BaseGameLogic.States
         }
 
         public virtual bool EnterConditions() { return true; }
+        /// <summary>
+        /// This method is called when system enter to this state.
+        /// </summary>
         public abstract void OnEnter();
+        /// <summary>
+        /// Coaled when system exit this state.
+        /// </summary>
         public abstract void OnExit();
         public abstract void OnSleep();
         public abstract void OnAwake();

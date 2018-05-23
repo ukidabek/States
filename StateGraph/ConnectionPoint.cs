@@ -2,8 +2,11 @@
 
 using System;
 
-namespace BaseGameLogic.States
+namespace BaseGameLogic.States.NodeDefinition
 {
+    /// <summary>
+    /// Class representing connection point.
+    /// </summary>
     [Serializable]
     public partial class ConnectionPoint
     {
