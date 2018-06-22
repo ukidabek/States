@@ -26,8 +26,6 @@ namespace BaseGameLogic.States
         [SerializeField] protected bool enterDefaultStateOnStart = false;
 
         public StateGraph Graph = null;
-        //[SerializeField] protected GameObject stateGraphPrefab = null;
-
 
         protected StateInterfaceHandler _currentState = null;
         /// <summary>
