@@ -86,17 +86,16 @@ namespace BaseGameLogic.States
             _transitionDone = false;
 
             HandleTransitionLoop(handler, _formAnyStateTransition);
-            HandleTransitionLoop(handler, handler.CurrentState.Transitions);
+            HandleTransitionLoop(handler, handler.CurrentStateInterfaceHandler.CurrentState.Transitions);
 
-            if (Type == GraphType.Free || _transitionDone) return;
+            if (Type == GraphType.Free || _transitionDone)
+                return;
 
-            for (int i = 0; i < handler.CurrentState.ExitStateTransitions.Count; i++)
+            for (int i = 0; i < handler.CurrentStateInterfaceHandler.CurrentState.ExitStateTransitions.Count; i++)
             {
-                BaseTransition transition = handler.CurrentState.ExitStateTransitions[i];
+                BaseTransition transition = handler.CurrentStateInterfaceHandler.CurrentState.ExitStateTransitions[i];
                 if(transition.Validate(handler))
-                {
                     break;
-                }
             }
 		}
 

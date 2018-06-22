@@ -3,6 +3,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEngine.Serialization;
 
 namespace BaseGameLogic.States
 {
@@ -21,31 +22,32 @@ namespace BaseGameLogic.States
 
         #region States management variables
 
-		[Header("States management.")]
-        [SerializeField] protected bool enterDefaultStateOnAwake = false;
+		[Header("States management."), FormerlySerializedAs("enterDefaultStateOnAwake")]
+        [SerializeField] protected bool enterDefaultStateOnStart = false;
 
-        [SerializeField] protected StateGraph _graph = null;
-        [SerializeField] protected GameObject stateGraphPrefab = null;
+        public StateGraph Graph = null;
+        //[SerializeField] protected GameObject stateGraphPrefab = null;
 
 
-        protected BaseState _currentState = null;
+        protected StateInterfaceHandler _currentState = null;
         /// <summary>
         /// Stack of states.
         /// </summary>
-        protected Stack<BaseState> statesStack = new Stack<BaseState>();
+        protected Stack<StateInterfaceHandler> statesStack = new Stack<StateInterfaceHandler>();
         public static bool IsGamePaused = false;
 
         /// <summary>
         /// Reference to current state of the object.
         /// </summary>
-        public BaseState CurrentState
+        public StateInterfaceHandler CurrentStateInterfaceHandler
         {
             get 
             {
-                switch (_graph.Type)
+                switch (Graph.Type)
                 {
                     case GraphType.Stack:
-                        if (statesStack.Count == 0) return null;
+                        if (statesStack.Count == 0)
+                            return null;
                         return statesStack.Peek();
 
                     case GraphType.Free:
@@ -58,44 +60,51 @@ namespace BaseGameLogic.States
 
         #endregion
 
-        #region Managers references
+        public class StateInterfaceHandler
+        {
+            public BaseState CurrentState { get; private set; }
+            public IOnSleep OnSleepInterface { get; private set; }
+            public IOnAwake OnAwakeInterface { get; private set; }
+            public IOnUpdate OnUpdateInterface { get; private set; }
+            public IOnLateUpdate OnLateUpdateInterface { get; private set; }
+            public IOnFixedUpdate OnFixedUpdateInterface { get; private set; }
 
-        //protected bool GameManagerExist { get; private set; }
-        //protected BaseGameManager GameManagerInstance { get { return BaseGameManager.Instance; } }
+            public StateInterfaceHandler(BaseState state)
+            {
+                CurrentState = state;
+                OnSleepInterface = GetInterface<IOnSleep>(state);
+                OnAwakeInterface = GetInterface<IOnAwake>(state);
+                OnUpdateInterface = GetInterface<IOnUpdate>(state);
+                OnLateUpdateInterface = GetInterface<IOnLateUpdate>(state);
+                OnFixedUpdateInterface = GetInterface<IOnFixedUpdate>(state);
+            }
 
-        /// <summary>
-        /// Enable or disable execution of StateObject updates methods.
-        /// </summary>
-		//protected bool IsGamePaused { get { return GameManagerExist && GameManagerInstance.GameStatus == GameStatusEnum.Pause; } }
+            private T GetInterface<T>(BaseState state) where T : class
+            {
+                if (state is T)
+                    return state as T;
 
-        #endregion
+                return null;
+            }
+        }
 
         /// <summary>
         /// Enters the default state of the object.
         /// </summary>
         protected virtual void EnterDefaultState()
         {
-            if(_graph != null)
+            if(Graph != null)
             {
-                this.EnterState(_graph.RootState);
+                this.EnterState(Graph.RootState);
                 return;
             }
         }
 
-        protected virtual void Awake()
-        {
-            if(stateGraphPrefab != null)
-            {
-                _graph = Instantiate(stateGraphPrefab, this.transform, false).GetComponent<StateGraph>();
-                _graph.transform.localPosition = Vector3.zero;
-                _graph.transform.rotation = Quaternion.identity;
-                _graph.transform.localScale = Vector3.one;
-            }
-        }
+        protected virtual void Awake() {}
 
         protected virtual void Start () 
         {
-            if(enterDefaultStateOnAwake)
+            if(enterDefaultStateOnStart)
                 EnterDefaultState();
         }
 
@@ -104,34 +113,31 @@ namespace BaseGameLogic.States
 
         protected virtual void Update ()
         {
-            if (IsGamePaused && CurrentState != null) return;
+            if (IsGamePaused && CurrentStateInterfaceHandler != null)
+                return;
 
-            if (_graph != null)
-                _graph.HandleTransitions(this);
+            if (Graph != null)
+                Graph.HandleTransitions(this);
 
-			CurrentState.OnUpdate();
+			if(CurrentStateInterfaceHandler.OnUpdateInterface != null)
+               CurrentStateInterfaceHandler.OnUpdateInterface.OnUpdate();
         }
 
         protected virtual void LateUpdate()
         {
-            if (IsGamePaused && CurrentState != null) return;
+            if (IsGamePaused && CurrentStateInterfaceHandler != null)
+                return;
 
-            CurrentState.OnLateUpdate();
+            if (CurrentStateInterfaceHandler.OnLateUpdateInterface != null)
+                CurrentStateInterfaceHandler.OnLateUpdateInterface.OnLateUpdate();
         }
 
         protected virtual void FixedUpdate()
         {
-            if (IsGamePaused && CurrentState != null) return;
-
-            CurrentState.OnFixedUpdate();
-        }
-
-        public virtual void OnAnimatorIK(int layerIndex)
-        {
-            if (IsGamePaused && CurrentState != null)
+            if (IsGamePaused && CurrentStateInterfaceHandler != null)
                 return;
-
-            CurrentState.OnAnimatorIK(layerIndex);
+            if (CurrentStateInterfaceHandler.OnFixedUpdateInterface != null)
+                CurrentStateInterfaceHandler.OnFixedUpdateInterface.OnFixedUpdate();
         }
 
         #endregion
@@ -147,22 +153,21 @@ namespace BaseGameLogic.States
 
             if (newState.EnterConditions())
             {
-                if(_graph.Type == GraphType.Stack)
+                var stateHandler = new StateInterfaceHandler(newState);
+                if (Graph.Type == GraphType.Stack)
                 {
                     if (statesStack.Count > 0)
-                        CurrentState.OnSleep();
+                        if(CurrentStateInterfaceHandler.OnSleepInterface != null)
+                            CurrentStateInterfaceHandler.OnSleepInterface.OnSleep();
                     
-                    statesStack.Push(newState);
+                    statesStack.Push(stateHandler);
                 }
                 else
-                {
-                    _currentState = newState;
-                }
+                    _currentState = stateHandler;
 
                 newState.ControlledObject = this;
                 newState.GetAllRequiredReferences(this.gameObject, true);
-                CurrentState.ControlledObject = this;
-                CurrentState.OnEnter();
+                newState.OnEnter();
 
                 #if UNITY_EDITOR
 				currentStateTypes.Insert(0, newState.GetType().Name);
@@ -180,12 +185,15 @@ namespace BaseGameLogic.States
         /// </summary>
         public void ExitState()
         {
-            if (_graph.Type == GraphType.Free) return;
+            if (Graph.Type == GraphType.Free)
+                return;
 
-            BaseState oldState = statesStack.Pop();
+            BaseState oldState = statesStack.Pop().CurrentState;
             oldState.ControlledObject = null;
             oldState.OnExit();
-            CurrentState.OnAwake();
+
+            if(CurrentStateInterfaceHandler.OnAwakeInterface != null)
+                CurrentStateInterfaceHandler.OnAwakeInterface.OnAwake();
 
             #if UNITY_EDITOR
             currentStateTypes.RemoveAt(0);
@@ -194,17 +202,11 @@ namespace BaseGameLogic.States
 
         public void ReserState()
         {
-            if(_graph.Type == GraphType.Stack)
-            {
+            if(Graph.Type == GraphType.Stack)
                 while(statesStack.Count > 1)
-                {
                     ExitState();
-                }
-            }
             else
-            {
                 EnterDefaultState();
-            }
         }
     }
 }

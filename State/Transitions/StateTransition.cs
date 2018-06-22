@@ -30,7 +30,7 @@ namespace BaseGameLogic.States
         {
             for (int i = 0; i < Conditions.Capacity; i++)
             {
-                if (!Conditions[i].Validate() || _targetState == stateHandler.CurrentState)
+                if (!Conditions[i].Validate() || _targetState == stateHandler.CurrentStateInterfaceHandler.CurrentState)
                     return false;
             }
 

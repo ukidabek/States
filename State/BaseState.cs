@@ -48,22 +48,16 @@ namespace BaseGameLogic.States
 			requiredFieldList = GetAllRequiredFields();
 
             foreach (var tranistion in _stateTransition)
-            {
                 FillConditionReference(this, RootParent.gameObject, tranistion.Conditions);
-            }
 
             foreach (var item in _exitStateTransitions)
-            {
                 FillConditionReference(this, RootParent.gameObject, item.Conditions);
-            }
         }
 
         private void FillConditionReference(BaseState baseState, GameObject parent, List<BaseStateTransitionCondition> conditions)
         {
             foreach (var condition in conditions)
-            {
                 condition.GetConditionReferences(baseState, parent);
-            }
         }
 
         /// <summary>
@@ -99,12 +93,8 @@ namespace BaseGameLogic.States
             requiredFieldList = requiredFieldList == null ? GetAllRequiredFields() : requiredFieldList;
 
             foreach (FieldInfo field in requiredFieldList)
-            {
                 if (overrideReference || field.GetValue(this) == null)
-                {
                     field.SetValue(this, GetComponentDeep(parent, field.FieldType));
-                }
-            }
         }
 
         protected Component GetComponentDeep(GameObject gameObject, Type type, bool includeInactive = false)
@@ -130,13 +120,7 @@ namespace BaseGameLogic.States
         /// Coaled when system exit this state.
         /// </summary>
         public abstract void OnExit();
-        public abstract void OnSleep();
-        public abstract void OnAwake();
-        public virtual void UpdateAnimator() {}
-        public abstract void OnUpdate();
-        public abstract void OnLateUpdate();
-        public abstract void OnFixedUpdate();
-        public virtual void HandleAnimator() {}
+
         public virtual void OnAnimatorIK(int layerIndex) {}
     }
 }
