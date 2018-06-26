@@ -66,7 +66,7 @@ namespace BaseGameLogic.States
 
         private void Awake()
         {
-            Transform root = BaseState.GetRootTransform(this.transform);
+            Transform root = StateUtility.GetRootTransform(this.transform);
 
             foreach (var transition in _formAnyStateTransition)
             {
@@ -83,17 +83,18 @@ namespace BaseGameLogic.States
         /// <param name="handler">State handler object</param>
         public void HandleTransitions(StateHandler handler) 
 		{
+            var state = (handler.CurrentStateInterfaceHandler.CurrentState as BaseState);
             _transitionDone = false;
 
             HandleTransitionLoop(handler, _formAnyStateTransition);
-            HandleTransitionLoop(handler, handler.CurrentStateInterfaceHandler.CurrentState.Transitions);
+            HandleTransitionLoop(handler, state.Transitions);
 
             if (Type == GraphType.Free || _transitionDone)
                 return;
 
-            for (int i = 0; i < handler.CurrentStateInterfaceHandler.CurrentState.ExitStateTransitions.Count; i++)
+            for (int i = 0; i < state.ExitStateTransitions.Count; i++)
             {
-                BaseTransition transition = handler.CurrentStateInterfaceHandler.CurrentState.ExitStateTransitions[i];
+                BaseTransition transition = state.ExitStateTransitions[i];
                 if(transition.Validate(handler))
                     break;
             }

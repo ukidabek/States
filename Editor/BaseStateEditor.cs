@@ -18,18 +18,18 @@ namespace BaseGameLogic.States
         public override void OnInspectorGUI() 
         {
             base.OnInspectorGUI();
-            if(GUILayout.Button(GET_ALL_REQUIRED_LABEL))
-            {
-                Undo.RecordObject(state, GET_ALL_REQUIRED_LABEL);
-                EditorGUI.BeginChangeCheck();
-                {
-                    state.GetAllRequiredReferences();
-                }
-                if(EditorGUI.EndChangeCheck())
-                {
-                    EditorUtility.SetDirty(state);
-                }
-            }
+            //if(GUILayout.Button(GET_ALL_REQUIRED_LABEL))
+            //{
+            //    Undo.RecordObject(state, GET_ALL_REQUIRED_LABEL);
+            //    EditorGUI.BeginChangeCheck();
+            //    {
+            //        state.GetAllRequiredReferences();
+            //    }
+            //    if(EditorGUI.EndChangeCheck())
+            //    {
+            //        EditorUtility.SetDirty(state);
+            //    }
+            //}
         }
     }
 }

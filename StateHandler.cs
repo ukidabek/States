@@ -60,14 +60,14 @@ namespace BaseGameLogic.States
 
         public class StateInterfaceHandler
         {
-            public BaseState CurrentState { get; private set; }
+            public IState CurrentState { get; private set; }
             public IOnSleep OnSleepInterface { get; private set; }
             public IOnAwake OnAwakeInterface { get; private set; }
             public IOnUpdate OnUpdateInterface { get; private set; }
             public IOnLateUpdate OnLateUpdateInterface { get; private set; }
             public IOnFixedUpdate OnFixedUpdateInterface { get; private set; }
 
-            public StateInterfaceHandler(BaseState state)
+            public StateInterfaceHandler(IState state)
             {
                 CurrentState = state;
                 OnSleepInterface = GetInterface<IOnSleep>(state);
@@ -77,7 +77,7 @@ namespace BaseGameLogic.States
                 OnFixedUpdateInterface = GetInterface<IOnFixedUpdate>(state);
             }
 
-            private T GetInterface<T>(BaseState state) where T : class
+            private T GetInterface<T>(object state) where T : class
             {
                 if (state is T)
                     return state as T;
@@ -144,12 +144,12 @@ namespace BaseGameLogic.States
         /// Enter a new state. 
         /// </summary>
         /// <param name="newState"> New state instance.</param>
-        public void EnterState(BaseState newState)
+        public void EnterState(IState newState)
         {
             if(newState == null)
                 return;
 
-            if (newState.EnterConditions())
+            if (/*newState.EnterConditions()*/true)
             {
                 var stateHandler = new StateInterfaceHandler(newState);
                 if (Graph.Type == GraphType.Stack)
@@ -164,7 +164,8 @@ namespace BaseGameLogic.States
                     _currentState = stateHandler;
 
                 newState.ControlledObject = this;
-                newState.GetAllRequiredReferences(this.gameObject, true);
+                var requiredFields = StateUtility.GetAllRequiredFields(newState);
+                StateUtility.GetAllRequiredReferences(newState, requiredFields, this.gameObject);
                 newState.OnEnter();
 
                 #if UNITY_EDITOR
@@ -186,7 +187,7 @@ namespace BaseGameLogic.States
             if (Graph.Type == GraphType.Free)
                 return;
 
-            BaseState oldState = statesStack.Pop().CurrentState;
+            IState oldState = statesStack.Pop().CurrentState;
             oldState.ControlledObject = null;
             oldState.OnExit();
 
