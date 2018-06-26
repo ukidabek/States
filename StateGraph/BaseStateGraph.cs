@@ -46,7 +46,9 @@ namespace BaseGameLogic.States
         public BaseState RootState { get { return _rootState; } set { _rootState = value; } }
 
         private bool _transitionDone = false;
-        
+
+        public StateHandler Handler;
+
         /// <summary>
         /// Returns stare transition.
         /// </summary>
@@ -115,6 +117,11 @@ namespace BaseGameLogic.States
                     break;
                 }
             }
+        }
+
+        protected virtual void Update()
+        {
+            HandleTransitions(Handler);
         }
     }
 }

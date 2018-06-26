@@ -22,15 +22,27 @@ namespace BaseGameLogic.States
         /// Get all references to fields marked with RequiredReference attribute 
         /// </summary>
         /// <param name="parent"></param>
-        public static void GetAllRequiredReferences(object state, FieldInfo[] requiredFieldList,  GameObject parent = null, bool overrideReference = false)
+        public static bool GetAllRequiredReferences(object state, FieldInfo[] requiredFieldList,  GameObject parent, bool overrideReference = false)
         {
-            //parent = parent == null ? GetRootTransform(this.transform).gameObject : parent;
-
-            //requiredFieldList = requiredFieldList == null ? GetAllRequiredFields() : requiredFieldList;
-
+            bool continsAllComponents = true;
             foreach (FieldInfo field in requiredFieldList)
                 if (overrideReference || field.GetValue(state) == null)
-                    field.SetValue(state, GetComponentDeep(parent, field.FieldType));
+                {
+                    var component = GetComponentDeep(parent, field.FieldType);
+                    if(component == null)
+                    {
+                        Debug.LogErrorFormat("Object {0} don't contain all required components type of {1} for state {2}",
+                            parent.name, field.FieldType.ToString(), state.GetType().ToString());
+                        if (continsAllComponents)
+                            continsAllComponents = false;
+                    }
+                    else
+                    {
+                        field.SetValue(state, component);
+                    }
+                }
+
+            return continsAllComponents;
         }
 
         protected static Component GetComponentDeep(GameObject gameObject, Type type, bool includeInactive = false)

@@ -25,9 +25,6 @@ namespace BaseGameLogic.States
 		[Header("States management."), FormerlySerializedAs("enterDefaultStateOnAwake")]
         [SerializeField] protected bool enterDefaultStateOnStart = false;
 
-        public StateGraph Graph = null;
-
-        protected StateInterfaceHandler _currentState = null;
         /// <summary>
         /// Stack of states.
         /// </summary>
@@ -37,24 +34,9 @@ namespace BaseGameLogic.States
         /// <summary>
         /// Reference to current state of the object.
         /// </summary>
-        public StateInterfaceHandler CurrentStateInterfaceHandler
-        {
-            get 
-            {
-                switch (Graph.Type)
-                {
-                    case GraphType.Stack:
-                        if (statesStack.Count == 0)
-                            return null;
-                        return statesStack.Peek();
+        public StateInterfaceHandler CurrentStateInterfaceHandler { get { return statesStack.Peek(); } }
 
-                    case GraphType.Free:
-                        return _currentState;
-                }
-
-                return null;
-            }
-        }
+        public bool KeepStatesOnStack = true;
 
         #endregion
 
@@ -86,25 +68,9 @@ namespace BaseGameLogic.States
             }
         }
 
-        /// <summary>
-        /// Enters the default state of the object.
-        /// </summary>
-        protected virtual void EnterDefaultState()
-        {
-            if(Graph != null)
-            {
-                this.EnterState(Graph.RootState);
-                return;
-            }
-        }
-
         protected virtual void Awake() {}
 
-        protected virtual void Start () 
-        {
-            if(enterDefaultStateOnStart)
-                EnterDefaultState();
-        }
+        protected virtual void Start () {}
 
         #region MonoBehaviour methods
 
@@ -113,9 +79,6 @@ namespace BaseGameLogic.States
         {
             if (IsGamePaused && CurrentStateInterfaceHandler != null)
                 return;
-
-            if (Graph != null)
-                Graph.HandleTransitions(this);
 
 			if(CurrentStateInterfaceHandler.OnUpdateInterface != null)
                CurrentStateInterfaceHandler.OnUpdateInterface.OnUpdate();
@@ -149,23 +112,20 @@ namespace BaseGameLogic.States
             if(newState == null)
                 return;
 
-            if (/*newState.EnterConditions()*/true)
+            var requiredFields = StateUtility.GetAllRequiredFields(newState);
+            if (StateUtility.GetAllRequiredReferences(newState, requiredFields, this.gameObject))
             {
                 var stateHandler = new StateInterfaceHandler(newState);
-                if (Graph.Type == GraphType.Stack)
-                {
+                if (KeepStatesOnStack)
                     if (statesStack.Count > 0)
                         if(CurrentStateInterfaceHandler.OnSleepInterface != null)
                             CurrentStateInterfaceHandler.OnSleepInterface.OnSleep();
-                    
-                    statesStack.Push(stateHandler);
-                }
                 else
-                    _currentState = stateHandler;
+                    statesStack.Pop();
+
+                statesStack.Push(stateHandler);
 
                 newState.ControlledObject = this;
-                var requiredFields = StateUtility.GetAllRequiredFields(newState);
-                StateUtility.GetAllRequiredReferences(newState, requiredFields, this.gameObject);
                 newState.OnEnter();
 
                 #if UNITY_EDITOR
@@ -184,7 +144,7 @@ namespace BaseGameLogic.States
         /// </summary>
         public void ExitState()
         {
-            if (Graph.Type == GraphType.Free)
+            if (KeepStatesOnStack)
                 return;
 
             IState oldState = statesStack.Pop().CurrentState;
@@ -201,11 +161,8 @@ namespace BaseGameLogic.States
 
         public void ReserState()
         {
-            if(Graph.Type == GraphType.Stack)
-                while(statesStack.Count > 1)
-                    ExitState();
-            else
-                EnterDefaultState();
+            while(statesStack.Count > 1)
+                ExitState();
         }
     }
 }
