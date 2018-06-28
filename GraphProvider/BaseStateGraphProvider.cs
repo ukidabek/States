@@ -5,7 +5,6 @@ namespace BaseGameLogic.States
     public abstract class BaseStateGraphProvider : MonoBehaviour
     {
         [SerializeField] private StateHandler _stateHandler = null;
-        [SerializeField] private bool _enterDefaultState = true;
         public abstract StateGraph Graph { get; }
 
         private void Awake()

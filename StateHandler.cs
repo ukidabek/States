@@ -10,7 +10,7 @@ namespace BaseGameLogic.States
     /// <summary>
     /// Base game object.
     /// </summary>
-    public class StateHandler : MonoBehaviour
+    public partial class StateHandler : MonoBehaviour
     {
         #if UNITY_EDITOR
 
@@ -22,9 +22,6 @@ namespace BaseGameLogic.States
 
         #region States management variables
 
-		[Header("States management."), FormerlySerializedAs("enterDefaultStateOnAwake")]
-        [SerializeField] protected bool enterDefaultStateOnStart = false;
-
         /// <summary>
         /// Stack of states.
         /// </summary>
@@ -35,53 +32,18 @@ namespace BaseGameLogic.States
         /// Reference to current state of the object.
         /// </summary>
         public StateInterfaceHandler CurrentStateInterfaceHandler { get { return statesStack.Peek(); } }
-
         public bool KeepStatesOnStack = true;
 
         #endregion
 
-        public class StateInterfaceHandler
-        {
-            public IState CurrentState { get; private set; }
-            public IOnSleep OnSleepInterface { get; private set; }
-            public IOnAwake OnAwakeInterface { get; private set; }
-            public IOnUpdate OnUpdateInterface { get; private set; }
-            public IOnLateUpdate OnLateUpdateInterface { get; private set; }
-            public IOnFixedUpdate OnFixedUpdateInterface { get; private set; }
-
-            public StateInterfaceHandler(IState state)
-            {
-                CurrentState = state;
-                OnSleepInterface = GetInterface<IOnSleep>(state);
-                OnAwakeInterface = GetInterface<IOnAwake>(state);
-                OnUpdateInterface = GetInterface<IOnUpdate>(state);
-                OnLateUpdateInterface = GetInterface<IOnLateUpdate>(state);
-                OnFixedUpdateInterface = GetInterface<IOnFixedUpdate>(state);
-            }
-
-            private T GetInterface<T>(object state) where T : class
-            {
-                if (state is T)
-                    return state as T;
-
-                return null;
-            }
-        }
-
-        protected virtual void Awake() {}
-
-        protected virtual void Start () {}
-
         #region MonoBehaviour methods
-
 
         protected virtual void Update ()
         {
             if (IsGamePaused && CurrentStateInterfaceHandler != null)
                 return;
 
-			if(CurrentStateInterfaceHandler.OnUpdateInterface != null)
-               CurrentStateInterfaceHandler.OnUpdateInterface.OnUpdate();
+            CurrentStateInterfaceHandler.Update();
         }
 
         protected virtual void LateUpdate()
@@ -89,16 +51,15 @@ namespace BaseGameLogic.States
             if (IsGamePaused && CurrentStateInterfaceHandler != null)
                 return;
 
-            if (CurrentStateInterfaceHandler.OnLateUpdateInterface != null)
-                CurrentStateInterfaceHandler.OnLateUpdateInterface.OnLateUpdate();
+            CurrentStateInterfaceHandler.LateUpdate();
         }
 
         protected virtual void FixedUpdate()
         {
             if (IsGamePaused && CurrentStateInterfaceHandler != null)
                 return;
-            if (CurrentStateInterfaceHandler.OnFixedUpdateInterface != null)
-                CurrentStateInterfaceHandler.OnFixedUpdateInterface.OnFixedUpdate();
+
+            CurrentStateInterfaceHandler.FixedUpdate();
         }
 
         #endregion
@@ -113,13 +74,13 @@ namespace BaseGameLogic.States
                 return;
 
             var requiredFields = StateUtility.GetAllRequiredFields(newState);
-            if (StateUtility.GetAllRequiredReferences(newState, requiredFields, this.gameObject))
+            if (StateUtility.GetAllRequiredReferences(newState, requiredFields, gameObject))
             {
                 var stateHandler = new StateInterfaceHandler(newState);
                 if (KeepStatesOnStack)
                     if (statesStack.Count > 0)
                         if(CurrentStateInterfaceHandler.OnSleepInterface != null)
-                            CurrentStateInterfaceHandler.OnSleepInterface.OnSleep();
+                            CurrentStateInterfaceHandler.Sleep();
                 else
                     statesStack.Pop();
 
@@ -152,7 +113,7 @@ namespace BaseGameLogic.States
             oldState.OnExit();
 
             if(CurrentStateInterfaceHandler.OnAwakeInterface != null)
-                CurrentStateInterfaceHandler.OnAwakeInterface.OnAwake();
+                CurrentStateInterfaceHandler.Awake();
 
             #if UNITY_EDITOR
             currentStateTypes.RemoveAt(0);
