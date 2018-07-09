@@ -3,13 +3,12 @@ using UnityEditor;
 using UnityEditor.SceneManagement;
 
 using System;
-using System.Collections;
 using System.Collections.Generic;
 
-using BaseGameLogic.States.Assembly;
-using BaseGameLogic.States.NodeDefinition;
+using BaseGameLogic.States.Utility.Assembly;
+using BaseGameLogic.States.Graph.NodeDefinition;
 
-namespace BaseGameLogic.States
+namespace BaseGameLogic.States.Graph
 {
     public class StateGraphEditorWindow : EditorWindow
     {

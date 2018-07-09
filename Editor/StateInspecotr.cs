@@ -1,12 +1,9 @@
 ﻿using UnityEditor;
 using UnityEngine;
 
-using System.Collections;
-using System.Collections.Generic;
+using BaseGameLogic.States.Graph.NodeDefinition;
 
-using BaseGameLogic.States.NodeDefinition;
-
-namespace BaseGameLogic.States
+namespace BaseGameLogic.States.Graph
 {
     public class StateInspecotr : BaseStateGraphInspector
     {

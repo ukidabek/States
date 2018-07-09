@@ -1,4 +1,4 @@
-﻿namespace BaseGameLogic.States.NodeDefinition
+﻿namespace BaseGameLogic.States.Graph.NodeDefinition
 {
     /// <summary>
     /// Type of connection point.

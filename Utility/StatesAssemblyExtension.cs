@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 
-namespace BaseGameLogic.States.Assembly
+namespace BaseGameLogic.States.Utility.Assembly
 {
     public static class StatesAssemblyExtension
     {

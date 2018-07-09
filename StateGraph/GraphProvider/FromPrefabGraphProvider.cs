@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace BaseGameLogic.States
+namespace BaseGameLogic.States.Graph.Providers
 {
     public class FromPrefabGraphProvider : BaseStateGraphProvider
     {

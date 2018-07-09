@@ -1,4 +1,4 @@
-﻿namespace BaseGameLogic.States
+﻿namespace BaseGameLogic.States.Graph
 {
     /// <summary>
     /// Type of state graph.

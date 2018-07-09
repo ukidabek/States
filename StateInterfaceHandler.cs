@@ -3,11 +3,11 @@
     public class StateInterfaceHandler
     {
         public IState CurrentState { get; private set; }
-        public IOnSleep OnSleepInterface { get; private set; }
-        public IOnAwake OnAwakeInterface { get; private set; }
-        public IOnUpdate OnUpdateInterface { get; private set; }
-        public IOnLateUpdate OnLateUpdateInterface { get; private set; }
-        public IOnFixedUpdate OnFixedUpdateInterface { get; private set; }
+        private IOnSleep OnSleepInterface { get; set; }
+        private IOnAwake OnAwakeInterface { get; set; }
+        private IOnUpdate OnUpdateInterface { get; set; }
+        private IOnLateUpdate OnLateUpdateInterface { get; set; }
+        private IOnFixedUpdate OnFixedUpdateInterface { get; set; }
 
         public StateInterfaceHandler(IState state)
         {
@@ -25,6 +25,16 @@
                 return state as T;
 
             return null;
+        }
+
+        public void Enter()
+        {
+            CurrentState.OnEnter();
+        }
+
+        public void Exit()
+        {
+            CurrentState.OnExit();
         }
 
         public void Sleep()

@@ -4,7 +4,7 @@ using UnityEditor;
 using System.Collections;
 using System.Collections.Generic;
 
-namespace BaseGameLogic.States
+namespace BaseGameLogic.States.Graph
 {
     [CustomEditor(typeof(StateGraph), true)]
     public class BaseStateGraphEditor : Editor

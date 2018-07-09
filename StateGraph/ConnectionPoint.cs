@@ -2,7 +2,7 @@
 
 using System;
 
-namespace BaseGameLogic.States.NodeDefinition
+namespace BaseGameLogic.States.Graph.NodeDefinition
 {
     /// <summary>
     /// Class representing connection point.

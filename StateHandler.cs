@@ -4,6 +4,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine.Serialization;
+using BaseGameLogic.States.Utility;
 
 namespace BaseGameLogic.States
 {
@@ -78,16 +79,16 @@ namespace BaseGameLogic.States
             {
                 var stateHandler = new StateInterfaceHandler(newState);
                 if (KeepStatesOnStack)
+                {
                     if (statesStack.Count > 0)
-                        if(CurrentStateInterfaceHandler.OnSleepInterface != null)
-                            CurrentStateInterfaceHandler.Sleep();
+                        CurrentStateInterfaceHandler.Sleep();
+                }
                 else
-                    statesStack.Pop();
+                    statesStack.Pop().Exit();
 
                 statesStack.Push(stateHandler);
 
-                newState.ControlledObject = this;
-                newState.OnEnter();
+                CurrentStateInterfaceHandler.Enter();
 
                 #if UNITY_EDITOR
 				currentStateTypes.Insert(0, newState.GetType().Name);
@@ -108,12 +109,9 @@ namespace BaseGameLogic.States
             if (KeepStatesOnStack)
                 return;
 
-            IState oldState = statesStack.Pop().CurrentState;
-            oldState.ControlledObject = null;
-            oldState.OnExit();
-
-            if(CurrentStateInterfaceHandler.OnAwakeInterface != null)
-                CurrentStateInterfaceHandler.Awake();
+            CurrentStateInterfaceHandler.Exit();
+            statesStack.Pop();
+            CurrentStateInterfaceHandler.Awake();
 
             #if UNITY_EDITOR
             currentStateTypes.RemoveAt(0);

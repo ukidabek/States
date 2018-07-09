@@ -3,9 +3,9 @@ using UnityEditor;
 
 using System;
 
-using BaseGameLogic.States.NodeDefinition;
+using BaseGameLogic.States.Graph.NodeDefinition;
 
-namespace BaseGameLogic.States
+namespace BaseGameLogic.States.Graph
 {
     internal class Connector 
     {

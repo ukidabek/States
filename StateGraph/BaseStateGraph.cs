@@ -1,12 +1,11 @@
 ﻿using UnityEngine;
 
-using System;
-using System.Collections;
 using System.Collections.Generic;
 
-using BaseGameLogic.States.NodeDefinition;
+using BaseGameLogic.States.Graph.NodeDefinition;
+using BaseGameLogic.States.Utility;
 
-namespace BaseGameLogic.States
+namespace BaseGameLogic.States.Graph
 {
     /// <summary>
     /// State graph.

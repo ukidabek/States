@@ -1,11 +1,10 @@
-﻿using BaseGameLogic.States.Assembly;
+﻿using UnityEngine;
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using System.Reflection;
-using UnityEngine;
 
-namespace BaseGameLogic.States
+using BaseGameLogic.States.Utility.Assembly;
+
+namespace BaseGameLogic.States.Utility
 {
     public class StateUtility
     {
@@ -31,7 +30,7 @@ namespace BaseGameLogic.States
                     var component = GetComponentDeep(parent, field.FieldType);
                     if(component == null)
                     {
-                        Debug.LogErrorFormat("Object {0} don't contain all required components type of {1} for state {2}",
+                        Debug.LogErrorFormat("Object {0} don't contain all required components type of {1} for {2}",
                             parent.name, field.FieldType.ToString(), state.GetType().ToString());
                         if (continsAllComponents)
                             continsAllComponents = false;

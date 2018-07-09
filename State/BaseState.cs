@@ -1,11 +1,9 @@
 ﻿using UnityEngine;
 
-using System;
 using System.Reflection;
-using System.Collections;
 using System.Collections.Generic;
 
-using BaseGameLogic.States.Assembly;
+using BaseGameLogic.States.Utility;
 
 namespace BaseGameLogic.States
 {
@@ -14,19 +12,9 @@ namespace BaseGameLogic.States
     /// </summary>
     public abstract class BaseState : MonoBehaviour, IState
     {
-        [SerializeField] private StateHandler controlledObject = null;
-        /// <summary>
-        /// Object controlled by the states in graph.
-        /// </summary>
-        public StateHandler ControlledObject
-        {
-    		get { return this.controlledObject; }
-			set { controlledObject = value; }
-    	}
-
 		private FieldInfo[] requiredFieldList = null;
 
-		public Transform RootParent { get; private set; }
+        public Transform RootParent = null;
 
         [SerializeField] private List<StateTransition> _stateTransition = new List<StateTransition>();
         /// <summary>
@@ -60,58 +48,6 @@ namespace BaseGameLogic.States
                 condition.GetConditionReferences(baseState, parent);
         }
 
-  //      /// <summary>
-  //      /// Returns root transform of object under control of states.
-  //      /// </summary>
-  //      /// <param name="parent">Start transform position</param>
-  //      /// <returns>Root transform</returns>
-  //      public static Transform GetRootTransform(Transform parent)
-  //      {
-  //          if (parent.parent == null)
-  //              return parent;
-  //          else
-  //              return GetRootTransform(parent.parent);
-  //      }
-
-  //      /// <summary>
-  //      /// Collect information for all required references for state to work.
-  //      /// </summary>
-  //      /// <returns></returns>
-  //      public FieldInfo[] GetAllRequiredFields()
-  //      {
-		//	return StatesAssemblyExtension.GetAllFieldsWithAttribute(this.GetType(), typeof(RequiredReferenceAttribute), true).ToArray();
-  //      }
-
-		///// <summary>
-		///// Get all references to fields marked with RequiredReference attribute 
-		///// </summary>
-		///// <param name="parent"></param>
-		//public void GetAllRequiredReferences(GameObject parent = null, bool overrideReference = false)
-		//{
-		//	parent = parent == null ? GetRootTransform(this.transform).gameObject : parent;
-
-  //          requiredFieldList = requiredFieldList == null ? GetAllRequiredFields() : requiredFieldList;
-
-  //          foreach (FieldInfo field in requiredFieldList)
-  //              if (overrideReference || field.GetValue(this) == null)
-  //                  field.SetValue(this, GetComponentDeep(parent, field.FieldType));
-  //      }
-
-  //      protected Component GetComponentDeep(GameObject gameObject, Type type, bool includeInactive = false)
-  //      {
-  //          Component component = gameObject.GetComponent(type);
-  //          if (component != null)
-  //              return component;
-
-  //          component = gameObject.GetComponentInChildren(type, includeInactive);
-  //          if (component != null)
-  //              return component;
-
-  //          component = gameObject.GetComponentInParent(type);
-  //          return component;
-  //      }
-
-        public virtual bool EnterConditions() { return true; }
         /// <summary>
         /// This method is called when system enter to this state.
         /// </summary>
