@@ -19,18 +19,14 @@ namespace BaseGameLogic.States.Utility.Assembly
             return GetDerivedTypes(typeof(T));
         }
 
-        public static Type[] GetDerivedTypes(Type baseType)
+        public static Type[] GetDerivedTypes(Type baseType, bool isAbstract = false) 
         {
-            return baseType.Assembly.GetTypes().Where(type => (type.IsSubclassOf(baseType) && !type.IsAbstract)).ToArray();
+            return baseType.Assembly.GetTypes().Where(type => (type.IsSubclassOf(baseType) && type.IsAbstract == isAbstract)).ToArray();
         }
 
         public static FieldInfo[] GetAllFieldsWithAttribute<Type, AttributeType>()
         {
             return GetAllFieldsWithAttribute(typeof(Type), typeof(AttributeType));
-        }
-        public static FieldInfo[] GetAllFieldsWithAttribute<T>(this Type type)
-        {
-            return GetAllFieldsWithAttribute(type, typeof(T));
         }
 
         private static FieldInfo[] GetAllFieldsWithAttribute(Type inType, Type attributeType)
@@ -39,14 +35,15 @@ namespace BaseGameLogic.States.Utility.Assembly
                 field => field.GetCustomAttributes(false).Any(attribute => attribute.GetType() == attributeType)).ToArray();
         }
 
-        public static List<FieldInfo> GetAllFieldsWithAttribute(Type inType, Type attributeType, bool inBaseType = false)
+        public static List<FieldInfo> GetAllFieldsWithAttribute(Type inType, Type attributeType, Type baseType = null)
         {
             List<FieldInfo> fields = new List<FieldInfo>();
-            if (inType == typeof(MonoBehaviour)) return fields;
+            var currentType = baseType == null ? typeof(MonoBehaviour) : baseType;
+            if (inType == currentType)
+                return fields;
 
             fields.AddRange(GetAllFieldsWithAttribute(inType, attributeType));
-            if (inBaseType)
-                fields.AddRange(GetAllFieldsWithAttribute(inType.BaseType, attributeType, inBaseType));
+            fields.AddRange(GetAllFieldsWithAttribute(inType.BaseType, attributeType, baseType));
 
             return fields;
         }

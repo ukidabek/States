@@ -14,7 +14,7 @@ namespace BaseGameLogic.States.Utility
         /// <returns></returns>
         public static FieldInfo[] GetAllRequiredFields(object state)
         {
-            return StatesAssemblyExtension.GetAllFieldsWithAttribute(state.GetType(), typeof(RequiredReferenceAttribute), true).ToArray();
+            return StatesAssemblyExtension.GetAllFieldsWithAttribute(state.GetType(), typeof(RequiredReferenceAttribute)).ToArray();
         }
 
         /// <summary>
