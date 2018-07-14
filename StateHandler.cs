@@ -73,9 +73,8 @@ namespace BaseGameLogic.States
         {
             if(newState == null)
                 return;
-
-            var requiredFields = StateUtility.GetAllRequiredFields(newState);
-            if (StateUtility.GetAllRequiredReferences(newState, requiredFields, gameObject))
+            var requirement = StateUtility.GetAllRequirements(newState);
+            if (StateUtility.GetAllRequiredReferences(requirement, gameObject, true))
             {
                 var stateHandler = new StateInterfaceHandler(newState);
                 if (KeepStatesOnStack)

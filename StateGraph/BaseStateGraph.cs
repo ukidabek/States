@@ -68,14 +68,12 @@ namespace BaseGameLogic.States.Graph
         private void Awake()
         {
             Transform root = StateUtility.GetRootTransform(this.transform);
+            List<StateUtility.Requirement> requirement = new List<StateUtility.Requirement>();
 
-            foreach (var transition in _formAnyStateTransition)
-            {
-                foreach (var condition in transition.Conditions)
-                {
-                    condition.GetConditionReferences(null, root.gameObject);
-                }
-            }
+            for (int i = 0; i < _formAnyStateTransition.Count; i++)
+                requirement.AddRange(StateUtility.GetAllRequirements(_formAnyStateTransition[i]));
+
+            StateUtility.GetAllRequiredReferences(requirement.ToArray(), root.gameObject, true);
         }
 
         /// <summary>

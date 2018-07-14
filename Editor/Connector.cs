@@ -36,11 +36,13 @@ namespace BaseGameLogic.States.Graph
             switch (type)
             {
                 case ConnectionPointType.In:
-                    if (_inNode == null) _inNode = state;
+                    if (_inNode == null)
+                        _inNode = state;
                     _inNodeSelected = true;
                     break;
                 case ConnectionPointType.Out:
-                    if (_outNode == null) _outNode = state;
+                    if (_outNode == null)
+                        _outNode = state;
                     if (_graph != null) _formAnyStateTransition = true;
                     _outNodeSelected = true;
                     break;
@@ -49,7 +51,7 @@ namespace BaseGameLogic.States.Graph
             if(_graph == null && !_formAnyStateTransition && _inNode != null && _outNode != null)
             {
                 Undo.RecordObject(_outNode.gameObject, "Transition added");
-                _outNode.Transitions.Add(new StateTransition(_inNode));
+                _outNode.Transitions.Add(new StateTransition(_outNode,_inNode));
 
                 if(SetDirty != null)
                 {
@@ -62,7 +64,7 @@ namespace BaseGameLogic.States.Graph
             {
                 Undo.RecordObject(_inNode.gameObject, "From Any state transition added");
 
-                _graph.FormAnyStateTransition.Add(new StateTransition(_inNode));
+                _graph.FormAnyStateTransition.Add(new StateTransition(_outNode, _inNode));
 
                 if (SetDirty != null)
                 {

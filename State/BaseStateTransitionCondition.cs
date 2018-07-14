@@ -8,14 +8,14 @@ namespace BaseGameLogic.States
 {
     public abstract class BaseStateTransitionCondition : MonoBehaviour
     {
-        protected BaseState state = null;
+        public BaseState State = null;
 
-        public void GetConditionReferences(BaseState state, GameObject parent)
-        {
-            this.state = state;
-            var requiredFields = StateUtility.GetAllRequiredFields(this);
-            StateUtility.GetAllRequiredReferences(this, requiredFields, parent);
-        }
+        //public void GetConditionReferences(BaseState state, GameObject parent)
+        //{
+        //    this.State = state;
+        //    var requiredFields = StateUtility.GetAllRequiredFields(this);
+        //    StateUtility.GetAllRequiredReferences(this, requiredFields, parent);
+        //}
 
         public abstract bool Validate();
     }

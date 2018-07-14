@@ -38,7 +38,7 @@ namespace BaseGameLogic.States.Utility.Assembly
         public static List<FieldInfo> GetAllFieldsWithAttribute(Type inType, Type attributeType, Type baseType = null)
         {
             List<FieldInfo> fields = new List<FieldInfo>();
-            var currentType = baseType == null ? typeof(MonoBehaviour) : baseType;
+            var currentType = baseType;
             if (inType == currentType)
                 return fields;
 

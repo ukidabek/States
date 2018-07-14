@@ -12,7 +12,8 @@ namespace BaseGameLogic.States
     /// </summary>
     [Serializable]
     public class StateTransition : BaseTransition
-    { 
+    {
+        [SerializeField] private BaseState _ownerState = null;
         [SerializeField] private BaseState _targetState = null;
         /// <summary>
         /// State that object will be when all conditions will be met.
@@ -21,8 +22,9 @@ namespace BaseGameLogic.States
 
         public StateTransition() {}
 
-        public StateTransition(BaseState targetState)
+        public StateTransition(BaseState ownerState, BaseState targetState)
         {
+            _ownerState = ownerState;
             _targetState = targetState;
         }
 

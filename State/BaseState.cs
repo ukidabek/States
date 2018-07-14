@@ -12,11 +12,9 @@ namespace BaseGameLogic.States
     /// </summary>
     public abstract class BaseState : MonoBehaviour, IState
     {
-		private FieldInfo[] requiredFieldList = null;
-
         public Transform RootParent = null;
 
-        [SerializeField] private List<StateTransition> _stateTransition = new List<StateTransition>();
+        [SerializeField, RequiredReference] private List<StateTransition> _stateTransition = new List<StateTransition>();
         /// <summary>
         /// All transitions for this state
         /// </summary>
@@ -24,7 +22,7 @@ namespace BaseGameLogic.States
 
         public int SelectedExitStateTransition = 0; 
 
-        [SerializeField] private List<ExitStateTransition> _exitStateTransitions = new List<ExitStateTransition>();
+        [SerializeField, RequiredReference] private List<ExitStateTransition> _exitStateTransitions = new List<ExitStateTransition>();
         /// <summary>
         /// All exit state transitions.
         /// </summary>
@@ -32,20 +30,19 @@ namespace BaseGameLogic.States
 
         protected virtual void Awake() 
 		{
-			RootParent = StateUtility.GetRootTransform(this.transform);
-			requiredFieldList = StateUtility.GetAllRequiredFields(this);
+            RootParent = StateUtility.GetRootTransform(transform);
 
             foreach (var tranistion in _stateTransition)
-                FillConditionReference(this, RootParent.gameObject, tranistion.Conditions);
+                FillConditionReference(this, tranistion.Conditions);
 
             foreach (var item in _exitStateTransitions)
-                FillConditionReference(this, RootParent.gameObject, item.Conditions);
+                FillConditionReference(this, item.Conditions);
         }
 
-        private void FillConditionReference(BaseState baseState, GameObject parent, List<BaseStateTransitionCondition> conditions)
+        private void FillConditionReference(BaseState baseState, List<BaseStateTransitionCondition> conditions)
         {
             foreach (var condition in conditions)
-                condition.GetConditionReferences(baseState, parent);
+                condition.State = baseState;
         }
 
         /// <summary>
