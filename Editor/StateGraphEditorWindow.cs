@@ -5,8 +5,8 @@ using UnityEditor.SceneManagement;
 using System;
 using System.Collections.Generic;
 
-using BaseGameLogic.States.Utility.Assembly;
 using BaseGameLogic.States.Graph.NodeDefinition;
+using BaseGameLogic.States.Utility;
 
 namespace BaseGameLogic.States.Graph
 {
