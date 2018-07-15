@@ -13,8 +13,8 @@ namespace BaseGameLogic.States
     [Serializable]
     public class StateTransition : BaseTransition
     {
-        [SerializeField] private BaseState _ownerState = null;
-        [SerializeField] private BaseState _targetState = null;
+        [SerializeField] protected BaseState _ownerState = null;
+        [SerializeField] protected BaseState _targetState = null;
         /// <summary>
         /// State that object will be when all conditions will be met.
         /// </summary>
@@ -32,7 +32,7 @@ namespace BaseGameLogic.States
         {
             for (int i = 0; i < Conditions.Capacity; i++)
             {
-                if (!Conditions[i].Validate() || _targetState == stateHandler.CurrentStateInterfaceHandler.CurrentState)
+                if (!Conditions[i].Validate() || (_targetState as IState) == stateHandler.CurrentStateInterfaceHandler.CurrentState)
                     return false;
             }
 

@@ -32,7 +32,7 @@ namespace BaseGameLogic.States
         /// <summary>
         /// Reference to current state of the object.
         /// </summary>
-        public StateInterfaceHandler CurrentStateInterfaceHandler { get { return statesStack.Peek(); } }
+        public StateInterfaceHandler CurrentStateInterfaceHandler { get { return statesStack.Count == 0 ? null : statesStack.Peek(); } }
         public bool KeepStatesOnStack = true;
 
         #endregion
@@ -41,7 +41,7 @@ namespace BaseGameLogic.States
 
         protected virtual void Update ()
         {
-            if (IsGamePaused && CurrentStateInterfaceHandler != null)
+            if (IsGamePaused || CurrentStateInterfaceHandler == null)
                 return;
 
             CurrentStateInterfaceHandler.Update();
@@ -49,7 +49,7 @@ namespace BaseGameLogic.States
 
         protected virtual void LateUpdate()
         {
-            if (IsGamePaused && CurrentStateInterfaceHandler != null)
+            if (IsGamePaused || CurrentStateInterfaceHandler == null)
                 return;
 
             CurrentStateInterfaceHandler.LateUpdate();
@@ -57,7 +57,7 @@ namespace BaseGameLogic.States
 
         protected virtual void FixedUpdate()
         {
-            if (IsGamePaused && CurrentStateInterfaceHandler != null)
+            if (IsGamePaused || CurrentStateInterfaceHandler == null)
                 return;
 
             CurrentStateInterfaceHandler.FixedUpdate();

@@ -1,0 +1,18 @@
+﻿using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+namespace BaseGameLogic.States.Providers
+{
+    public abstract class BaseStateProvider : MonoBehaviour
+    {
+        [SerializeField] private StateHandler _stateHandler = null;
+        public abstract IState DefaultState { get; }
+
+        protected virtual void Start()
+        {
+            if (_stateHandler != null)
+                _stateHandler.EnterState(DefaultState);
+        }
+    }
+}
