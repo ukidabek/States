@@ -105,12 +105,10 @@ namespace BaseGameLogic.States
         /// </summary>
         public void ExitState()
         {
-            if (KeepStatesOnStack)
-                return;
-
             CurrentStateInterfaceHandler.Exit();
             statesStack.Pop();
-            CurrentStateInterfaceHandler.Awake();
+            if(CurrentStateInterfaceHandler != null)
+                CurrentStateInterfaceHandler.Awake();
 
             #if UNITY_EDITOR
             currentStateTypes.RemoveAt(0);

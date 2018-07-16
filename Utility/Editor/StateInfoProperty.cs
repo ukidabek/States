@@ -8,13 +8,13 @@ using System.Collections.Generic;
 
 namespace BaseGameLogic.States.Utility
 {
-    [CustomPropertyDrawer(typeof(StateInfo))]
+    [CustomPropertyDrawer(typeof(StateConstructor))]
     public class StateInfoProperty : PropertyDrawer
     {
         private List<string> constructorNames = new List<string>();
-        private List<StateInfo> _stateInfoList = new List<StateInfo>();
+        private List<StateConstructor> _stateInfoList = new List<StateConstructor>();
 
-        private StateInfo stateInfo = null;
+        private StateConstructor stateInfo = null;
         private FieldInfo field = null;
 
         public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
@@ -22,41 +22,31 @@ namespace BaseGameLogic.States.Utility
             if (stateInfo == null)
             {
                 field = property.serializedObject.targetObject.GetType().GetField(property.propertyPath, BindingFlags.NonPublic | BindingFlags.Instance);
-                stateInfo = field.GetValue(property.serializedObject.targetObject) as StateInfo;
+                stateInfo = field.GetValue(property.serializedObject.targetObject) as StateConstructor;
             }
 
             if (constructorNames.Count == 0)
             {
-                var types = new List<Type>(AppDomain.CurrentDomain.GetAssemblies().SelectMany(s => s.GetTypes()).Where(Conditions));
-                for (int i = 0; i < types.Count; i++)
+                foreach (var type in GetTypes())
                 {
-                    var constructors = types[i].GetConstructors();
-                    for (int j = 0; j < constructors.Length; j++)
+                    foreach (var constructor in type.GetConstructors())
                     {
-                        var info = new StateInfo(constructors[j]);
-                        string constructor = string.Empty;
-                        constructor += constructors[j].DeclaringType.Name;
-
-                        for (int k = 0; k < info.Parameters.Length; k++)
-                        {
-                            Type parameterType = info.Parameters[k].Type;
-                            constructor += string.Format(" {0} {1}", parameterType.Name, info.Parameters[k].ParameterName);
-                        }
-                        _stateInfoList.Add(info);
-                        constructorNames.Add(constructor);
+                        _stateInfoList.Add(new StateConstructor(constructor));
+                        constructorNames.Add(_stateInfoList[_stateInfoList.Count - 1].Name);
                     }
                 }
 
-                if (string.IsNullOrEmpty(stateInfo.Type.TypeName) && string.IsNullOrEmpty(stateInfo.Type.AssemblFullName))
+                if (string.IsNullOrEmpty(stateInfo.Type.FullName) && string.IsNullOrEmpty(stateInfo.Type.AssemblFullName))
                     stateInfo = _stateInfoList[0];
             }
 
-            return EditorGUIUtility.singleLineHeight * (stateInfo.Parameters.Length + 1);
+            return EditorGUIUtility.singleLineHeight * (stateInfo.Parameters.Length + 2);
         }
 
-        private bool Conditions(Type arg)
+        private Type[] GetTypes()
         {
-            return (typeof(IState)).IsAssignableFrom(arg) && arg.BaseType == typeof(System.Object) && !arg.IsInterface;
+            Func<Type, bool> quiry = (Type arg) => { return (typeof(IState)).IsAssignableFrom(arg) && arg.BaseType == typeof(System.Object) && !arg.IsInterface; };
+            return AppDomain.CurrentDomain.GetAssemblies().SelectMany(s => s.GetTypes()).Where(quiry).ToArray();
         }
 
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
@@ -70,6 +60,8 @@ namespace BaseGameLogic.States.Utility
 
             Rect rect = position;
             rect.height = EditorGUIUtility.singleLineHeight;
+            GUI.Label(rect, new GUIContent(property.displayName));
+            rect.y += EditorGUIUtility.singleLineHeight;
             index = EditorGUI.Popup(rect, index, constructorNames.ToArray());
             for (int i = 0; i < stateInfo.Parameters.Length; i++)
             {
@@ -80,6 +72,15 @@ namespace BaseGameLogic.States.Utility
                 {
                     case "Int32":
                         stateInfo.Parameters[i].IntValue = EditorGUI.IntField(rect, parameterLabel, stateInfo.Parameters[i].IntValue);
+                        break;
+                    case "Single":
+                        stateInfo.Parameters[i].FloatValue = EditorGUI.FloatField(rect, parameterLabel, stateInfo.Parameters[i].FloatValue);
+                        break;
+                    case "Boolean":
+                        stateInfo.Parameters[i].BoolValue = EditorGUI.Toggle(rect, parameterLabel, stateInfo.Parameters[i].BoolValue);
+                        break;
+                    case "String":
+                        stateInfo.Parameters[i].StringValue = EditorGUI.TextField(rect, parameterLabel, stateInfo.Parameters[i].StringValue);
                         break;
                     default:
                         stateInfo.Parameters[i].ObjectValue = EditorGUI.ObjectField(rect, parameterLabel, stateInfo.Parameters[i].ObjectValue, parametersType, true);

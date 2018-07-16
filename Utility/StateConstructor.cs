@@ -6,22 +6,18 @@ using System.Reflection;
 
 namespace BaseGameLogic.States.Utility
 {
-    using Assembly = System.Reflection.Assembly;
-    [Serializable] public class StateInfo
+    [Serializable] public class StateConstructor
     {
-        [SerializeField] TypeInfo _type = null;
-        public TypeInfo Type { get { return _type; } }
-
-        [SerializeField] private ConstructorParameter[] _parameters = null;
-        public ConstructorParameter[] Parameters { get { return _parameters; } }
-
         [Serializable] public class TypeInfo
         {
             [SerializeField] private string _assemblFullName = string.Empty;
             public string AssemblFullName { get { return _assemblFullName; } }
 
             [SerializeField] private string _typeName = string.Empty;
-            public string TypeName { get { return _typeName; } }
+            public string FullName { get { return _typeName; } }
+
+            [SerializeField] private string _name = string.Empty;
+            public string Name { get { return _name; } }
 
             private Type _type = null;
 
@@ -29,9 +25,8 @@ namespace BaseGameLogic.States.Utility
             {
                 _assemblFullName = type.Assembly.GetName().FullName;
                 _typeName = type.FullName;
+                _name = type.Name;
             }
-
-
 
             private bool AssemblyQuiry(Assembly assembly)
             {
@@ -64,6 +59,9 @@ namespace BaseGameLogic.States.Utility
 
             public UnityEngine.Object ObjectValue;
             public int IntValue = 0;
+            public float FloatValue = 0f;
+            public bool BoolValue = false;
+            public string StringValue = string.Empty;
 
             public ConstructorParameter(ParameterInfo parameterInfo)
             {
@@ -86,19 +84,36 @@ namespace BaseGameLogic.States.Utility
                 {
                     case "Int32":
                         return IntValue;
+                    case "Single":
+                        return FloatValue;
+                    case "Boolean":
+                        return BoolValue;
+                    case "String":
+                        return StringValue;
                     default:
                         return ObjectValue;
                 }
             }
         }
 
-        public StateInfo() { }
-        public StateInfo(Type type)
+        [SerializeField] private TypeInfo _type = null;
+        public TypeInfo Type { get { return _type; } }
+
+        [SerializeField] private ConstructorParameter[] _parameters = null;
+        public ConstructorParameter[] Parameters { get { return _parameters; } }
+
+        [SerializeField] private string _name = string.Empty;
+        public string Name { get { return _name; } }
+
+        public StateConstructor() { }
+
+        public StateConstructor(Type type)
         {
             _type = new TypeInfo(type);
+            _name = string.Format("{0} (", type.Name);
         }
 
-        public StateInfo(ConstructorInfo info) : this(info.DeclaringType)
+        public StateConstructor(ConstructorInfo info) : this(info.DeclaringType)
         {
             var parameters = info.GetParameters();
             _parameters = new ConstructorParameter[parameters.Length];
@@ -106,7 +121,9 @@ namespace BaseGameLogic.States.Utility
             for (int i = 0; i < parameters.Length; i++)
             {
                 _parameters[i] = new ConstructorParameter(parameters[i]);
+                _name += string.Format("{0} {1}{2}", _parameters[i].Type.Name, _parameters[i].ParameterName, i < parameters.Length - 1 ? ", " : "");
             }
+            _name += ")";
         }
 
         public IState GetInstance()
@@ -122,8 +139,8 @@ namespace BaseGameLogic.States.Utility
         public override int GetHashCode()
         {
             int value = 0;
-            for (int i = 0; i < _type.TypeName.Length; i++)
-                value += _type.TypeName[i];
+            for (int i = 0; i < _type.FullName.Length; i++)
+                value += _type.FullName[i];
 
             for (int i = 0; i < _parameters.Length; i++)
                 value += _parameters[i].GetHashCode();
@@ -139,12 +156,12 @@ namespace BaseGameLogic.States.Utility
             return GetHashCode() == obj.GetHashCode();
         }
 
-        public static bool operator !=(StateInfo a, StateInfo b)
+        public static bool operator != (StateConstructor a, StateConstructor b)
         {
             return !(a == b);
         }
 
-        public static bool operator ==(StateInfo a, StateInfo b)
+        public static bool operator == (StateConstructor a, StateConstructor b)
         {
             if (ReferenceEquals(a, null) && ReferenceEquals(b, null))
                 return true;
