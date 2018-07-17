@@ -3,7 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 
 namespace BaseGameLogic.States.Providers
-{
+{ 
+    [RequireComponent(typeof(StateHandler))]
     public abstract class BaseStateProvider : MonoBehaviour
     {
         [SerializeField] private StateHandler _stateHandler = null;
@@ -13,6 +14,11 @@ namespace BaseGameLogic.States.Providers
         {
             if (_stateHandler != null)
                 _stateHandler.EnterState(DefaultState);
+        }
+
+        private void Reset()
+        {
+            _stateHandler = GetComponent<StateHandler>();
         }
     }
 }
