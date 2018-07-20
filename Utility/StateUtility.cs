@@ -107,7 +107,7 @@ namespace BaseGameLogic.States.Utility
                 var component = GetComponentDeep(parent, field.FieldType);
                 if (component == null)
                 {
-                    Debug.LogErrorFormat("Object {0} don't contain all required components type of {1} for {2}",
+                    Debug.LogErrorFormat("Object {0} don't contain all required components! Component type of {1} is missing for {2}",
                         parent.name, field.FieldType.ToString(), @object.GetType().ToString());
                     return false;
                 }
