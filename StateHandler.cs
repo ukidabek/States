@@ -120,5 +120,11 @@ namespace BaseGameLogic.States
             while(statesStack.Count > 1)
                 ExitState();
         }
+
+        public void ClearStack()
+        {
+            while (statesStack.Count > 0)
+                ExitState();
+        }
     }
 }
