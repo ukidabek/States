@@ -8,6 +8,7 @@ namespace BaseGameLogic.States.Providers
     public abstract class BaseStateProvider : MonoBehaviour
     {
         [SerializeField] private StateHandler _stateHandler = null;
+        [SerializeField] private bool _enterDefaultState = true;
         public abstract IState DefaultState { get; }
 
         protected virtual void Start()
@@ -17,7 +18,7 @@ namespace BaseGameLogic.States.Providers
 
         public void EnterDefaultState()
         {
-            if (_stateHandler != null)
+            if (_enterDefaultState && _stateHandler != null)
                 _stateHandler.EnterState(DefaultState);
         }
 
