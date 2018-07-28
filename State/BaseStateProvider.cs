@@ -13,12 +13,13 @@ namespace BaseGameLogic.States.Providers
 
         protected virtual void Start()
         {
-            EnterDefaultState();
+            if (_enterDefaultState)
+                EnterDefaultState();
         }
 
         public void EnterDefaultState()
         {
-            if (_enterDefaultState && _stateHandler != null)
+            if(_stateHandler != null)
                 _stateHandler.EnterState(DefaultState);
         }
 
