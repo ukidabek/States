@@ -10,6 +10,7 @@ namespace BaseGameLogic.States.Utility
 {
     public class StateUtility
     {
+        private static Dictionary<Type, List<Requirement>> _typeRequirementsDictionary = new Dictionary<Type, List<Requirement>>();
 
         public class Requirement
         {
@@ -47,18 +48,28 @@ namespace BaseGameLogic.States.Utility
 
         public static Requirement[] GetAllRequirements(object @object)
         {
-            var fieldList = StatesAssemblyExtension.GetAllFieldsWithAttribute(@object.GetType(), typeof(RequiredReferenceAttribute));
-            List<Requirement> requirement = new List<Requirement>();
-
-            for (int i = 0; i < fieldList.Count; i++)
+            var type = @object.GetType();
+            List<Requirement> requirements = null;
+            if(_typeRequirementsDictionary.TryGetValue(type, out requirements))
             {
-                if (fieldList[i].FieldType.IsArray || fieldList[i].FieldType.GetInterfaces().Contains(typeof(IList)))
-                    requirement.AddRange(GetRequirementsInList(fieldList[i].GetValue(@object) as IList));
-                else
-                    requirement.Add(new Requirement(@object, fieldList[i]));
+                return requirements.ToArray();
             }
+            else
+            {
+                requirements = new List<Requirement>();
 
-            return requirement.ToArray();
+                var fieldList = StatesAssemblyExtension.GetAllFieldsWithAttribute(type, typeof(RequiredReferenceAttribute));
+
+                for (int i = 0; i < fieldList.Count; i++)
+                {
+                    if (fieldList[i].FieldType.IsArray || fieldList[i].FieldType.GetInterfaces().Contains(typeof(IList)))
+                        requirements.AddRange(GetRequirementsInList(fieldList[i].GetValue(@object) as IList));
+                    else
+                        requirements.Add(new Requirement(@object, fieldList[i]));
+                }
+                _typeRequirementsDictionary.Add(type, requirements);
+                return requirements.ToArray();
+            }
         }
 
 
@@ -120,6 +131,7 @@ namespace BaseGameLogic.States.Utility
             return true;
         }
 
+        [Obsolete("GetAllRequiredReferences(Requirement[], GameObject , bool) is obsolete use GetAllRequiredReferences(object, Requirement[], GameObject, bool).")]
         public static bool GetAllRequiredReferences(Requirement[] requiredFieldList, GameObject parent, bool overrideReference = false)
         {
             bool continsAllComponents = true;
@@ -132,6 +144,20 @@ namespace BaseGameLogic.States.Utility
 
             return continsAllComponents;
         }
+
+        public static bool GetAllRequiredReferences(object @object, Requirement[] requiredFieldList, GameObject parent, bool overrideReference = false)
+        {
+            bool continsAllComponents = true;
+            for (int i = 0; i < requiredFieldList.Length; i++)
+            {
+                continsAllComponents = SetField(@object, parent, requiredFieldList[i].FieldInfo, overrideReference);
+                if (!continsAllComponents)
+                    break;
+            }
+
+            return continsAllComponents;
+        }
+
 
         protected static Component GetComponentDeep(GameObject gameObject, Type type, bool includeInactive = false)
         {
