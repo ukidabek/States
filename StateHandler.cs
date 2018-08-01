@@ -33,8 +33,12 @@ namespace BaseGameLogic.States
         /// Reference to current state of the object.
         /// </summary>
         public StateInterfaceHandler CurrentStateInterfaceHandler { get { return statesStack.Count == 0 ? null : statesStack.Peek(); } }
+
+
         public bool KeepStatesOnStack = true;
 
+        private Dictionary<Type, object> _componentsDictionary = new Dictionary<Type, object>();
+        public Dictionary<Type, object> ComponentsDictionary { get { return _componentsDictionary; } }
         #endregion
 
         #region MonoBehaviour methods
@@ -125,6 +129,11 @@ namespace BaseGameLogic.States
         {
             while (statesStack.Count > 0)
                 ExitState();
+        }
+
+        private void OnDestroy()
+        {
+            StateUtility.StateHandlerDestoryed(this);
         }
     }
 }

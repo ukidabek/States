@@ -11,6 +11,8 @@ namespace BaseGameLogic.States.Utility
     public class StateUtility
     {
         private static Dictionary<Type, List<Requirement>> _typeRequirementsDictionary = new Dictionary<Type, List<Requirement>>();
+        private static Dictionary<GameObject, Dictionary<Type,object>> _componentsDictionary = new Dictionary<GameObject, Dictionary<Type, object>>();
+
 
         public class Requirement
         {
@@ -113,18 +115,34 @@ namespace BaseGameLogic.States.Utility
 
         public static bool SetField(object @object, GameObject parent, FieldInfo field, bool overrideReference = false)
         {
+            Dictionary<Type, object> componentdictionary = null;
+            if (!_componentsDictionary.TryGetValue(parent, out componentdictionary))
+            {
+                componentdictionary = new Dictionary<Type, object>();
+                _componentsDictionary.Add(parent, componentdictionary);
+            }
+
             if (overrideReference || field.GetValue(@object) == null)
             {
-                var component = GetComponentDeep(parent, field.FieldType);
-                if (component == null)
+                object component = null;
+                if(componentdictionary.TryGetValue(field.FieldType, out component))
                 {
-                    Debug.LogErrorFormat("Object {0} don't contain all required components! Component type of {1} is missing for {2}",
-                        parent.name, field.FieldType.ToString(), @object.GetType().ToString());
-                    return false;
+                    field.SetValue(@object, component);
                 }
                 else
                 {
-                    field.SetValue(@object, component);
+                    component = GetComponentDeep(parent, field.FieldType);
+                    if (component == null)
+                    {
+                        Debug.LogErrorFormat("Object {0} don't contain all required components! Component type of {1} is missing for {2}",
+                            parent.name, field.FieldType.ToString(), @object.GetType().ToString());
+                        return false;
+                    }
+                    else
+                    {
+                        componentdictionary.Add(field.FieldType, component);
+                        field.SetValue(@object, component);
+                    }
                 }
             }
 
@@ -158,7 +176,6 @@ namespace BaseGameLogic.States.Utility
             return continsAllComponents;
         }
 
-
         protected static Component GetComponentDeep(GameObject gameObject, Type type, bool includeInactive = false)
         {
             Component component = gameObject.GetComponent(type);
@@ -184,6 +201,11 @@ namespace BaseGameLogic.States.Utility
                 return parent;
             else
                 return GetRootTransform(parent.parent);
+        }
+
+        public static void StateHandlerDestoryed(StateHandler stateHandler)
+        {
+            _componentsDictionary.Remove(stateHandler.gameObject);
         }
     }
 }
