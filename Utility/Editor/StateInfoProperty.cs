@@ -46,6 +46,9 @@ namespace BaseGameLogic.States.Utility
         private Type[] GetTypes()
         {
             Func<Type, bool> quiry = (Type arg) => { return (typeof(IState)).IsAssignableFrom(arg) && arg.BaseType == typeof(System.Object) && !arg.IsInterface; };
+            var enumeroatr = AppDomain.CurrentDomain.GetAssemblies().SelectMany(s => s.GetTypes()).Where(quiry);
+            if (enumeroatr.Count() == 0)
+                return null;
             return AppDomain.CurrentDomain.GetAssemblies().SelectMany(s => s.GetTypes()).Where(quiry).ToArray();
         }
 
@@ -56,6 +59,12 @@ namespace BaseGameLogic.States.Utility
             {
                 stateInfo = _stateInfoList[index = 0];
                 field.SetValue(property.serializedObject.targetObject, stateInfo);
+            }
+
+            if (_stateInfoList.Count < 0)
+            {
+                EditorGUI.LabelField(position, new GUIContent(string.Format("There is no classes that implement {0}.", (typeof(IState)).Name)));
+                return;
             }
 
             Rect rect = position;
@@ -93,6 +102,8 @@ namespace BaseGameLogic.States.Utility
                 stateInfo = _stateInfoList[index];
                 field.SetValue(property.serializedObject.targetObject, stateInfo);
             }
+
+            property.serializedObject.ApplyModifiedProperties();
         }
     }
 }
