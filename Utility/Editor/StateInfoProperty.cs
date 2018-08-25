@@ -104,6 +104,7 @@ namespace BaseGameLogic.States.Utility
             }
 
             property.serializedObject.ApplyModifiedProperties();
+            property.serializedObject.UpdateIfRequiredOrScript();
         }
     }
 }
