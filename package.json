@@ -9,6 +9,6 @@
   },
   "unity": "2021.1",
   "dependencies": {
-    "com.cooki.general": "1.0.0"
+    "com.cooki.utilities": "1.0.0"
   }
 }
