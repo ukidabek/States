@@ -1,4 +1,6 @@
-﻿namespace Utilities.States
+﻿using Utilities.General;
+
+namespace Utilities.States
 {
     public abstract class StateTransitionLogicWithCoroutineBase : StateTransitionLogicBase
     {
