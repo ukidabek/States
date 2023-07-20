@@ -1,0 +1,11 @@
+{
+  "name": "com.cooki.states",
+  "version": "1.0.0",
+  "displayName": "States",
+  "description": "This package provides a implementation a generic state machine.",
+  "author": {
+    "name": "\u0141ukasz D\u0105bek",
+    "email": "ukidabek@gmail.com"
+  },
+  "unity": "2021.1"
+}
