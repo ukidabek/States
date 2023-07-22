@@ -23,7 +23,7 @@ namespace Utilities.States
 		public override void OnInspectorGUI()
 		{
 			base.OnInspectorGUI();
-			if (GUILayout.Button("Get all state logic components"))
+			if (GUILayout.Button($"Get all {nameof(IStateLogic)}"))
 			{
 				var stateLogic = m_state
 					.GetComponents<IStateLogic>()

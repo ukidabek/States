@@ -22,14 +22,22 @@ namespace Utilities.States
 		public override void OnInspectorGUI()
 		{
 			base.OnInspectorGUI();
-			var selectedStateMachine = m_statesMachines.ObjectSelector(ref m_show, "Select state machine",
-				stateMachine => stateMachine.Name);
-
-			if(selectedStateMachine != null && selectedStateMachine is Object unityObjectStateMachine)
-			{
-				m_objectProperty.objectReferenceValue = unityObjectStateMachine;
-				serializedObject.ApplyModifiedProperties();
-			}
+			m_statesMachines.ObjectSelector(ref m_show, 
+				$"Select {nameof(IStateMachine)}",
+				(stateMachine) =>
+				{
+					if (stateMachine is Object unityObjectStateMachine)
+					{
+						m_objectProperty.objectReferenceValue = unityObjectStateMachine;
+						serializedObject.ApplyModifiedProperties();
+					}
+				},
+				(stateMachine) =>
+				{
+					if (stateMachine is Component component)
+						return $"{component.gameObject.GetFullName()}/{stateMachine.Name}";
+					return stateMachine.Name;
+				});
 		}
 	}
 }

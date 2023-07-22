@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace Utilities.States
 {
@@ -8,9 +9,12 @@ namespace Utilities.States
 	public class SubStateMachine : StateLogic, IStateMachine
 	{
 		[SerializeField] private State _currentState = null;
-		[SerializeField] private Object[] m_stateLogicExecutorsObjects = null;
-		[SerializeField] private Object[] m_stateTransitionObject;
+		[FormerlySerializedAs("m_stateLogicExecutorsObjects")]
+		[SerializeField] private Object[] m_logicExecutor = null;
+		[FormerlySerializedAs("m_stateLogicExecutorsObjects")]
+		[SerializeField] private Object[] m_stateTransition = null;
 		[SerializeField] private Object[] m_stateProcessors = null;
+		[Space]
 		[SerializeField] private StateSetter m_defaultStateSetter = null;
 
 		public string Name => name;
@@ -25,12 +29,12 @@ namespace Utilities.States
 		{
 			if (m_stateMachine == null)
 			{
-				m_stateLogicExecutors = m_stateLogicExecutorsObjects.OfType<IStateLogicExecutor>();
+				m_stateLogicExecutors = m_logicExecutor.OfType<IStateLogicExecutor>();
 
 				m_stateMachine = new StateMachine(
 					$"{name}{nameof(SubStateMachine)}",
 					m_stateLogicExecutors,
-					m_stateTransitionObject.OfType<IStateTransitionLogic>(),
+					m_stateTransition.OfType<IStateTransitionLogic>(),
 					m_stateProcessors.OfType<IStatePreProcessor>(),
 					m_stateProcessors.OfType<IStatePostProcessor>());
 

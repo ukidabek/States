@@ -9,8 +9,9 @@ namespace Utilities.States
         [SerializeField] private State m_currentState = null;
 		[SerializeField] private Object[] m_logicExecutor;
         [SerializeField] private Object[] m_stateTransitions = null;
-		[SerializeField] private StateSetter m_defaultStateSetter = null;
 		[SerializeField] private Object[] m_stateProcessors = null;
+		[Space]
+		[SerializeField] private StateSetter m_defaultStateSetter = null;
 
 		public string Name => name;
 
