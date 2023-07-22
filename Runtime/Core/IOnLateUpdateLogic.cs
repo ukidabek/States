@@ -1,6 +1,6 @@
 ﻿namespace Utilities.States
 {
-    public interface IOnLateUpdateLogic
+	public interface IOnLateUpdateLogic : IUpdateLogic
     {
         void OnLateUpdate(float deltaTime, float timeScale);
     }

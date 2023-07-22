@@ -45,6 +45,10 @@ namespace Utilities.States
             }
 
 			CurrentState?.Exit();
+
+            foreach (var stateLogicExecutor in _stateLogicExecutor)
+                stateLogicExecutor.RemoveLogicToExecute(CurrentState);
+
 			_statePostProcessors.Process(CurrentState);
 			CurrentState = statToEnter;
 

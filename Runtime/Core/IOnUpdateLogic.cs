@@ -1,7 +1,7 @@
 ﻿namespace Utilities.States
 {
-    public interface IOnUpdateLogic
-    {
+    public interface IOnUpdateLogic : IUpdateLogic
+	{
         void OnUpdate(float deltaTime, float timeScale);
     }
 }

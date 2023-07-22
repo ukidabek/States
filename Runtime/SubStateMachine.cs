@@ -4,6 +4,7 @@ using UnityEngine;
 
 namespace Utilities.States
 {
+	[AddComponentMenu("States/StateLogic/SubStateMachine")]
 	public class SubStateMachine : StateLogic, IStateMachine
 	{
 		[SerializeField] private State _currentState = null;

@@ -1,8 +1,10 @@
-﻿using Utilities.General;
+﻿using UnityEngine;
+using Utilities.General;
 
 namespace Utilities.States
 {
-    public abstract class StateTransitionLogicWithCoroutineBase : StateTransitionLogicBase
+	[AddComponentMenu("States/StateLogic/Transitions/StateTransitionLogicWithCoroutineBase")]
+	public abstract class StateTransitionLogicWithCoroutineBase : StateTransitionLogicBase
     {
         protected CoroutineManager _manager;
 

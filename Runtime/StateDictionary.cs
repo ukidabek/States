@@ -4,6 +4,7 @@ using UnityEngine;
 
 namespace Utilities.States
 {
+	[AddComponentMenu("States/Core/StateDictionary")]
 	public class StateDictionary : MonoBehaviour
 	{
 		[SerializeField] private Object m_stateMachineObject = null;

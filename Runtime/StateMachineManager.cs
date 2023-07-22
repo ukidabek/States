@@ -3,6 +3,7 @@ using UnityEngine;
 
 namespace Utilities.States
 {
+	[AddComponentMenu("States/Core/StateMachineManager")]
     public class StateMachineManager : MonoBehaviour, IStateMachine
     {
         [SerializeField] private State m_currentState = null;

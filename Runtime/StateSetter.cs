@@ -1,10 +1,10 @@
-﻿using UnityEditor.VersionControl;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.Assertions;
 using UnityEngine.Serialization;
 
 namespace Utilities.States
 {
+	[AddComponentMenu("States/Core/StateSetter")]
 	public class StateSetter : MonoBehaviour
 	{
 #if UNITY_EDITOR

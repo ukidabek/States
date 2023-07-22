@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace Utilities.States
 {
-
+    [AddComponentMenu("States/Core/State")]
 	public class State : MonoBehaviour, IState
     {
         [SerializeField] private StateID m_stateID;

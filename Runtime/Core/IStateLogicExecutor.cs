@@ -4,5 +4,6 @@
     {
         bool Enabled { get; set; }
         void SetLogicToExecute(IState state);
-    }
+		void RemoveLogicToExecute(IState state);
+	}
 }
