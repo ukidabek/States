@@ -56,7 +56,7 @@ namespace Utilities.States
 
 			m_stateMachines.ObjectSelector(ref m_showStateMachines,
 				$"Select {nameof(IStateMachine)}",
-				(selectedStateMachine) => StateEditorHelper.ApplyObject(selectedStateMachine, m_stateSerializedProperty),
+				(selectedStateMachine) => StateEditorHelper.ApplyObject(selectedStateMachine, m_stateMachineSerializedProperty),
 				(stateMachine) =>
 				{
 					if (stateMachine is Component component)
@@ -67,7 +67,7 @@ namespace Utilities.States
 
 			m_states.ObjectSelector(ref m_showStateSelections,
 				$"Select {nameof(IState)}",
-				(selectedStateMachine) => StateEditorHelper.ApplyObject(selectedStateMachine, m_stateSerializedProperty),
+				(selectedState) => StateEditorHelper.ApplyObject(selectedState, m_stateSerializedProperty),
 				(state) =>
 				{
 					if (state is Component component)
