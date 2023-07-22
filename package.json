@@ -1,6 +1,6 @@
 {
   "name": "com.cooki.states",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "displayName": "States",
   "description": "This package provides a implementation a generic state machine.",
   "author": {
