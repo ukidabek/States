@@ -44,12 +44,15 @@ namespace Utilities.States
                 transition.Perform(CurrentState, statToEnter);
             }
 
-			CurrentState?.Exit();
+            if (CurrentState != null)
+            {
+                CurrentState.Exit();
+                foreach (var stateLogicExecutor in _stateLogicExecutor)
+                    stateLogicExecutor.RemoveLogicToExecute(CurrentState);
 
-            foreach (var stateLogicExecutor in _stateLogicExecutor)
-                stateLogicExecutor.RemoveLogicToExecute(CurrentState);
+                _statePostProcessors.Process(CurrentState);
+            }
 
-			_statePostProcessors.Process(CurrentState);
 			CurrentState = statToEnter;
 
 			foreach (var stateLogicExecutor in _stateLogicExecutor) 

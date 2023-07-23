@@ -22,15 +22,15 @@ namespace Utilities.States
 	{
         protected readonly List<T> _logic = new List<T>(30);
 
-		public override void RemoveLogicToExecute(IState state)
+		public override void SetLogicToExecute(IState state)
 		{
-			var logicToAdd = _logic.OfType<T>();
+			var logicToAdd = state.Logic.OfType<T>();
             _logic.AddRange(logicToAdd);
 		}
 
-		public override void SetLogicToExecute(IState state)
+		public override void RemoveLogicToExecute(IState state)
 		{
-            var logicToRemove = _logic.OfType<T>().ToHashSet();
+            var logicToRemove = state.Logic.OfType<T>().ToHashSet();
             _logic.RemoveAll(logic => logicToRemove.Contains(logic));
 		}
 	}
