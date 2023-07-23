@@ -8,12 +8,19 @@ namespace Utilities.States
 	[AddComponentMenu("States/StateLogic/SubStateMachine")]
 	public class SubStateMachine : StateLogic, IStateMachine
 	{
+		private enum LogicExecutorHandlingMode
+		{
+			AddRemove,
+			EnableDisable,
+		}
+
 		[SerializeField] private State _currentState = null;
 		[FormerlySerializedAs("m_stateLogicExecutorsObjects")]
 		[SerializeField] private Object[] m_logicExecutor = null;
 		[FormerlySerializedAs("m_stateLogicExecutorsObjects")]
 		[SerializeField] private Object[] m_stateTransition = null;
 		[SerializeField] private Object[] m_stateProcessors = null;
+		[SerializeField] private LogicExecutorHandlingMode m_logicExecutorHandlingMode = LogicExecutorHandlingMode.AddRemove;
 		[Space]
 		[SerializeField] private StateSetter m_defaultStateSetter = null;
 
@@ -47,14 +54,30 @@ namespace Utilities.States
 		public override void Activate()
 		{
 			CreateStateMachine();
-			foreach (var executor in m_stateLogicExecutors)
-				executor.Enabled = true;
+			switch (m_logicExecutorHandlingMode)
+			{
+				case LogicExecutorHandlingMode.AddRemove:
+					m_stateMachine?.SetStateLogic();
+					break;
+				case LogicExecutorHandlingMode.EnableDisable:
+					foreach (var executor in m_stateLogicExecutors)
+						executor.Enabled = true;
+					break;
+			}
 		}
 
 		public override void Deactivate()
 		{
-			foreach (var executor in m_stateLogicExecutors)
-				executor.Enabled = false;
+			switch (m_logicExecutorHandlingMode)
+			{
+				case LogicExecutorHandlingMode.AddRemove:
+					m_stateMachine?.RemoveStateLogic();
+					break;
+				case LogicExecutorHandlingMode.EnableDisable:
+					foreach (var executor in m_stateLogicExecutors)
+						executor.Enabled = false;
+					break;
+			}
 		}
 
 		private void StateMachineOnOnStateChange()

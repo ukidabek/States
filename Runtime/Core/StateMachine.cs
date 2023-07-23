@@ -33,34 +33,44 @@ namespace Utilities.States
 		}
 
         public void EnterState(IState statToEnter)
-        {
-            if(CurrentState == statToEnter) return;
+		{
+			if (CurrentState == statToEnter) return;
 
-            PreviousState = CurrentState;
+			PreviousState = CurrentState;
 
-            foreach (var transition in _transitions)
-            {
-                transition.Cancel();
-                transition.Perform(CurrentState, statToEnter);
-            }
+			foreach (var transition in _transitions)
+			{
+				transition.Cancel();
+				transition.Perform(CurrentState, statToEnter);
+			}
 
-            if (CurrentState != null)
-            {
-                CurrentState.Exit();
-                foreach (var stateLogicExecutor in _stateLogicExecutor)
-                    stateLogicExecutor.RemoveLogicToExecute(CurrentState);
+			if (CurrentState != null)
+			{
+				CurrentState.Exit();
+				RemoveStateLogic();
 
-                _statePostProcessors.Process(CurrentState);
-            }
+				_statePostProcessors.Process(CurrentState);
+			}
 
 			CurrentState = statToEnter;
 
-			foreach (var stateLogicExecutor in _stateLogicExecutor) 
-                stateLogicExecutor.SetLogicToExecute(CurrentState);
+			SetStateLogic();
 
 			_statePreProcessors.Process(CurrentState);
 			CurrentState?.Enter();
-            OnStateChange?.Invoke();
-        }
-    }
+			OnStateChange?.Invoke();
+		}
+
+		public void SetStateLogic()
+		{
+			foreach (var stateLogicExecutor in _stateLogicExecutor)
+				stateLogicExecutor.SetLogicToExecute(CurrentState);
+		}
+		
+		public void RemoveStateLogic()
+		{
+			foreach (var stateLogicExecutor in _stateLogicExecutor)
+				stateLogicExecutor.RemoveLogicToExecute(CurrentState);
+		}
+	}
 }
