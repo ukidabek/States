@@ -5,6 +5,7 @@ using Object = UnityEngine.Object;
 
 namespace Utilities.States
 {
+	[AddComponentMenu("States/StateLogic/SwitchStateStateLogic")]
 	public class SwitchStateStateLogic : StateLogic, IOnUpdateLogic
 	{
 		public enum ConditionMode { All, Any }

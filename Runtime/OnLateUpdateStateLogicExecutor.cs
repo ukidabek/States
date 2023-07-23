@@ -8,8 +8,8 @@ namespace Utilities.States
         private void LateUpdate()
         {
 			var timeInfo = GetTimeInfo();
-			foreach (var onUpdateLogic in _logic)
-				onUpdateLogic.OnLateUpdate(timeInfo.Item1, timeInfo.Item2);
+			for (int i = 0; i < _logic.Count; i++)
+				_logic[i].OnLateUpdate(timeInfo.Item1, timeInfo.Item2);
 		}
 	}
 }
