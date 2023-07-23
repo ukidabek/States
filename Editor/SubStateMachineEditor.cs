@@ -2,7 +2,7 @@
 
 namespace Utilities.States
 {
-	[CustomEditor(typeof(StateMachineEditor))]
+	[CustomEditor(typeof(SubStateMachine))]
 	public class SubStateMachineEditor : StateMachineEditor
 	{
 	}
