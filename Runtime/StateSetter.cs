@@ -9,6 +9,7 @@ namespace Utilities.States
 	{
 #if UNITY_EDITOR
 		[SerializeField] private string m_description;
+		public string Description => m_description;
 #endif
 		[SerializeField] protected Object _stateMachineObject = null;
 		[FormerlySerializedAs("_defaultState")]

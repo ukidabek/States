@@ -59,13 +59,19 @@ namespace Utilities.States
 					m_logicExecutorProperty.SetValue(target, selectedObjects
 						.OfType<UnityEngine.Object>()
 						.ToArray());
-					serializedObject.ApplyModifiedProperties();
+					serializedObject.UpdateIfRequiredOrScript();
 				},
 				(executor) =>
 				{
 					if (executor is Component component)
 						return $"{component.gameObject.GetFullName()}/{executor.GetType().Name}";
 					return string.Empty;
+				},
+				()=>
+				{
+					var selected = (m_logicExecutorProperty.GetValue(target) as IEnumerable<UnityEngine.Object>)
+						.OfType<IStateLogicExecutor>();
+					StateEditorHelper.GenerateSelectionList(m_logicExecutors, selected, ref m_logicExecutorsSelection);
 				});
 
 			m_stateTransitions.ObjectsSelector(ref m_showStateTransitionsSelection,
@@ -76,13 +82,19 @@ namespace Utilities.States
 					m_stateTransitionProperty.SetValue(target, selectedObjects
 						.OfType<UnityEngine.Object>()
 						.ToArray());
-					serializedObject.ApplyModifiedProperties();
+					serializedObject.UpdateIfRequiredOrScript();
 				},
 				(executor) =>
 				{
 					if (executor is Component component)
 						return $"{component.gameObject.GetFullName()}/{executor.GetType().Name}";
 					return string.Empty;
+				},
+				() =>
+				{
+					var selected = (m_stateTransitionProperty.GetValue(target) as IEnumerable<UnityEngine.Object>)
+						.OfType<IStateTransitionLogic>();
+					StateEditorHelper.GenerateSelectionList(m_stateTransitions, selected, ref m_stateTransitionsSelection);
 				});
 
 			m_statePreProcessors.ObjectsSelector(ref m_showStatePreProcessorSelection,
@@ -93,13 +105,19 @@ namespace Utilities.States
 					m_stateProcessorsProperty.SetValue(target, selectedObjects
 						.OfType<UnityEngine.Object>()
 						.ToArray());
-					serializedObject.ApplyModifiedProperties();
+					serializedObject.UpdateIfRequiredOrScript();
 				},
 				(executor) =>
 				{
 					if (executor is Component component)
 						return $"{component.gameObject.GetFullName()}/{executor.GetType().Name}";
 					return string.Empty;
+				},
+				() =>
+				{
+					var selected = (m_logicExecutorProperty.GetValue(target) as IEnumerable<UnityEngine.Object>)
+						.OfType<IStatePreProcessor>();
+					StateEditorHelper.GenerateSelectionList(m_statePreProcessors, selected, ref m_statePreProcessorSelection);
 				});
 
 			m_stateSetters.ObjectSelector(ref m_showStateSettersSelection,
@@ -107,8 +125,9 @@ namespace Utilities.States
 				(StateSetter setter) =>
 				{
 					m_defaultStateSetterProperty.SetValue(target, setter);
-					serializedObject.ApplyModifiedProperties();
-				});
+					serializedObject.UpdateIfRequiredOrScript();
+				},
+				(setter) => string.IsNullOrEmpty(setter.Description) ? setter.GetType().Name : setter.Description);
 		}
 	}
 }
