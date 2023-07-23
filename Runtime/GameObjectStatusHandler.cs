@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace Stages
 {
-	[Serializable]
+	[Serializable, Obsolete("GameObjectStatusHandler is obsolete! Use GenericStatusHandler!")]
 	public class GameObjectStatusHandler : StatusHandler<GameObject>
 	{
 		public GameObjectStatusHandler(GameObject managedObject, bool status) : base(managedObject, status) { }

@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace Stages
 {
-	[Serializable]
+	[Serializable, Obsolete("BehaviourStatusHandler is obsolete! Use GenericStatusHandler!")]
 	public class BehaviourStatusHandler : StatusHandler<Behaviour>
 	{
 		public BehaviourStatusHandler(Behaviour managedObject, bool status) : base(managedObject, status) { }
