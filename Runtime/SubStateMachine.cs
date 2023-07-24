@@ -57,6 +57,7 @@ namespace Utilities.States
 			switch (m_logicExecutorHandlingMode)
 			{
 				case LogicExecutorHandlingMode.AddRemove:
+					m_stateMachine?.CurrentState?.Exit();
 					m_stateMachine?.SetStateLogic();
 					break;
 				case LogicExecutorHandlingMode.EnableDisable:
@@ -71,6 +72,7 @@ namespace Utilities.States
 			switch (m_logicExecutorHandlingMode)
 			{
 				case LogicExecutorHandlingMode.AddRemove:
+					m_stateMachine?.CurrentState?.Enter();
 					m_stateMachine?.RemoveStateLogic();
 					break;
 				case LogicExecutorHandlingMode.EnableDisable:
