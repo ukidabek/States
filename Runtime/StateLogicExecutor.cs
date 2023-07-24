@@ -33,5 +33,12 @@ namespace Utilities.States
             var logicToRemove = state.Logic.OfType<T>().ToHashSet();
             _logic.RemoveAll(logic => logicToRemove.Contains(logic));
 		}
+
+        [ContextMenu("Log Logic")]
+        private void LogLogic()
+        {
+            foreach (var logic in _logic) 
+                Debug.Log(logic.GetType().Name);
+        }
 	}
 }
