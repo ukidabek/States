@@ -46,19 +46,18 @@ namespace Utilities.States
 
 			if (CurrentState != null)
 			{
-				CurrentState.Exit();
 				RemoveStateLogic();
-
+				CurrentState.Exit();
 				_statePostProcessors.Process(CurrentState);
 			}
 
 			CurrentState = statToEnter;
 
-			SetStateLogic();
-
 			_statePreProcessors.Process(CurrentState);
 			CurrentState?.Enter();
 			OnStateChange?.Invoke();
+			
+			SetStateLogic();
 		}
 
 		public void SetStateLogic()
