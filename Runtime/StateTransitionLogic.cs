@@ -3,7 +3,7 @@ using Object = UnityEngine.Object;
 
 namespace Utilities.States
 {
-    public abstract class StateTransitionLogicBase : MonoBehaviour, IStateTransitionLogic
+    public abstract class StateTransitionLogic : MonoBehaviour, IStateTransitionLogic
     {
         protected interface ITransitionLogicTriggerCondition
         {

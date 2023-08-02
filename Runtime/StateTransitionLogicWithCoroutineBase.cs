@@ -4,7 +4,7 @@ using Utilities.General;
 namespace Utilities.States
 {
 	[AddComponentMenu("States/StateLogic/Transitions/StateTransitionLogicWithCoroutineBase")]
-	public abstract class StateTransitionLogicWithCoroutineBase : StateTransitionLogicBase
+	public abstract class StateTransitionLogicWithCoroutineBase : StateTransitionLogic
     {
         protected CoroutineManager _manager;
 

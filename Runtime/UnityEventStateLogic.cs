@@ -3,7 +3,7 @@ using UnityEngine.Events;
 
 namespace Utilities.States
 {
-	[AddComponentMenu("States/StateLogic/UnityEventStateLogic")]
+	[StateLogicPath("States/StateLogic")]
 	public class UnityEventStateLogic : StateLogic
 	{
 		[SerializeField] private UnityEvent OnActivate = null;

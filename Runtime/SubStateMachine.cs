@@ -5,7 +5,7 @@ using UnityEngine.Serialization;
 
 namespace Utilities.States
 {
-	[AddComponentMenu("States/StateLogic/SubStateMachine")]
+	[StateLogicPath("States/StateLogic")]
 	public class SubStateMachine : StateLogic, IStateMachine
 	{
 		private enum LogicExecutorHandlingMode

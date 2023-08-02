@@ -2,7 +2,7 @@
 
 namespace Utilities.States
 {
-    public abstract class SwitchStateConditionBase : MonoBehaviour, ISwitchStateCondition
+    public abstract class SwitchStateCondition : MonoBehaviour, ISwitchStateCondition
     {
         public abstract bool Condition { get; }
         public virtual void Activate() {}

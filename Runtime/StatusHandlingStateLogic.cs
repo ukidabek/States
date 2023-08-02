@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace Utilities.States
 {
-	[AddComponentMenu("States/StateLogic/StatusHandlingStateLogic")]
+	[StateLogicPath("States/StateLogic")]
 	public class StatusHandlingStateLogic : StateLogic
     {
 		[SerializeField] private GenericStatusHandler[] m_statusHandlers = null;
