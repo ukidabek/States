@@ -1,14 +1,19 @@
+using System;
 using System.Linq;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
 namespace Utilities.States
 {
+
 	[AddComponentMenu("States/Core/StateMachineManager")]
     public class StateMachineManager : MonoBehaviour, IStateMachine
     {
-        [SerializeField] private State m_currentState = null;
-		[SerializeField] private Object[] m_logicExecutor;
-        [SerializeField] private Object[] m_stateTransitions = null;
+		[SerializeField] private Executor m_executors = 0;
+		public Executor Executor => m_executors;
+
+		[SerializeField] private State m_currentState = null;
+        [SerializeField] private Object[] m_stateTransition = null;
 		[SerializeField] private Object[] m_stateProcessors = null;
 		[Space]
 		[SerializeField] private StateSetter m_defaultStateSetter = null;
@@ -19,14 +24,15 @@ namespace Utilities.States
 
 		public IState PreviousState => m_stateMachine.PreviousState;
 
-        private StateMachine m_stateMachine = null;
+        protected StateMachine m_stateMachine = null;
 
-        private void Awake()
+		private void Awake()
 		{
+			var stateLogicExecutor = GetComponents<IStateLogicExecutor>();
 			m_stateMachine = new StateMachine(
 							name,
-							m_logicExecutor.OfType<IStateLogicExecutor>(),
-							m_stateTransitions.OfType<IStateTransitionLogic>(),
+							stateLogicExecutor,
+							m_stateTransition.OfType<IStateTransitionLogic>(),
 							m_stateProcessors.OfType<IStatePreProcessor>(),
 							m_stateProcessors.OfType<IStatePostProcessor>()); 
 			m_stateMachine.OnStateChange += OnStateChange;

@@ -7,9 +7,18 @@ using UnityEngine;
 
 namespace Utilities.States
 {
+	[CustomEditor(typeof(StateMachineManager), true)]
 	public class StateMachineEditor : Editor
 	{
-		private FieldInfo m_logicExecutorProperty = null;
+		public static Type[] m_executorsTypes = new Type[]
+		{
+			typeof(OnUpdateStateLogicExecutor),
+			typeof(OnLateUpdateStateLogicExecutor),
+			typeof(OnFixedUpdateStateLogicExecutor),
+		};
+
+		private StateMachineManager m_stateMachineManager = null;
+
 		private FieldInfo m_stateTransitionProperty = null;
 		private FieldInfo m_stateProcessorsProperty = null;
 		private FieldInfo m_defaultStateSetterProperty = null;
@@ -30,16 +39,16 @@ namespace Utilities.States
 
 		protected virtual void OnEnable()
 		{
-			var targetType = target.GetType();
+			m_stateMachineManager = (StateMachineManager)target;
+
+			var targetType = typeof(StateMachineManager);
 			var bindingsFlags = BindingFlags.NonPublic | BindingFlags.Instance;
-			m_logicExecutorProperty = targetType.GetField("m_logicExecutor", bindingsFlags);
 			m_stateTransitionProperty = targetType.GetField("m_stateTransition", bindingsFlags);
 			m_stateProcessorsProperty = targetType.GetField("m_stateProcessors", bindingsFlags);
 			m_defaultStateSetterProperty = targetType.GetField("m_defaultStateSetter", bindingsFlags);
 
 			var components = target as Component;
 			var root = components.transform.root.gameObject;
-			m_logicExecutors = root.GetComponentsInChildren<IStateLogicExecutor>();
 			m_stateTransitions = root.GetComponentsInChildren<IStateTransitionLogic>();
 			m_statePreProcessors = root.GetComponentsInChildren<IStatePreProcessor>();
 			m_stateSetters = root.GetComponentsInChildren<StateSetter>();
@@ -47,32 +56,30 @@ namespace Utilities.States
 
 		public override void OnInspectorGUI()
 		{
+			EditorGUI.BeginChangeCheck();
 			base.OnInspectorGUI();
+			if (EditorGUI.EndChangeCheck())
+			{
+				var gameObject = m_stateMachineManager.gameObject;
+				var enumValues = Enum.GetValues(typeof(Executor));
+				var executors = (uint)m_stateMachineManager.Executor;
+				int length = enumValues.Length;
+				for (int i = 0; i < length; i++)
+				{
+					var type = m_executorsTypes[i];
+					var executor = gameObject.GetComponent(type);
+
+					bool shouldExist = (1 & executors >> i) == 1;
+
+					if (shouldExist && executor == null)
+						gameObject.AddComponent(type);
+
+					if (!shouldExist && executor != null)
+						GameObject.DestroyImmediate(executor, true);
+				}
+			}
 
 			EditorGUILayout.Space();
-
-			m_logicExecutors.ObjectsSelector(ref m_showLogicExecutorsSelection,
-				ref m_logicExecutorsSelection,
-				$"Select {nameof(IStateLogicExecutor)}",
-				(selectedObjects) =>
-				{
-					m_logicExecutorProperty.SetValue(target, selectedObjects
-						.OfType<UnityEngine.Object>()
-						.ToArray());
-					serializedObject.UpdateIfRequiredOrScript();
-				},
-				(executor) =>
-				{
-					if (executor is Component component)
-						return $"{component.gameObject.GetFullName()}/{executor.GetType().Name}";
-					return string.Empty;
-				},
-				()=>
-				{
-					var selected = (m_logicExecutorProperty.GetValue(target) as IEnumerable<UnityEngine.Object>)
-						.OfType<IStateLogicExecutor>();
-					StateEditorHelper.GenerateSelectionList(m_logicExecutors, selected, ref m_logicExecutorsSelection);
-				});
 
 			m_stateTransitions.ObjectsSelector(ref m_showStateTransitionsSelection,
 				ref m_stateTransitionsSelection,
@@ -115,7 +122,7 @@ namespace Utilities.States
 				},
 				() =>
 				{
-					var selected = (m_logicExecutorProperty.GetValue(target) as IEnumerable<UnityEngine.Object>)
+					var selected = (m_stateProcessorsProperty.GetValue(target) as IEnumerable<UnityEngine.Object>)
 						.OfType<IStatePreProcessor>();
 					StateEditorHelper.GenerateSelectionList(m_statePreProcessors, selected, ref m_statePreProcessorSelection);
 				});
@@ -128,6 +135,7 @@ namespace Utilities.States
 					serializedObject.UpdateIfRequiredOrScript();
 				},
 				(setter) => string.IsNullOrEmpty(setter.Description) ? setter.GetType().Name : setter.Description);
+
 		}
 	}
 }

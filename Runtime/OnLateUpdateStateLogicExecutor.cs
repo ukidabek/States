@@ -3,6 +3,7 @@
 namespace Utilities.States
 {
 	[AddComponentMenu("States/Executors/OnLateUpdateStateLogicExecutor")]
+	[DisallowMultipleComponent]
 	public class OnLateUpdateStateLogicExecutor : StateLogicExecutor<IOnLateUpdateLogic>
     {
         private void LateUpdate()

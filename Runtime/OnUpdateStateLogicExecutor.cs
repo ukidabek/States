@@ -3,6 +3,7 @@
 namespace Utilities.States
 {
     [AddComponentMenu("States/Executors/OnUpdateStateLogicExecutor")]
+    [DisallowMultipleComponent]
 	public class OnUpdateStateLogicExecutor : StateLogicExecutor<IOnUpdateLogic>
     {
         private void Update()
