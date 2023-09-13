@@ -9,8 +9,6 @@ namespace Utilities.States
 	public class StatusHandlingStateLogic : StateLogic
     {
 		[SerializeField] private GenericStatusHandler[] m_statusHandlers = null;
-        [SerializeField] private GameObjectStatusHandler[] m_gameObjectStatusHandlers = null;
-        [SerializeField] private BehaviourStatusHandler[] m_behaviourStatusHandler = null;
 
         private IEnumerable<StatusHandler> m_handlers;
 
@@ -19,8 +17,6 @@ namespace Utilities.States
 			if (m_handlers != null) return;
 			m_handlers = new List<StatusHandler>()
 				.Concat(m_statusHandlers)
-				.Concat(m_behaviourStatusHandler)
-				.Concat(m_gameObjectStatusHandlers)
 				.ToArray();
 		}
 
@@ -43,14 +39,8 @@ namespace Utilities.States
 		private void Migrate()
 		{
 			m_statusHandlers = new List<StatusHandler>()
-				.Concat(m_gameObjectStatusHandlers)
-				.Concat(m_behaviourStatusHandler)
 				.Select(handler => new GenericStatusHandler(handler))
 				.ToArray();
-
-			m_gameObjectStatusHandlers = null;
-			m_behaviourStatusHandler = null;
-
 			UnityEditor.EditorUtility.SetDirty(gameObject);
 		}
 #endif

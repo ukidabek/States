@@ -23,12 +23,10 @@ namespace Utilities.States
 		private FieldInfo m_stateProcessorsProperty = null;
 		private FieldInfo m_defaultStateSetterProperty = null;
 
-		private IEnumerable<IStateLogicExecutor> m_logicExecutors = null;
 		private IEnumerable<IStateTransitionLogic> m_stateTransitions = null;
 		private IEnumerable<IStatePreProcessor> m_statePreProcessors = null;
 		private IEnumerable<StateSetter> m_stateSetters = null;
 
-		private bool m_showLogicExecutorsSelection = false;
 		private bool m_showStateTransitionsSelection = false;
 		private bool m_showStatePreProcessorSelection = false;
 		private bool m_showStateSettersSelection = false;
