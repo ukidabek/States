@@ -1,11 +1,9 @@
-using System;
 using System.Linq;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
 namespace Utilities.States
 {
-
 	[AddComponentMenu("States/Core/StateMachineManager")]
     public class StateMachineManager : MonoBehaviour, IStateMachine
     {
@@ -28,17 +26,18 @@ namespace Utilities.States
 
 		private void Awake()
 		{
-			var stateLogicExecutor = GetComponents<IStateLogicExecutor>();
-			m_stateMachine = new StateMachine(
-							name,
-							stateLogicExecutor,
-							m_stateTransition.OfType<IStateTransitionLogic>(),
-							m_stateProcessors.OfType<IStatePreProcessor>(),
-							m_stateProcessors.OfType<IStatePostProcessor>()); 
+			var executors = GetComponents<IStateLogicExecutor>();
+			var transitions = m_stateTransition.OfType<IStateTransitionLogic>();
+			var preProcessors = m_stateProcessors.OfType<IStatePreProcessor>();
+			var postProcessors = m_stateProcessors.OfType<IStatePostProcessor>();
+
+			m_stateMachine = new StateMachine(name, executors, transitions, preProcessors, postProcessors);
 			m_stateMachine.OnStateChange += OnStateChange;
 		}
 
 		private void OnEnable() => m_defaultStateSetter?.SetState();
+
+		private void OnDestroy() => m_stateMachine.OnStateChange -= OnStateChange;
 
 		private void OnStateChange() => m_currentState = m_stateMachine.CurrentState as State;
 

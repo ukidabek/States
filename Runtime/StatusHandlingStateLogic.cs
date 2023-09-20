@@ -1,6 +1,5 @@
 ﻿using Stages;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 
 namespace Utilities.States
@@ -12,18 +11,17 @@ namespace Utilities.States
 
         private IEnumerable<StatusHandler> m_handlers;
 
+		private void Awake() => InitializeHandlersList();
+
 		private void InitializeHandlersList()
 		{
 			if (m_handlers != null) return;
-			m_handlers = new List<StatusHandler>()
-				.Concat(m_statusHandlers)
-				.ToArray();
+			m_handlers = m_statusHandlers;
 		}
 
 		public override void Activate()
 		{
 			base.Activate();
-			InitializeHandlersList();
 			foreach (var handler in m_handlers)
                 handler.Set();
 		}
@@ -34,15 +32,5 @@ namespace Utilities.States
 			foreach (var handler in m_handlers)
 				handler.Reset();
 		}
-#if UNITY_EDITOR
-		[ContextMenu("Migrate")]
-		private void Migrate()
-		{
-			m_statusHandlers = new List<StatusHandler>()
-				.Select(handler => new GenericStatusHandler(handler))
-				.ToArray();
-			UnityEditor.EditorUtility.SetDirty(gameObject);
-		}
-#endif
 	}
 }

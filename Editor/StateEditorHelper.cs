@@ -78,8 +78,9 @@ namespace Utilities.States
 
 		public static void GenerateSelectionList<T>(IEnumerable<T> all, IEnumerable<T> selected, ref bool[] selection)
 		{
-			if(all.Count() != selection.Length)
-				selection = new bool[all.Count()];
+			var count = all.Count();
+			if(count != selection.Length)
+				selection = new bool[count];
 
 			var set = selected.ToHashSet();
 			var index = 0;

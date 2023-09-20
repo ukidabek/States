@@ -61,13 +61,12 @@ namespace Utilities.States
 				var gameObject = m_stateMachineManager.gameObject;
 				var enumValues = Enum.GetValues(typeof(Executor));
 				var executors = (uint)m_stateMachineManager.Executor;
-				int length = enumValues.Length;
+				var length = enumValues.Length;
 				for (int i = 0; i < length; i++)
 				{
 					var type = m_executorsTypes[i];
 					var executor = gameObject.GetComponent(type);
-
-					bool shouldExist = (1 & executors >> i) == 1;
+					var shouldExist = (1 & executors >> i) == 1;
 
 					if (shouldExist && executor == null)
 						gameObject.AddComponent(type);
