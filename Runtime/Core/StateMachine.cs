@@ -12,7 +12,7 @@ namespace Utilities.States
         public event Action<IState> OnStateChanged;
 
 		private readonly IEnumerable<IStateLogicExecutor> m_stateLogicExecutor = null;
-        private readonly IEnumerable<IStateTransitionLogic> m_transitions = null;
+        private readonly IEnumerable<IStateTransition> m_transitions = null;
 		private readonly IEnumerable<Context> m_context = null;
 		private readonly IEnumerable<IStatePreProcessor> m_statePreProcessors = null;
 		private readonly IEnumerable<IStatePostProcessor> m_statePostProcessors = null;
@@ -23,7 +23,7 @@ namespace Utilities.States
 
 		public StateMachine(
 			IEnumerable<IStateLogicExecutor> stateLogicExecutor, 
-			IEnumerable<IStateTransitionLogic> transitions,
+			IEnumerable<IStateTransition> transitions,
 			IEnumerable<Context> context,
             IEnumerable<IStatePreProcessor> statePreProcessor = null, 
 			IEnumerable<IStatePostProcessor> statePostProcessor = null)
@@ -34,7 +34,7 @@ namespace Utilities.States
 		public StateMachine(
 			string name,
 			IEnumerable<IStateLogicExecutor> stateLogicExecutor,
-			IEnumerable<IStateTransitionLogic> transitions,
+			IEnumerable<IStateTransition> transitions,
 			IEnumerable<Context> context,
 			IEnumerable<IStatePreProcessor> statePreProcessor,
 			IEnumerable<IStatePostProcessor> statePostProcessor)

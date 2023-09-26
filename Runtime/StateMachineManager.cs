@@ -33,7 +33,7 @@ namespace Utilities.States
 		private void Awake()
 		{
 			var executors = GetComponents<IStateLogicExecutor>();
-			var transitions = GetComponents<IStateTransitionLogic>();
+			var transitions = GetComponents<IStateTransition>();
 			var preProcessors = GetComponents<IStatePreProcessor>();
 			var postProcessors = GetComponents<IStatePostProcessor>();
 

@@ -6,13 +6,50 @@ using UnityEngine;
 
 namespace Utilities.States.Test
 {
-	[CreateAssetMenu]
+
 	public class StateMachineTests
 	{
 		private GameObject m_gameObject = null;
 		private StateMachine m_stateMachine = null;
 
 		private IEnumerable<Context> m_contexts = null;
+
+		[Test]
+		public void Validate_If_StateMachine_Enter_State()
+		{
+			m_contexts = Array.Empty<Context>();
+			m_stateMachine = new StateMachine(new[] { new StateLogicExecutor() }, Array.Empty<IStateTransition>(), m_contexts);
+			var stateA = new State(new StateID(), new[] { new StateLogic() });
+			var stateB = new State(new StateID(), new[] { new StateLogic() });
+
+			m_stateMachine.EnterState(stateA);
+			m_stateMachine.EnterState(stateB);
+
+			Assert.AreEqual(stateB, m_stateMachine.CurrentState);
+			Assert.AreEqual(stateA, m_stateMachine.PreviousState);
+		}
+
+		[TestCase(1)]
+		[TestCase(10)]
+		[TestCase(100)]
+		public void Validate_If_StateLogic_Are_Update(int iterations)
+		{
+			m_contexts = Array.Empty<Context>();
+			var executor = new StateLogicExecutor();
+			var logic = new StateLogic();
+			var state = new State(new StateID(), new[] { logic });
+
+			m_stateMachine = new StateMachine(new[] { executor }, Array.Empty<IStateTransition>(), m_contexts);
+			m_stateMachine.EnterState(state);
+
+			for (int i = 0; i < iterations; i++)
+				executor.Update();
+
+			Assert.AreEqual((float)iterations, logic.UpdateCount);
+			Assert.AreEqual((float)iterations, logic.LateUpdateCount);
+			Assert.AreEqual((float)iterations, logic.FixUpdateCount);
+
+		}
 
 		[Test]
 		public void Validate_If_References_Form_Context_Are_Injected_Correctly()
@@ -25,7 +62,7 @@ namespace Utilities.States.Test
 			var rigidbody = m_gameObject.GetComponent<Rigidbody>();
 
 			m_contexts = new Component[] { boxCollider, rigidbody }.Select(component => new Context(component));
-			m_stateMachine = new StateMachine(new[] { new StateLogicExecutor() }, Array.Empty<IStateTransitionLogic>(), m_contexts);
+			m_stateMachine = new StateMachine(new[] { new StateLogicExecutor() }, Array.Empty<IStateTransition>(), m_contexts);
 			m_stateMachine.EnterState(state);
 
 			Assert.AreEqual(stateLogic.BoxCollider, boxCollider);
@@ -42,7 +79,7 @@ namespace Utilities.States.Test
 			var rigidbody = m_gameObject.GetComponent<Rigidbody>();
 
 			m_contexts = new[] { new Context("Test", rigidbody) };
-			m_stateMachine = new StateMachine(new[] { new StateLogicExecutor() }, Array.Empty<IStateTransitionLogic>(), m_contexts);
+			m_stateMachine = new StateMachine(new[] { new StateLogicExecutor() }, Array.Empty<IStateTransition>(), m_contexts);
 			m_stateMachine.EnterState(state);
 
 			Assert.AreEqual(stateLogic.RigidbodyWithID, rigidbody);

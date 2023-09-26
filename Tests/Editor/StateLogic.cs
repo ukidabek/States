@@ -1,8 +1,9 @@
-﻿using UnityEngine;
+﻿using NUnit.Framework;
+using UnityEngine;
 
 namespace Utilities.States.Test
 {
-	public class StateLogic : IStateLogic
+	public class StateLogic : IStateLogic, IOnUpdateLogic, IOnFixUpdateLogic, IOnLateUpdateLogic
 	{
 		[ContextField] private BoxCollider m_boxCollider = null;
 		public BoxCollider BoxCollider => m_boxCollider;
@@ -13,12 +14,30 @@ namespace Utilities.States.Test
 		[ContextField("Test")] private Rigidbody m_rigidbodyWithID = null;
 		public Rigidbody RigidbodyWithID => m_rigidbodyWithID;
 
-		public void Activate()
+		public float UpdateCount = 0;
+		public float FixUpdateCount = 0;
+		public float LateUpdateCount = 0;
+
+		public void Activate() { }
+
+		public void Deactivate() { }
+
+		public void OnUpdate(float deltaTime, float timeScale)
 		{
+			Assert.AreEqual(1f, timeScale);
+			UpdateCount += deltaTime;
 		}
 
-		public void Deactivate()
+		public void OnFixUpdate(float deltaTime, float timeScale)
 		{
+			Assert.AreEqual(1f, timeScale);
+			FixUpdateCount += deltaTime;
+		}
+
+		public void OnLateUpdate(float deltaTime, float timeScale)
+		{
+			Assert.AreEqual(1f, timeScale);
+			LateUpdateCount += deltaTime;
 		}
 	}
 }
