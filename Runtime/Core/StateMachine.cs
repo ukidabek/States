@@ -1,35 +1,50 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
 
 namespace Utilities.States
 {
-	public class StateMachine : IStateMachine
+	public class StateMachine : IStateMachine, IDisposable
     {
-        public event Action OnStateChange; 
-        
-        private readonly IEnumerable<IStateLogicExecutor> _stateLogicExecutor = null;
-        private readonly IEnumerable<IStateTransitionLogic> _transitions = null;
-        private readonly IEnumerable<IStatePreProcessor> _statePreProcessors = null;
-		private readonly IEnumerable<IStatePostProcessor> _statePostProcessors = null;
+		private const BindingFlags Binding_Flags = BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance;
+
+        public event Action<IState> OnStateChanged;
+
+		private readonly IEnumerable<IStateLogicExecutor> m_stateLogicExecutor = null;
+        private readonly IEnumerable<IStateTransitionLogic> m_transitions = null;
+		private readonly IEnumerable<Context> m_context = null;
+		private readonly IEnumerable<IStatePreProcessor> m_statePreProcessors = null;
+		private readonly IEnumerable<IStatePostProcessor> m_statePostProcessors = null;
 
 		public IState CurrentState { get; private set; }
 		public string Name { get; private set; }
 		public IState PreviousState { get; private set; }
 
-		public StateMachine(IEnumerable<IStateLogicExecutor> stateLogicExecutor, IEnumerable<IStateTransitionLogic> transitions, 
-            IEnumerable<IStatePreProcessor> statePreProcessor = null, IEnumerable<IStatePostProcessor> statePostProcessor = null)
-            : this(nameof(StateMachine), stateLogicExecutor, transitions, statePreProcessor, statePostProcessor)
+		public StateMachine(
+			IEnumerable<IStateLogicExecutor> stateLogicExecutor, 
+			IEnumerable<IStateTransitionLogic> transitions,
+			IEnumerable<Context> context,
+            IEnumerable<IStatePreProcessor> statePreProcessor = null, 
+			IEnumerable<IStatePostProcessor> statePostProcessor = null)
+            : this(nameof(StateMachine), stateLogicExecutor, transitions, context, statePreProcessor, statePostProcessor)
 		{
 		}
 
-		public StateMachine(string name, IEnumerable<IStateLogicExecutor> stateLogicExecutor, IEnumerable<IStateTransitionLogic> transitions, 
-            IEnumerable<IStatePreProcessor> statePreProcessor, IEnumerable<IStatePostProcessor> statePostProcessor)
-        {
-            Name = name;
-            _stateLogicExecutor = stateLogicExecutor;
-            _transitions = transitions;
-			_statePreProcessors = statePreProcessor;
-            _statePostProcessors = statePostProcessor;
+		public StateMachine(
+			string name,
+			IEnumerable<IStateLogicExecutor> stateLogicExecutor,
+			IEnumerable<IStateTransitionLogic> transitions,
+			IEnumerable<Context> context,
+			IEnumerable<IStatePreProcessor> statePreProcessor,
+			IEnumerable<IStatePostProcessor> statePostProcessor)
+		{
+			Name = name;
+			m_stateLogicExecutor = stateLogicExecutor;
+			m_transitions = transitions;
+			m_context = context;
+			m_statePreProcessors = statePreProcessor;
+			m_statePostProcessors = statePostProcessor;
 		}
 
         public void EnterState(IState statToEnter)
@@ -38,7 +53,7 @@ namespace Utilities.States
 
 			PreviousState = CurrentState;
 
-			foreach (var transition in _transitions)
+			foreach (var transition in m_transitions)
 			{
 				transition.Cancel();
 				transition.Perform(CurrentState, statToEnter);
@@ -48,28 +63,69 @@ namespace Utilities.States
 			{
 				RemoveStateLogic();
 				CurrentState.Exit();
-				_statePostProcessors.Process(CurrentState);
+				m_statePostProcessors.Process(CurrentState);
 			}
 
 			CurrentState = statToEnter;
 
-			_statePreProcessors.Process(CurrentState);
+			FillState(CurrentState, m_context);
+
+			m_statePreProcessors.Process(CurrentState);
 			CurrentState?.Enter();
-			OnStateChange?.Invoke();
+			OnStateChanged?.Invoke(CurrentState);
 			
 			SetStateLogic();
 		}
 
+		private void FillState(IState state, IEnumerable<Context> contexts)
+		{
+			var stateLogic = state.Logic;
+
+			foreach (var logic in stateLogic)
+			{
+				var logicType = logic.GetType();
+				var fields = logicType.GetFields(Binding_Flags);
+
+				foreach (var field in fields)
+				{
+					var attribute = field.GetCustomAttribute<ContextField>();
+					if (attribute == null) continue;
+
+					Context context = default;
+					var attributeID = attribute.ID;
+					if (string.IsNullOrEmpty(attributeID))
+					{
+						context = contexts.FirstOrDefault(context => context.Type == field.FieldType);
+						if (context == null)
+							continue;
+					}
+					else
+					{
+						context = contexts.FirstOrDefault(context => context.Type == field.FieldType && context.Id == attributeID);
+						if (context == null)
+							continue;
+					}
+
+					field.SetValue(logic, context.Object);
+				}
+			}
+		}
+
 		public void SetStateLogic()
 		{
-			foreach (var stateLogicExecutor in _stateLogicExecutor)
+			foreach (var stateLogicExecutor in m_stateLogicExecutor)
 				stateLogicExecutor.SetLogicToExecute(CurrentState);
 		}
 		
 		public void RemoveStateLogic()
 		{
-			foreach (var stateLogicExecutor in _stateLogicExecutor)
+			foreach (var stateLogicExecutor in m_stateLogicExecutor)
 				stateLogicExecutor.RemoveLogicToExecute(CurrentState);
+		}
+
+		public void Dispose()
+		{
+			OnStateChanged = null;
 		}
 	}
 }
