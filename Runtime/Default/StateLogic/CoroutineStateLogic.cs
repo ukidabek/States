@@ -1,8 +1,7 @@
 ﻿using System.Collections;
-using UnityEngine;
 using Utilities.General;
 
-namespace Utilities.States
+namespace Utilities.States.Default
 {
 	public abstract class CoroutineStateLogic : StateLogic
     {

@@ -4,7 +4,7 @@ using System.Linq;
 using UnityEditor;
 using UnityEngine;
 
-namespace Utilities.States
+namespace Utilities.States.Default
 {
 	internal static class StateEditorHelper
 	{

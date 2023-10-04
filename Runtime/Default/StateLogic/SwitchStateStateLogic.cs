@@ -3,7 +3,7 @@ using System.Linq;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
-namespace Utilities.States
+namespace Utilities.States.Default
 {
 	[StateLogicPath("States/StateLogic")]
 	public class SwitchStateStateLogic : StateLogic, IOnUpdateLogic
@@ -84,8 +84,8 @@ namespace Utilities.States
 		{
 			var gameObject = transform.gameObject;
 			var stateMachine = gameObject.GetComponent<IStateMachine>();
-		
-			if(stateMachine != null)
+
+			if (stateMachine != null)
 				return stateMachine;
 
 			return GetStateMachine(transform.parent);

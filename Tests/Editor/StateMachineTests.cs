@@ -6,7 +6,6 @@ using UnityEngine;
 
 namespace Utilities.States.Test
 {
-
 	public class StateMachineTests
 	{
 		private GameObject m_gameObject = null;
@@ -83,6 +82,70 @@ namespace Utilities.States.Test
 			m_stateMachine.EnterState(state);
 
 			Assert.AreEqual(stateLogic.RigidbodyWithID, rigidbody);
+		}
+
+		[Test]
+		public void Validate_If_References_Form_Context_Are_Injected_Correctly_When_Context_Field_Type_Is_Interface()
+		{
+			var stateLogic = new StateLogic();
+			var state = new State(new StateID(), new[] { stateLogic });
+
+			m_gameObject = new GameObject("TestObject", typeof(BoxCollider), typeof(Rigidbody));
+			var testInterface = ScriptableObject.CreateInstance<TestInterface>(); 
+
+			m_contexts = new UnityEngine.Object[] { testInterface }.Select(component => new Context(component));
+			m_stateMachine = new StateMachine(new[] { new StateLogicExecutor() }, Array.Empty<IStateTransition>(), m_contexts);
+			m_stateMachine.EnterState(state);
+
+			Assert.AreEqual(stateLogic.TestInterface, testInterface);
+		}
+
+		[Test]
+		public void Validate_If_References_Form_Context_Are_Injected_Correctly_When_Context_Field_Type_Is_Interface_Using_ID()
+		{
+			var stateLogic = new StateLogic();
+			var state = new State(new StateID(), new[] { stateLogic });
+
+			m_gameObject = new GameObject("TestObject", typeof(BoxCollider), typeof(Rigidbody));
+			var testInterface = ScriptableObject.CreateInstance<TestInterface>();
+
+			m_contexts = new[] { new Context("Test_1", testInterface) };
+			m_stateMachine = new StateMachine(new[] { new StateLogicExecutor() }, Array.Empty<IStateTransition>(), m_contexts);
+			m_stateMachine.EnterState(state);
+
+			Assert.AreEqual(stateLogic.TestInterface, testInterface);
+		}
+
+		[Test]
+		public void Validate_If_References_Form_Context_Are_Injected_Correctly_To_Property()
+		{
+			var stateLogic = new StateLogic();
+			var state = new State(new StateID(), new[] { stateLogic });
+
+			m_gameObject = new GameObject("TestObject", typeof(SphereCollider));
+			var sphereCollider = m_gameObject.GetComponent<SphereCollider>();
+
+			m_contexts = new Component[] { sphereCollider }.Select(component => new Context(component));
+			m_stateMachine = new StateMachine(new[] { new StateLogicExecutor() }, Array.Empty<IStateTransition>(), m_contexts);
+			m_stateMachine.EnterState(state);
+
+			Assert.AreEqual(stateLogic.SphereCollider, sphereCollider);
+		}
+
+		[Test]
+		public void Validate_If_References_Form_Context_Are_Injected_Correctly_To_Property_Using_ID()
+		{
+			var stateLogic = new StateLogic();
+			var state = new State(new StateID(), new[] { stateLogic });
+
+			m_gameObject = new GameObject("TestObject", typeof(SphereCollider));
+			var animator = m_gameObject.GetComponent<Animator>();
+
+			m_contexts = new[] { new Context("Test_3", animator) };
+			m_stateMachine = new StateMachine(new[] { new StateLogicExecutor() }, Array.Empty<IStateTransition>(), m_contexts);
+			m_stateMachine.EnterState(state);
+
+			Assert.AreEqual(stateLogic.Animator, animator);
 		}
 
 		[TearDown]

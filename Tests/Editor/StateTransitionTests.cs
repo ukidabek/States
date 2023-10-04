@@ -1,5 +1,6 @@
 ﻿using NUnit.Framework;
 using System;
+using Utilities.States.Default;
 
 namespace Utilities.States.Test
 {

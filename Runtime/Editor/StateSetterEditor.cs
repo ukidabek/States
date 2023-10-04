@@ -2,7 +2,7 @@
 using UnityEditor;
 using UnityEngine;
 
-namespace Utilities.States
+namespace Utilities.States.Default
 {
 	[CustomEditor(typeof(StateSetter))]
 	public class StateSetterEditor : Editor

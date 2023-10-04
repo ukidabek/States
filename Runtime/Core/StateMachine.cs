@@ -77,6 +77,30 @@ namespace Utilities.States
 			SetStateLogic();
 		}
 
+		private bool ValidateType(Context context, MemberInfo member)
+		{
+			var contextType = context.Type;
+			Type memberType = default;
+
+			switch (member)
+			{
+				case FieldInfo fieldInfo:
+					memberType = fieldInfo.FieldType;
+					break;
+				case PropertyInfo propertyInfo:
+					memberType = propertyInfo.PropertyType;
+					break;
+			}
+
+			if (memberType.IsInterface)
+			{
+				var interfaces = contextType.GetInterfaces();
+				return interfaces.Contains(memberType);
+			}
+
+			return contextType == memberType;
+		}
+
 		private void FillState(IState state, IEnumerable<Context> contexts)
 		{
 			var stateLogic = state.Logic;
@@ -84,29 +108,37 @@ namespace Utilities.States
 			foreach (var logic in stateLogic)
 			{
 				var logicType = logic.GetType();
-				var fields = logicType.GetFields(Binding_Flags);
+				var members = logicType.GetMembers(Binding_Flags);
 
-				foreach (var field in fields)
+				foreach (var member in members)
 				{
-					var attribute = field.GetCustomAttribute<ContextField>();
+					var attribute = member.GetCustomAttribute<ContextField>();
 					if (attribute == null) continue;
 
 					Context context = default;
 					var attributeID = attribute.ID;
 					if (string.IsNullOrEmpty(attributeID))
 					{
-						context = contexts.FirstOrDefault(context => context.Type == field.FieldType);
+						context = contexts.FirstOrDefault(context => ValidateType(context, member));
 						if (context == null)
 							continue;
 					}
 					else
 					{
-						context = contexts.FirstOrDefault(context => context.Type == field.FieldType && context.Id == attributeID);
+						context = contexts.FirstOrDefault(context => ValidateType(context, member) && context.Id == attributeID);
 						if (context == null)
 							continue;
 					}
 
-					field.SetValue(logic, context.Object);
+					switch(member)
+					{
+						case FieldInfo fieldInfo:
+							fieldInfo.SetValue(logic, context.Object);
+							break;
+						case PropertyInfo propertyInfo:
+							propertyInfo.SetValue(logic, context.Object);
+							break;
+					}
 				}
 			}
 		}

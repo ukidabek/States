@@ -1,4 +1,4 @@
-﻿namespace Utilities.States
+﻿namespace Utilities.States.Default
 {
 	public enum TransitionMode
 	{

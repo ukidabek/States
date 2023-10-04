@@ -2,7 +2,7 @@
 using System.Linq;
 using UnityEngine;
 
-namespace Utilities.States
+namespace Utilities.States.Default
 {
 	[AddComponentMenu("States/Core/StateDictionary")]
 	public class StateDictionary : MonoBehaviour

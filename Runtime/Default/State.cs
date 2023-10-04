@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-namespace Utilities.States
+namespace Utilities.States.Default
 {
     [AddComponentMenu("States/Core/State")]
 	public class State : MonoBehaviour, IState

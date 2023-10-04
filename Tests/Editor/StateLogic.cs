@@ -14,6 +14,16 @@ namespace Utilities.States.Test
 		[ContextField("Test")] private Rigidbody m_rigidbodyWithID = null;
 		public Rigidbody RigidbodyWithID => m_rigidbodyWithID;
 
+		[ContextField] private ITestInterface m_testInterface = null;
+		public ITestInterface TestInterface => m_testInterface;
+
+		[ContextField("Test_1")] private ITestInterface1 m_testInterface1 = null;
+		public ITestInterface1 TestInterface1 => m_testInterface1;
+
+		[ContextField] public SphereCollider SphereCollider { get; set; }
+
+		[ContextField("Test_3")] public Animator Animator { get; private set; }
+
 		public float UpdateCount = 0;
 		public float FixUpdateCount = 0;
 		public float LateUpdateCount = 0;

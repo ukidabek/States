@@ -1,16 +1,16 @@
 ﻿using System;
 using UnityEngine;
 
-namespace Stages
+namespace Utilities.States.Default
 {
 	public abstract class StatusHandler
 	{
 		[SerializeField] protected bool m_status = false;
 		public abstract UnityEngine.Object ManagedObject { get; }
-		
+
 		public abstract void Set();
 		public abstract void Reset();
-		
+
 		public override int GetHashCode() => ManagedObject.GetHashCode();
 
 		public override bool Equals(object obj) => ManagedObject == (obj as StatusHandler).ManagedObject;
@@ -32,7 +32,7 @@ namespace Stages
 
 		private void Set(bool status)
 		{
-			switch(m_managedObject) 
+			switch (m_managedObject)
 			{
 				case Behaviour behaviour:
 					behaviour.enabled = status;
@@ -67,8 +67,8 @@ namespace Stages
 
 		protected StatusHandler(T managedObject, bool status)
 		{
-			this.m_status = status;
-			this.m_managedObject = managedObject;
+			m_status = status;
+			m_managedObject = managedObject;
 		}
 
 		public override UnityEngine.Object ManagedObject => m_managedObject;

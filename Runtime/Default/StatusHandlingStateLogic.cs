@@ -1,8 +1,7 @@
-﻿using Stages;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
-namespace Utilities.States
+namespace Utilities.States.Default
 {
 	[StateLogicPath("States/StateLogic")]
 	public class StatusHandlingStateLogic : StateLogic

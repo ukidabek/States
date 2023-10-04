@@ -1,10 +1,10 @@
 ﻿using UnityEngine;
 using Utilities.General;
 
-namespace Utilities.States
+namespace Utilities.States.Default
 {
 	[AddComponentMenu("States/StateLogic/Transitions/StateTransitionLogicWithCoroutineBase")]
-	public abstract class StateTransitionLogicWithCoroutineBase : StateTransitionLogic
+	public abstract class StateTransitionLogicWithCoroutine : StateTransitionLogic
     {
         protected CoroutineManager _manager;
 

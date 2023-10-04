@@ -2,7 +2,7 @@
 using UnityEngine.Assertions;
 using UnityEngine.Serialization;
 
-namespace Utilities.States
+namespace Utilities.States.Default
 {
 	[AddComponentMenu("States/Core/StateSetter")]
 	public class StateSetter : MonoBehaviour

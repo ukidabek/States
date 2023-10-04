@@ -1,9 +1,7 @@
 ﻿using UnityEngine;
 
-namespace Utilities.States
+namespace Utilities.States.Default
 {
 	[CreateAssetMenu(menuName = "States/StateID", fileName = "StateID")]
-	public class StateID : ScriptableObject, IStateID
-	{
-	}
+	public class StateID : ScriptableObject, IStateID { }
 }

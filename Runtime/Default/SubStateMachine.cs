@@ -1,17 +1,12 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 
-namespace Utilities.States
+namespace Utilities.States.Default
 {
+
 	[StateLogicPath("States/StateLogic")]
 	public class SubStateMachine : StateMachineManager, IStateLogic, IStateMachine
-	{
-		private enum LogicExecutorHandlingMode
-		{
-			AddRemove,
-			EnableDisable,
-		}
-		
+	{		
 		[SerializeField] private LogicExecutorHandlingMode m_logicExecutorHandlingMode = LogicExecutorHandlingMode.AddRemove;
 	
 		private IEnumerable<IStateLogicExecutor> m_stateLogicExecutors = null;

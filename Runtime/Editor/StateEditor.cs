@@ -7,7 +7,7 @@ using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
-namespace Utilities.States
+namespace Utilities.States.Default
 {
 	[CustomEditor(typeof(State))]
 	public class StateEditor : Editor, ISearchWindowProvider

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Utilities.States
+namespace Utilities.States.Default
 {
 	public class StateTransition : IStateTransition
 	{

@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Utilities.States
+namespace Utilities.States.Default
 {
 	[AddComponentMenu("States/Core/StateMachineManager")]
 	public class StateMachineManager : MonoBehaviour, IStateMachine

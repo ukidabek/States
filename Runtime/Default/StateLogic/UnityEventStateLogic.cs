@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.Events;
 
-namespace Utilities.States
+namespace Utilities.States.Default
 {
 	[StateLogicPath("States/StateLogic")]
 	public class UnityEventStateLogic : StateLogic

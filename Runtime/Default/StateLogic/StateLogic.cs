@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace Utilities.States
+namespace Utilities.States.Default
 {
 	public abstract class StateLogic : MonoBehaviour, IStateLogic
     {
