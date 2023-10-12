@@ -2,8 +2,5 @@
 
 namespace Utilities.States
 {
-	public class ConfigField : Attribute
-	{
-
-	}
+	public class ConfigField : Attribute { }
 }
