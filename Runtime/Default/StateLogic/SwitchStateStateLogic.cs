@@ -49,6 +49,7 @@ namespace Utilities.States.Default
 		{
 			_stateConditions = _stateConditions
 				.Concat(_conditionsObjects.OfType<ISwitchStateCondition>())
+				.Distinct()
 				.ToList();
 		}
 
