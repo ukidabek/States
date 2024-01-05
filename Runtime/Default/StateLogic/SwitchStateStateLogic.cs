@@ -18,6 +18,8 @@ namespace Utilities.States.Default
 		[SerializeField] private bool m_switchEnabled = true;
 
 		private List<ISwitchStateCondition> _stateConditions = new List<ISwitchStateCondition>();
+		public IEnumerable<IContextDestination> ContextDestinations { get; private set; }
+
 		private IStateMachine m_stateMachine = null;
 
 		private bool Condition
@@ -35,7 +37,11 @@ namespace Utilities.States.Default
 			}
 		}
 
-		private void Awake() => m_stateMachine = _stateMachineInstance as IStateMachine;
+		private void Awake()
+		{
+			m_stateMachine = _stateMachineInstance as IStateMachine;
+			ContextDestinations = _stateConditions.OfType<IContextDestination>().Concat(_conditionsObjects.OfType<IContextDestination>());
+		}
 
 		public override void Activate()
 		{
