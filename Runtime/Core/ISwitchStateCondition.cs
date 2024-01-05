@@ -1,6 +1,6 @@
 ﻿namespace Utilities.States
 {
-    public interface ISwitchStateCondition
+    public interface ISwitchStateCondition : IContextDestination
     {
         bool Condition { get; }
     }
