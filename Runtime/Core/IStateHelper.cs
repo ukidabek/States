@@ -8,8 +8,7 @@ namespace Utilities.States
         public static IEnumerable<IContextDestination> GetContextDestination(this IState state)
         {
             var logic = state.Logic;
-            var x = logic.OfType<IContextDestination>();
-            return x.Concat(logic.SelectMany(logic => logic.ContextDestinations));
+            return logic.OfType<IContextDestination>().Concat(logic.SelectMany(logic => logic.ContextDestinations));
         }
     }
 }

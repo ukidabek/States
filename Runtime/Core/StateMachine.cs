@@ -103,9 +103,8 @@ namespace Utilities.States
 
 		private void FillState(IState state, IEnumerable<Context> contexts)
 		{
-			var stateLogic = state.GetContextDestination();
-
-			foreach (var logic in stateLogic)
+			var contextDestinations = state.GetContextDestination();
+			foreach (var logic in contextDestinations)
 			{
 				var logicType = logic.GetType();
 				var members = logicType.GetMembers(Binding_Flags);

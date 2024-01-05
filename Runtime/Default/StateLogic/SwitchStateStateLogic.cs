@@ -1,5 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Net.WebSockets;
+using System.Threading.Tasks;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
@@ -18,7 +20,7 @@ namespace Utilities.States.Default
 		[SerializeField] private bool m_switchEnabled = true;
 
 		private List<ISwitchStateCondition> _stateConditions = new List<ISwitchStateCondition>();
-		public IEnumerable<IContextDestination> ContextDestinations { get; private set; }
+		public override IEnumerable<IContextDestination> ContextDestinations { get; protected set; }
 
 		private IStateMachine m_stateMachine = null;
 

@@ -1,4 +1,6 @@
-﻿using NUnit.Framework;
+﻿using System;
+using System.Collections.Generic;
+using NUnit.Framework;
 using UnityEngine;
 
 namespace Utilities.States.Test
@@ -27,6 +29,8 @@ namespace Utilities.States.Test
 		public float UpdateCount = 0;
 		public float FixUpdateCount = 0;
 		public float LateUpdateCount = 0;
+
+        public virtual IEnumerable<IContextDestination> ContextDestinations { get; protected set;} = Array.Empty<IContextDestination>();
 
 		public void Activate() { }
 

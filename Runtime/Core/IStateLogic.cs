@@ -5,7 +5,7 @@ namespace Utilities.States
 {
     public interface IStateLogic : IContextDestination
     {
-        IEnumerable<IContextDestination> ContextDestinations => Array.Empty<IContextDestination>();
+        IEnumerable<IContextDestination> ContextDestinations { get; }
         void Activate();
         void Deactivate();
     }

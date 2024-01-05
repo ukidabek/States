@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace Utilities.States.Default
@@ -6,10 +7,13 @@ namespace Utilities.States.Default
 
 	[StateLogicPath("States/StateLogic")]
 	public class SubStateMachine : StateMachineManager, IStateLogic, IStateMachine
-	{		
+	{
 		[SerializeField] private LogicExecutorHandlingMode m_logicExecutorHandlingMode = LogicExecutorHandlingMode.AddRemove;
-	
+
 		private IEnumerable<IStateLogicExecutor> m_stateLogicExecutors = null;
+
+		public virtual IEnumerable<IContextDestination> ContextDestinations => Array.Empty<IContextDestination>();
+
 
 		public void Activate()
 		{

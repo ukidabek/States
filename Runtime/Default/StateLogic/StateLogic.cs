@@ -1,12 +1,15 @@
-﻿using UnityEngine;
+﻿using System;
+using System.Collections.Generic;
+using UnityEngine;
 
 namespace Utilities.States.Default
 {
-	public abstract class StateLogic : MonoBehaviour, IStateLogic
+    public abstract class StateLogic : MonoBehaviour, IStateLogic
     {
-        public virtual void Activate() {}
-        public virtual void Deactivate() {}
-        
+        public virtual IEnumerable<IContextDestination> ContextDestinations { get; protected set; } = Array.Empty<IContextDestination>();
+        public virtual void Activate() { }
+        public virtual void Deactivate() { }
+
         [ContextMenu("Change object name")]
         private void ChangeObjectName()
         {
@@ -17,7 +20,8 @@ namespace Utilities.States.Default
 
     public abstract class StateLogicScriptableObject : ScriptableObject, IStateLogic
     {
-        public virtual void Activate() {}
-        public virtual void Deactivate() {}
+        public virtual IEnumerable<IContextDestination> ContextDestinations { get; protected set; } = Array.Empty<IContextDestination>();
+        public virtual void Activate() { }
+        public virtual void Deactivate() { }
     }
 }
