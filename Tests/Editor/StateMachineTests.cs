@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace Utilities.States.Test
 {
-	public class StateMachineTests
+    public class StateMachineTests
 	{
 		private GameObject m_gameObject = null;
 		private StateMachine m_stateMachine = null;
@@ -146,6 +146,23 @@ namespace Utilities.States.Test
 			m_stateMachine.EnterState(state);
 
 			Assert.AreEqual(stateLogic.Animator, animator);
+		}
+
+		[Test]
+		public void Validate_If_References_Form_Context_Are_Injected_Correctly_To_Destinations_Provided_By_StateLogic()
+		{
+			var stateLogic = new TestStateLogic();
+			var state = new State(new StateID(), new[] { stateLogic });
+
+			m_gameObject = new GameObject("TestObject", typeof(SphereCollider));
+			var rigidbody = m_gameObject.GetComponent<Rigidbody>();
+
+			m_contexts = new[] { new Context(rigidbody), new Context("Test_1", rigidbody) };
+			m_stateMachine = new StateMachine(new[] { new StateLogicExecutor() }, Array.Empty<IStateTransition>(), m_contexts);
+			m_stateMachine.EnterState(state);
+
+			Assert.AreEqual(stateLogic.Test.Rigidbody, rigidbody);
+			Assert.AreEqual(stateLogic.Test.Rigidbody2, rigidbody);
 		}
 
 		[TearDown]

@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 
 namespace Utilities.States.Test
 {
@@ -8,7 +9,7 @@ namespace Utilities.States.Test
 
 		public IEnumerable<IStateLogic> Logic { get; private set; }
 
-		public State(IStateID iD, IEnumerable<IStateLogic> logic)
+        public State(IStateID iD, IEnumerable<IStateLogic> logic)
 		{
 			ID = iD;
 			Logic = logic;

@@ -103,7 +103,7 @@ namespace Utilities.States
 
 		private void FillState(IState state, IEnumerable<Context> contexts)
 		{
-			var stateLogic = state.Logic;
+			var stateLogic = state.GetContextDestination();
 
 			foreach (var logic in stateLogic)
 			{

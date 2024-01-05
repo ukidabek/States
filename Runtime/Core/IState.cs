@@ -2,9 +2,9 @@
 
 namespace Utilities.States
 {
-	public interface IState
+    public interface IState
     {
-		IStateID ID { get; }  
+        IStateID ID { get; }
         IEnumerable<IStateLogic> Logic { get; }
         void Enter();
         void Exit();
