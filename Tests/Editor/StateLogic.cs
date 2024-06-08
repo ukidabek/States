@@ -5,12 +5,13 @@ using UnityEngine;
 
 namespace Utilities.States.Test
 {
+	public class ExtendedStateLogic : StateLogic {}
 	public class StateLogic : IStateLogic, IOnUpdateLogic, IOnFixUpdateLogic, IOnLateUpdateLogic
 	{
-		[ContextField] private BoxCollider m_boxCollider = null;
+		[ContextField] protected BoxCollider m_boxCollider = null;
 		public BoxCollider BoxCollider => m_boxCollider;
 
-		[ContextField] private Rigidbody m_rigidbody = null;
+		[ContextField] protected Rigidbody m_rigidbody = null;
 		public Rigidbody Rigidbody => m_rigidbody;
 
 		[ContextField("Test")] private Rigidbody m_rigidbodyWithID = null;

@@ -50,6 +50,8 @@ namespace Utilities.States.Test
 
 		}
 
+		private IEnumerable<Context> GenerateContext(params UnityEngine.Object[] components) => components.Select(component => new Context(component));
+
 		[Test]
 		public void Validate_If_References_Form_Context_Are_Injected_Correctly()
 		{
@@ -60,7 +62,25 @@ namespace Utilities.States.Test
 			var boxCollider = m_gameObject.GetComponent<BoxCollider>();
 			var rigidbody = m_gameObject.GetComponent<Rigidbody>();
 
-			m_contexts = new Component[] { boxCollider, rigidbody }.Select(component => new Context(component));
+			m_contexts = GenerateContext(boxCollider, rigidbody);
+			m_stateMachine = new StateMachine(new[] { new StateLogicExecutor() }, Array.Empty<IStateTransition>(), m_contexts);
+			m_stateMachine.EnterState(state);
+
+			Assert.AreEqual(stateLogic.BoxCollider, boxCollider);
+			Assert.AreEqual(stateLogic.Rigidbody, rigidbody);
+		}
+
+		[Test]
+		public void Validate_If_References_Form_Context_Are_Injected_Correctly_Is_State_Logic_Inherit_Context_Fields()
+		{
+			var stateLogic = new ExtendedStateLogic();
+			var state = new State(new StateID(), new[] { stateLogic });
+
+			m_gameObject = new GameObject("TestObject", typeof(BoxCollider), typeof(Rigidbody));
+			var boxCollider = m_gameObject.GetComponent<BoxCollider>();
+			var rigidbody = m_gameObject.GetComponent<Rigidbody>();
+
+			m_contexts = GenerateContext(boxCollider, rigidbody);
 			m_stateMachine = new StateMachine(new[] { new StateLogicExecutor() }, Array.Empty<IStateTransition>(), m_contexts);
 			m_stateMachine.EnterState(state);
 
@@ -93,7 +113,7 @@ namespace Utilities.States.Test
 			m_gameObject = new GameObject("TestObject", typeof(BoxCollider), typeof(Rigidbody));
 			var testInterface = ScriptableObject.CreateInstance<TestInterface>(); 
 
-			m_contexts = new UnityEngine.Object[] { testInterface }.Select(component => new Context(component));
+			m_contexts = GenerateContext(testInterface);
 			m_stateMachine = new StateMachine(new[] { new StateLogicExecutor() }, Array.Empty<IStateTransition>(), m_contexts);
 			m_stateMachine.EnterState(state);
 
@@ -125,7 +145,7 @@ namespace Utilities.States.Test
 			m_gameObject = new GameObject("TestObject", typeof(SphereCollider));
 			var sphereCollider = m_gameObject.GetComponent<SphereCollider>();
 
-			m_contexts = new Component[] { sphereCollider }.Select(component => new Context(component));
+			m_contexts = GenerateContext(sphereCollider);
 			m_stateMachine = new StateMachine(new[] { new StateLogicExecutor() }, Array.Empty<IStateTransition>(), m_contexts);
 			m_stateMachine.EnterState(state);
 
