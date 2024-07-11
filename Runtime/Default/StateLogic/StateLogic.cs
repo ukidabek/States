@@ -7,7 +7,10 @@ namespace Utilities.States.Default
     public abstract class StateLogic : MonoBehaviour, IStateLogic
     {
         public virtual IEnumerable<IContextDestination> ContextDestinations { get; protected set; } = Array.Empty<IContextDestination>();
-        public virtual void Activate() { }
+
+        public virtual bool CanBeDeactivated => true;
+
+		public virtual void Activate() { }
         public virtual void Deactivate() { }
 
         [ContextMenu("Change object name")]
@@ -21,6 +24,8 @@ namespace Utilities.States.Default
     public abstract class StateLogicScriptableObject : ScriptableObject, IStateLogic
     {
         public virtual IEnumerable<IContextDestination> ContextDestinations { get; protected set; } = Array.Empty<IContextDestination>();
+		public virtual bool CanBeDeactivated => true;
+		
         public virtual void Activate() { }
         public virtual void Deactivate() { }
     }

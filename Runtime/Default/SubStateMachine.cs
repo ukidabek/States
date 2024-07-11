@@ -14,6 +14,7 @@ namespace Utilities.States.Default
 
 		public virtual IEnumerable<IContextDestination> ContextDestinations => Array.Empty<IContextDestination>();
 
+		public bool CanBeDeactivated => true;
 
 		public void Activate()
 		{

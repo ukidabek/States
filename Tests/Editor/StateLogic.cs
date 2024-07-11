@@ -6,7 +6,7 @@ using UnityEngine;
 namespace Utilities.States.Test
 {
 	public class ExtendedStateLogic : StateLogic {}
-	public class StateLogic : IStateLogic, IOnUpdateLogic, IOnFixUpdateLogic, IOnLateUpdateLogic
+	public class StateLogic : IStateLogic, IOnUpdateLogic, IOnFixedUpdateLogic, IOnLateUpdateLogic
 	{
 		[ContextField] protected BoxCollider m_boxCollider = null;
 		public BoxCollider BoxCollider => m_boxCollider;
@@ -32,6 +32,8 @@ namespace Utilities.States.Test
 		public float LateUpdateCount = 0;
 
         public virtual IEnumerable<IContextDestination> ContextDestinations { get; protected set;} = Array.Empty<IContextDestination>();
+
+		public bool CanBeDeactivated { get; set; }
 
 		public void Activate() { }
 

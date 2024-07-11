@@ -46,6 +46,9 @@ namespace Utilities.States
 
 		public void EnterState(IState statToEnter)
 		{
+			var currentStateNotNull = CurrentState != null;
+
+			if (currentStateNotNull && !CurrentState.CanExit) return;
 			if (CurrentState == statToEnter) return;
 
 			PreviousState = CurrentState;
@@ -56,7 +59,7 @@ namespace Utilities.States
 				transition.Perform(CurrentState, statToEnter);
 			}
 
-			if (CurrentState != null)
+			if (currentStateNotNull)
 			{
 				RemoveStateLogic();
 				CurrentState.Exit();

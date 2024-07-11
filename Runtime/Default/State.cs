@@ -16,7 +16,9 @@ namespace Utilities.States.Default
 
         public IEnumerable<IContextDestination> ContextDestinations => throw new System.NotImplementedException();
 
-        public void Enter()
+        public bool CanExit => Logic.All(_logic => _logic.CanBeDeactivated);
+
+		public void Enter()
         {
             foreach (var stateLogic in Logic) 
                 stateLogic.Activate();

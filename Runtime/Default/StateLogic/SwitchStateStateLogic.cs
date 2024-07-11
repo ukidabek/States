@@ -1,8 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using System.Net.WebSockets;
-using System.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.Serialization;
 using Object = UnityEngine.Object;
 
 namespace Utilities.States.Default
@@ -15,11 +14,11 @@ namespace Utilities.States.Default
 		[SerializeField] private ConditionMode _mode = ConditionMode.All;
 		[SerializeField] private Object _stateMachineInstance = null;
 		[SerializeField] private State _stateToEnter = null;
-		[SerializeField] private Object[] _conditionsObjects = null;
+		[FormerlySerializedAs("_conditionsObjects"), SerializeField] private Object[] m_conditionsObjects = null;
 		[SerializeField] private bool m_returnOnEmpty = false;
 		[SerializeField] private bool m_switchEnabled = true;
 
-		private List<ISwitchStateCondition> _stateConditions = new List<ISwitchStateCondition>();
+		private List<ISwitchStateCondition> m_stateConditions = new List<ISwitchStateCondition>();
 		public override IEnumerable<IContextDestination> ContextDestinations { get; protected set; }
 
 		private IStateMachine m_stateMachine = null;
@@ -28,12 +27,12 @@ namespace Utilities.States.Default
 		{
 			get
 			{
-				var isEmpty = _stateConditions.Count() == 0;
+				var isEmpty = m_stateConditions.Count() == 0;
 				if (isEmpty) return m_returnOnEmpty;
 				return _mode switch
 				{
-					ConditionMode.All => _stateConditions.All(condition => condition.Condition),
-					ConditionMode.Any => _stateConditions.Any(condition => condition.Condition),
+					ConditionMode.All => m_stateConditions.All(condition => condition.Condition),
+					ConditionMode.Any => m_stateConditions.Any(condition => condition.Condition),
 					_ => false
 				};
 			}
@@ -42,27 +41,27 @@ namespace Utilities.States.Default
 		private void Awake()
 		{
 			m_stateMachine = _stateMachineInstance as IStateMachine;
-			ContextDestinations = _stateConditions.OfType<IContextDestination>().Concat(_conditionsObjects.OfType<IContextDestination>());
+			ContextDestinations = m_stateConditions.OfType<IContextDestination>().Concat(m_conditionsObjects.OfType<IContextDestination>());
 		}
 
 		public override void Activate()
 		{
-			_stateConditions = _stateConditions
-				.Concat(_conditionsObjects.OfType<ISwitchStateCondition>())
+			m_stateConditions = m_stateConditions
+				.Concat(m_conditionsObjects.OfType<ISwitchStateCondition>())
 				.Distinct()
 				.ToList();
 		}
 
 		public void AddCondition(ISwitchStateCondition condition)
 		{
-			if (_stateConditions.Contains(condition)) return;
-			_stateConditions.Add(condition);
+			if (m_stateConditions.Contains(condition)) return;
+			m_stateConditions.Add(condition);
 		}
 
 		public void RemoveCondition(ISwitchStateCondition condition)
 		{
-			if (!_stateConditions.Contains(condition)) return;
-			_stateConditions.Remove(condition);
+			if (!m_stateConditions.Contains(condition)) return;
+			m_stateConditions.Remove(condition);
 		}
 
 		public virtual void OnUpdate(float deltaTime, float timeScale)
@@ -77,8 +76,7 @@ namespace Utilities.States.Default
 		public void Switch()
 		{
 			var stateToEnter = _stateToEnter as IState;
-			if (_stateToEnter == null || m_stateMachine.CurrentState == stateToEnter)
-				return;
+			if (_stateToEnter == null || m_stateMachine.CurrentState == stateToEnter) return;
 			m_stateMachine.EnterState(_stateToEnter);
 		}
 
@@ -103,7 +101,7 @@ namespace Utilities.States.Default
 		public void GetConditions()
 		{
 			var components = GetComponentsInChildren<ISwitchStateCondition>();
-			_conditionsObjects = components.OfType<Object>().ToArray();
+			m_conditionsObjects = components.OfType<Object>().ToArray();
 		}
 #endif
 	}

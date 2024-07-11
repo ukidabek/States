@@ -6,7 +6,8 @@ namespace Utilities.States
     public interface IStateLogic : IContextDestination
     {
         IEnumerable<IContextDestination> ContextDestinations { get; }
-        void Activate();
+        bool CanBeDeactivated { get; }
+		void Activate();
         void Deactivate();
     }
 }

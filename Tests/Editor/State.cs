@@ -9,7 +9,9 @@ namespace Utilities.States.Test
 
 		public IEnumerable<IStateLogic> Logic { get; private set; }
 
-        public State(IStateID iD, IEnumerable<IStateLogic> logic)
+		public bool CanExit { get; set; } = true;
+
+		public State(IStateID iD, IEnumerable<IStateLogic> logic)
 		{
 			ID = iD;
 			Logic = logic;

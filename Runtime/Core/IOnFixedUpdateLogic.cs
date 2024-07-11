@@ -1,6 +1,6 @@
 ﻿namespace Utilities.States
 {
-    public interface IOnFixUpdateLogic : IUpdateLogic
+    public interface IOnFixedUpdateLogic : IUpdateLogic
 	{
         void OnFixUpdate(float deltaTime, float timeScale);
     }

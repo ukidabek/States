@@ -7,6 +7,7 @@ namespace Utilities.States
         IStateID ID { get; }
         IEnumerable<IStateLogic> Logic { get; }
         void Enter();
+        bool CanExit { get; }
         void Exit();
     }
 }

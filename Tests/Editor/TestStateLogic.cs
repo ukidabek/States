@@ -22,6 +22,8 @@ namespace Utilities.States.Test
 
 		public IEnumerable<IContextDestination> ContextDestinations {get; private set;}
 
+		public bool CanBeDeactivated => true;
+
 		public void Activate() { }
 
 		public void Deactivate() { }

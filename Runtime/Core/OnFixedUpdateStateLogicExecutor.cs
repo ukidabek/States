@@ -4,9 +4,11 @@ namespace Utilities.States
 {
 	[AddComponentMenu("States/Executors/OnFixedUpdateStateLogicExecutor")]
 	[DisallowMultipleComponent]
-	public class OnFixedUpdateStateLogicExecutor : StateLogicExecutor<IOnFixUpdateLogic>
+	public class OnFixedUpdateStateLogicExecutor : StateLogicExecutor<IOnFixedUpdateLogic>
     {
-        private void Update()
+		protected override (float, float) GetTimeInfo() => (Time.fixedDeltaTime, Time.timeScale);
+
+		private void FixedUpdate()
         {
 			var timeInfo = GetTimeInfo();
 			for (int i = 0; i < _logic.Count; i++)
