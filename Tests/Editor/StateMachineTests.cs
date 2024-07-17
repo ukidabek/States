@@ -28,6 +28,24 @@ namespace Utilities.States.Test
 			Assert.AreEqual(stateA, m_stateMachine.PreviousState);
 		}
 
+		[Test]
+		public void Validate_If_State_Wont_Change_When_Current_State_Cant_Exit()
+		{
+			m_contexts = Array.Empty<Context>();
+			m_stateMachine = new StateMachine(new[] { new StateLogicExecutor() }, Array.Empty<IStateTransition>(), m_contexts);
+			var stateA = new State(new StateID(), new[] { new StateLogic() });
+			var stateB = new State(new StateID(), new[] { new StateLogic() });
+
+			m_stateMachine.EnterState(stateA);
+			Assert.AreEqual(stateA, m_stateMachine.CurrentState);
+
+			stateA.CanExit = false;
+			m_stateMachine.EnterState(stateB);
+
+			Assert.AreNotEqual(stateB, m_stateMachine.CurrentState);
+			Assert.AreEqual(stateA, m_stateMachine.CurrentState);
+		}
+
 		[TestCase(1)]
 		[TestCase(10)]
 		[TestCase(100)]
