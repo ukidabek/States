@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace Utilities.States.Test
 {
-    public class TestStateLogic : IStateLogic
+    public class TestUpdateLogic : IStateLogic, IUpdateLogic
 	{
         public class TestClass : IContextDestination
 		{
@@ -15,7 +15,7 @@ namespace Utilities.States.Test
 
 		public TestClass Test = new TestClass();
 
-        public TestStateLogic()
+        public TestUpdateLogic()
         {
 			ContextDestinations = new [] {Test };
         }

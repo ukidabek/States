@@ -11,8 +11,8 @@ namespace Utilities.States
 		private void FixedUpdate()
         {
 			var timeInfo = GetTimeInfo();
-			for (int i = 0; i < _logic.Count; i++)
-				_logic[i].OnFixUpdate(timeInfo.Item1, timeInfo.Item2);
+			for (int i = 0; i < m_logic.Count; i++)
+				m_logic[i].OnFixUpdate(timeInfo.Item1, timeInfo.Item2);
 		}
 	}
 }

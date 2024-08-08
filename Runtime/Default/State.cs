@@ -14,8 +14,6 @@ namespace Utilities.States.Default
         [SerializeField] private Object[] m_logic = null;
         public IEnumerable<IStateLogic> Logic => m_logic.OfType<IStateLogic>();
 
-        public IEnumerable<IContextDestination> ContextDestinations => throw new System.NotImplementedException();
-
         public bool CanExit => Logic.All(_logic => _logic.CanBeDeactivated);
 
 		public void Enter()
