@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace Utilities.States.Test
 {
-    public class StateMachineTests
+	public class StateMachineTests
 	{
 		private GameObject m_gameObject = null;
 		private StateMachine m_stateMachine = null;
@@ -129,7 +129,7 @@ namespace Utilities.States.Test
 			var state = new State(new StateID(), new[] { stateLogic });
 
 			m_gameObject = new GameObject("TestObject", typeof(BoxCollider), typeof(Rigidbody));
-			var testInterface = ScriptableObject.CreateInstance<TestInterface>(); 
+			var testInterface = ScriptableObject.CreateInstance<TestInterface>();
 
 			m_contexts = GenerateContext(testInterface);
 			m_stateMachine = new StateMachine(new[] { new StateLogicExecutor() }, Array.Empty<IStateTransition>(), m_contexts);
@@ -189,7 +189,7 @@ namespace Utilities.States.Test
 		[Test]
 		public void Validate_If_References_Form_Context_Are_Injected_Correctly_To_Destinations_Provided_By_StateLogic()
 		{
-			var stateLogic = new TestStateLogic();
+			var stateLogic = new TestUpdateLogic();
 			var state = new State(new StateID(), new[] { stateLogic });
 
 			m_gameObject = new GameObject("TestObject", typeof(SphereCollider));

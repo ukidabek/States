@@ -20,18 +20,18 @@ namespace Utilities.States
 
 	public abstract class StateLogicExecutor<T> : StateLogicExecutor where T : IUpdateLogic
 	{
-        protected readonly List<T> _logic = new List<T>(30);
+        protected readonly List<T> m_logic = new List<T>(30);
 
 		public override void SetLogicToExecute(IState state)
 		{
 			var logicToAdd = state.Logic.OfType<T>();
-            _logic.AddRange(logicToAdd);
+            m_logic.AddRange(logicToAdd.Except(m_logic));
 		}
 
 		public override void RemoveLogicToExecute(IState state)
 		{
             var logicToRemove = state.Logic.OfType<T>().ToHashSet();
-            _logic.RemoveAll(logic => logicToRemove.Contains(logic));
+            m_logic.RemoveAll(logic => logicToRemove.Contains(logic));
 		}
 	}
 }
