@@ -203,6 +203,22 @@ namespace Utilities.States.Test
 			Assert.AreEqual(stateLogic.Test.Rigidbody2, rigidbody);
 		}
 
+		[Test]
+		public void Validate_If_Class_Wuth_Extend_Context_Type_Are_Injectec_Correctly()
+		{
+			var stateLogic = new TestUpdateLogic();
+			var state = new State(new StateID(), new[] { stateLogic });
+
+			m_gameObject = new GameObject("TestObject", typeof(TextExtensionClass));
+			var extensionClass = m_gameObject.GetComponent<TextExtensionClass>();
+
+			m_contexts = new[] { new Context(extensionClass)};
+			m_stateMachine = new StateMachine(new[] { new StateLogicExecutor() }, Array.Empty<IStateTransition>(), m_contexts);
+			m_stateMachine.EnterState(state);
+
+			Assert.AreEqual(extensionClass, stateLogic.Test.BaseClass);
+		}
+
 		[TearDown]
 		public void TearDown()
 		{

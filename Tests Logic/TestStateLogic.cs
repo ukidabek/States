@@ -3,24 +3,26 @@ using UnityEngine;
 
 namespace Utilities.States.Test
 {
-    public class TestUpdateLogic : IStateLogic, IUpdateLogic
+	public class TestUpdateLogic : IStateLogic, IUpdateLogic
 	{
-        public class TestClass : IContextDestination
+		public class TestClass : IContextDestination
 		{
 			[ContextField] private Rigidbody rigidbody1;
 			public Rigidbody Rigidbody => rigidbody1;
 
 			[ContextField("Test_1")] public Rigidbody Rigidbody2;
-		} 
+
+			[ContextField] public TestBaseClass BaseClass = null;
+		}
 
 		public TestClass Test = new TestClass();
 
-        public TestUpdateLogic()
-        {
-			ContextDestinations = new [] {Test };
-        }
+		public TestUpdateLogic()
+		{
+			ContextDestinations = new[] { Test };
+		}
 
-		public IEnumerable<IContextDestination> ContextDestinations {get; private set;}
+		public IEnumerable<IContextDestination> ContextDestinations { get; private set; }
 
 		public bool CanBeDeactivated => true;
 

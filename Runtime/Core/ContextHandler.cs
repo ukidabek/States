@@ -5,7 +5,7 @@ using System.Reflection;
 
 namespace Utilities.States
 {
-    public class ContextHandler
+	public class ContextHandler
 	{
 		private const BindingFlags Binding_Flags = BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.FlattenHierarchy | BindingFlags.Instance;
 
@@ -30,7 +30,7 @@ namespace Utilities.States
 				return interfaces.Contains(memberType);
 			}
 
-			return contextType == memberType;
+			return memberType.IsAssignableFrom(contextType);
 		}
 
 		public void FillState(IState state, IEnumerable<Context> contexts)

@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using NUnit.Framework;
 using UnityEngine;
+using UnityEngine.Assertions;
 
 namespace Utilities.States.Test
 {
-	public class ExtendedStateLogic : StateLogic {}
+	public class ExtendedStateLogic : StateLogic { }
 	public class StateLogic : IStateLogic, IOnUpdateLogic, IOnFixedUpdateLogic, IOnLateUpdateLogic
 	{
 		[ContextField] protected BoxCollider m_boxCollider = null;
@@ -31,7 +31,7 @@ namespace Utilities.States.Test
 		public float FixUpdateCount = 0;
 		public float LateUpdateCount = 0;
 
-        public virtual IEnumerable<IContextDestination> ContextDestinations { get; protected set;} = Array.Empty<IContextDestination>();
+		public virtual IEnumerable<IContextDestination> ContextDestinations { get; protected set; } = Array.Empty<IContextDestination>();
 
 		public bool CanBeDeactivated { get; set; }
 
