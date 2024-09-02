@@ -1,12 +1,14 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace Utilities.States.Default
 {
-	[AddComponentMenu("States/Core/StateMachineManager")]
-	public class StateMachineManager : MonoBehaviour, IStateMachine
+	[AddComponentMenu("States/Core/StateMachineHost")]
+	public class StateMachineHost : MonoBehaviour, IStateMachine
 	{
+		[SerializeField] private ExternalContext[] m_externalContext = null;
 		[SerializeField] private List<Context> m_context = new List<Context>();
 		[SerializeField] private Executor m_executors = 0;
 		public Executor Executor => m_executors;
@@ -36,12 +38,14 @@ namespace Utilities.States.Default
 			var transitions = GetComponents<IStateTransition>();
 			var preProcessors = GetComponents<IStatePreProcessor>();
 			var postProcessors = GetComponents<IStatePostProcessor>();
+			var externalContext = m_externalContext.SelectMany(_context => _context.Context);
+			var context = m_context.Concat(externalContext).ToArray();
 
 			m_stateMachine = new StateMachine(
 				name, 
 				executors, 
-				transitions, 
-				m_context, 
+				transitions,
+				context, 
 				preProcessors, 
 				postProcessors);
 			m_stateMachine.OnStateChanged += OnStateChange;

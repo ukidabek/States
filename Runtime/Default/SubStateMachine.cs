@@ -6,7 +6,7 @@ namespace Utilities.States.Default
 {
 
 	[StateLogicPath("States/StateLogic")]
-	public class SubStateMachine : StateMachineManager, IStateLogic, IStateMachine
+	public class SubStateMachine : StateMachineHost, IStateLogic, IStateMachine
 	{
 		[SerializeField] private LogicExecutorHandlingMode m_logicExecutorHandlingMode = LogicExecutorHandlingMode.AddRemove;
 

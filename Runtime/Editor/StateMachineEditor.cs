@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace Utilities.States.Default
 {
-	[CustomEditor(typeof(StateMachineManager), true)]
+	[CustomEditor(typeof(StateMachineHost), true)]
 	public class StateMachineEditor : Editor
 	{
 		public static Type[] m_executorsTypes = new Type[]
@@ -16,7 +16,7 @@ namespace Utilities.States.Default
 			typeof(OnFixedUpdateStateLogicExecutor),
 		};
 
-		private StateMachineManager m_stateMachineManager = null;
+		private StateMachineHost m_stateMachineManager = null;
 
 		private FieldInfo m_defaultStateSetterProperty = null;
 
@@ -28,9 +28,9 @@ namespace Utilities.States.Default
 
 		protected virtual void OnEnable()
 		{
-			m_stateMachineManager = (StateMachineManager)target;
+			m_stateMachineManager = (StateMachineHost)target;
 
-			var targetType = typeof(StateMachineManager);
+			var targetType = typeof(StateMachineHost);
 			var bindingsFlags = BindingFlags.NonPublic | BindingFlags.Instance;
 			m_defaultStateSetterProperty = targetType.GetField("m_defaultStateSetter", bindingsFlags);
 
