@@ -1,5 +1,4 @@
-﻿using System;
-using UnityEditor;
+﻿using UnityEditor;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -20,7 +19,18 @@ namespace Utilities.States.Default
 			base.Activate();
 			var sceneName = m_sceneToLoad.name;
 			m_loadSceneOperation = SceneManager.LoadSceneAsync(sceneName, m_loadSceneMode);
-			m_loadSceneOperation.allowSceneActivation = m_setSceneAsActive;
+			if (!m_setSceneAsActive) return;
+			if (m_loadSceneOperation == null) return;
+			m_loadSceneOperation.completed += OnLoadCompleated;
+		}
+
+		private void OnLoadCompleated(AsyncOperation operation)
+		{
+			operation.completed -= OnLoadCompleated;
+			var sceneName = m_sceneToLoad.name;
+			var scene = SceneManager.GetSceneByName(sceneName);
+			if (!scene.IsValid()) return;
+			SceneManager.SetActiveScene(scene);
 		}
 	}
 }
