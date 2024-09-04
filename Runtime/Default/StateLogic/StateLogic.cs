@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Utilities.States.Default
 {
-    public abstract class StateLogic : MonoBehaviour, IStateLogic
+	public abstract class StateLogic : MonoBehaviour, IStateLogic
     {
         public virtual IEnumerable<IContextDestination> ContextDestinations { get; protected set; } = Array.Empty<IContextDestination>();
 
