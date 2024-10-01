@@ -3,7 +3,7 @@
 namespace Utilities.States.Default
 {
 	[CustomEditor(typeof(SubStateMachine))]
-	public class SubStateMachineEditor : StateMachineEditor
+	public class SubStateMachineEditor : StateMachineHostEditor
 	{
 	}
 }

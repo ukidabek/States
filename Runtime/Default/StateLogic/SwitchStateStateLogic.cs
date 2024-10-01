@@ -12,8 +12,8 @@ namespace Utilities.States.Default
 		public enum ConditionMode { All, Any }
 
 		[SerializeField] private ConditionMode _mode = ConditionMode.All;
-		[SerializeField] private Object _stateMachineInstance = null;
-		[SerializeField] private State _stateToEnter = null;
+		[FormerlySerializedAs("_stateMachineInstance"),SerializeField] private Object m_stateMachineInstance = null;
+		[FormerlySerializedAs("_stateToEnter"), SerializeField] private State m_stateToEnter = null;
 		[FormerlySerializedAs("_conditionsObjects"), SerializeField] private Object[] m_conditionsObjects = null;
 		[SerializeField] private bool m_returnOnEmpty = false;
 		[SerializeField] private bool m_switchEnabled = true;
@@ -54,7 +54,7 @@ namespace Utilities.States.Default
 
 		private void Awake()
 		{
-			m_stateMachine = _stateMachineInstance as IStateMachine;
+			m_stateMachine = m_stateMachineInstance as IStateMachine;
 		}
 
 		public override void Activate()
@@ -88,16 +88,16 @@ namespace Utilities.States.Default
 
 		public void Switch()
 		{
-			var stateToEnter = _stateToEnter as IState;
-			if (_stateToEnter == null || m_stateMachine.CurrentState == stateToEnter) return;
-			m_stateMachine.EnterState(_stateToEnter);
+			var stateToEnter = m_stateToEnter as IState;
+			if (m_stateToEnter == null || m_stateMachine.CurrentState == stateToEnter) return;
+			m_stateMachine.EnterState(m_stateToEnter);
 		}
 
 #if UNITY_EDITOR
 		public void GetStateMachineObject()
 		{
 			var stateMachine = GetStateMachine(transform.parent);
-			_stateMachineInstance = stateMachine as Object;
+			m_stateMachineInstance = stateMachine as Object;
 		}
 
 		private IStateMachine GetStateMachine(Transform transform)

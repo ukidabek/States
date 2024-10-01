@@ -34,10 +34,12 @@ namespace Utilities.States.Default
 
 			foreach (var type in m_stateLogicTypes)
 			{
-
 				var path = string.Empty;
-		
-				var addComponentAttribute = type.GetCustomAttributes(true).OfType<StateLogicPath>().FirstOrDefault();
+
+				var addComponentAttribute = type.GetCustomAttributes(true)
+					.OfType<StateLogicPath>()
+					.FirstOrDefault();
+
 				if (addComponentAttribute != null)
 				{
 					var pathSegments = addComponentAttribute.Path.Split("/");

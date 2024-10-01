@@ -16,6 +16,8 @@ namespace Utilities.States.Default
 
         public bool CanExit => Logic.All(_logic => _logic.CanBeDeactivated);
 
+		public string Name => gameObject.name;
+
 		public void Enter()
         {
             foreach (var stateLogic in Logic) 

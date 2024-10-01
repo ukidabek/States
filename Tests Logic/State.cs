@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 
 namespace Utilities.States.Test
 {
@@ -10,6 +9,14 @@ namespace Utilities.States.Test
 		public IEnumerable<IStateLogic> Logic { get; private set; }
 
 		public bool CanExit { get; set; } = true;
+
+		public string Name { get; private set; } = string.Empty;
+
+		public State(string name, IStateID iD, IEnumerable<IStateLogic> logic)
+			: this(iD, logic)
+		{
+			Name = name;
+		}
 
 		public State(IStateID iD, IEnumerable<IStateLogic> logic)
 		{

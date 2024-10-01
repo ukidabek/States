@@ -17,10 +17,7 @@ namespace Utilities.States
 
 		public Context() { }
 
-		public Context(Object @object = null)
-		{
-			m_object = @object;
-		}
+		public Context(Object @object = null) => m_object = @object;
 
 		public Context(string id = "", Object @object = null)
 		{

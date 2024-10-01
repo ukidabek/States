@@ -2,13 +2,15 @@
 using System.Collections.Generic;
 using System.Reflection;
 using UnityEditor;
+using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 
 namespace Utilities.States.Default
 {
 	[CustomEditor(typeof(StateMachineHost), true)]
-	public class StateMachineEditor : Editor
+	public class StateMachineHostEditor : Editor, ISearchWindowProvider
 	{
+		private static List<SearchTreeEntry> m_entries = new List<SearchTreeEntry>();
 		public static Type[] m_executorsTypes = new Type[]
 		{
 			typeof(OnUpdateStateLogicExecutor),
@@ -17,13 +19,8 @@ namespace Utilities.States.Default
 		};
 
 		private StateMachineHost m_stateMachineManager = null;
-
 		private FieldInfo m_defaultStateSetterProperty = null;
-
 		private IEnumerable<StateSetter> m_stateSetters = null;
-
-		private bool m_showStateSettersSelection = false;
-
 		private bool[] m_statePreProcessorSelection = Array.Empty<bool>();
 
 		protected virtual void OnEnable()
@@ -37,6 +34,21 @@ namespace Utilities.States.Default
 			var components = target as Component;
 			var root = components.transform.root.gameObject;
 			m_stateSetters = root.GetComponentsInChildren<StateSetter>();
+
+			m_entries.Clear();
+			m_entries.Add(new SearchTreeGroupEntry(new GUIContent($"{nameof(StateSetter)}'s"), 0));
+			foreach (var setter in m_stateSetters)
+			{
+				var name = setter.gameObject.GetFullName();
+				if (setter.State != null)
+					name = $"{name}/{setter.State.Name}";
+
+				m_entries.Add(new SearchTreeEntry(new GUIContent(name))
+				{
+					level = 1,
+					userData = setter,
+				});
+			}
 		}
 
 		public override void OnInspectorGUI()
@@ -63,17 +75,24 @@ namespace Utilities.States.Default
 				}
 			}
 
-			EditorGUILayout.Space();
+			if (GUILayout.Button($"Select {nameof(StateSetter)}"))
+			{
+				var mousePosition = GUIUtility.GUIToScreenPoint(Event.current.mousePosition);
+				var content = new SearchWindowContext(mousePosition);
+				SearchWindow.Open(content, this);
+			}
+		}
 
-			m_stateSetters.ObjectSelector(ref m_showStateSettersSelection,
-				$"Select Default {nameof(StateSetter)}",
-				(StateSetter setter) =>
-				{
-					m_defaultStateSetterProperty.SetValue(target, setter);
-					serializedObject.UpdateIfRequiredOrScript();
-				},
-				(setter) => string.IsNullOrEmpty(setter.Description) ? setter.GetType().Name : setter.Description);
+		public List<SearchTreeEntry> CreateSearchTree(SearchWindowContext context) => m_entries;
 
+		public bool OnSelectEntry(SearchTreeEntry SearchTreeEntry, SearchWindowContext context)
+		{
+			if (!(SearchTreeEntry.userData is StateSetter setter)) return false;
+
+			m_defaultStateSetterProperty.SetValue(target, setter);
+			serializedObject.UpdateIfRequiredOrScript();
+
+			return true;
 		}
 	}
 }

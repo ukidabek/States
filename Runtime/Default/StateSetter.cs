@@ -15,8 +15,12 @@ namespace Utilities.States.Default
 
 		public IState State
 		{
-			get => m_setter.State;
-			set => m_setter.State = value;
+			get => m_setter == null ? null : m_setter.State;
+			set
+			{
+				if (m_state == null) return;
+				m_setter.State = value;
+			}
 		}
 
 		public IStateMachine StateMachine

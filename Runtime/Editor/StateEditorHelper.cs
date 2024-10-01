@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using UnityEditor;
+using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 
 namespace Utilities.States.Default
@@ -14,7 +15,7 @@ namespace Utilities.States.Default
 			return rootGameObject.GetComponentsInChildren<T>();
 		}
 
-		public static void ApplyObject<T>(T objectToSet, SerializedProperty serializedProperty)
+		public static void ApplyObject<T>(this SerializedProperty serializedProperty, T objectToSet)
 		{
 			if (objectToSet != null && objectToSet is UnityEngine.Object stateMachineObject)
 			{
@@ -23,19 +24,31 @@ namespace Utilities.States.Default
 			}
 		}
 
+		public static void GenerateEntries<T>(List<SearchTreeEntry> list, IEnumerable<T> objects, string title, Func<T, SearchTreeEntry> getEntry)
+		{
+			list.Clear();
+			list.Add(new SearchTreeGroupEntry(new GUIContent(title), 0));
+			if (objects == null) return;
+			foreach (var component in objects)
+			{
+				var entry = getEntry(component);
+				entry.level = 1;
+				list.Add(entry);
+			}
+		}
+
 		public static string GetFullName(this GameObject gameObject)
 		{
 			string GetFullName(GameObject gameObject, string name)
 			{
-				
-				if(gameObject.transform.parent != null) 
+				if (gameObject.transform.parent != null)
 				{
 					name += $"/{gameObject.name}";
 					var nextGameObject = gameObject.transform.parent.gameObject;
 					name = GetFullName(nextGameObject, name);
 				}
 				else
-					name += gameObject.name;
+					name += $"/{gameObject.name}";
 
 				return name;
 			}
@@ -46,7 +59,7 @@ namespace Utilities.States.Default
 
 		public static void ObjectSelector<T>(this IEnumerable<T> @object, ref bool show, string text, Action<T> select, Func<T, string> getName = null, Action onOpen = null)
 		{
-			if (getName == null) 
+			if (getName == null)
 				getName = (T item) => item.ToString();
 
 			if (show)
@@ -79,7 +92,7 @@ namespace Utilities.States.Default
 		public static void GenerateSelectionList<T>(IEnumerable<T> all, IEnumerable<T> selected, ref bool[] selection)
 		{
 			var count = all.Count();
-			if(count != selection.Length)
+			if (count != selection.Length)
 				selection = new bool[count];
 
 			var set = selected.ToHashSet();
@@ -96,7 +109,7 @@ namespace Utilities.States.Default
 			if (show)
 			{
 				var count = objects.Count();
-				if(selection.Length != count)
+				if (selection.Length != count)
 					selection = new bool[count];
 
 				int index = 0;
@@ -112,8 +125,8 @@ namespace Utilities.States.Default
 				{
 					var selectedObjects = new List<T>();
 					index = 0;
-                    foreach (var item in objects)
-                    {
+					foreach (var item in objects)
+					{
 						var status = selection[index];
 						if (status)
 							selectedObjects.Add(item);
