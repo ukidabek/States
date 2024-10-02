@@ -12,6 +12,8 @@ namespace Utilities.States.Test
 
 		public string Name { get; private set; } = string.Empty;
 
+		public bool IsStatic { get; set; }
+
 		public State(string name, IStateID iD, IEnumerable<IStateLogic> logic)
 			: this(iD, logic)
 		{

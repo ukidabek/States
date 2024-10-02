@@ -4,6 +4,7 @@ namespace Utilities.States
 {
     public interface IState
     {
+        public bool IsStatic { get; }
         string Name { get; }
         IStateID ID { get; }
         IEnumerable<IStateLogic> Logic { get; }

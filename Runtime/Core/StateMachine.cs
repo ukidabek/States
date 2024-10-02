@@ -49,6 +49,7 @@ namespace Utilities.States
 			var currentStateNotNull = CurrentState != null;
 
 			if (currentStateNotNull && !CurrentState.CanExit) return;
+
 			if (CurrentState == statToEnter) return;
 
 			PreviousState = CurrentState;

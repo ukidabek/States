@@ -18,6 +18,9 @@ namespace Utilities.States.Default
 
 		public string Name => gameObject.name;
 
+        [SerializeField] private bool m_isStatic = false;
+        public bool IsStatic => m_isStatic;
+
 		public void Enter()
         {
             foreach (var stateLogic in Logic) 

@@ -204,7 +204,7 @@ namespace Utilities.States.Test
 		}
 
 		[Test]
-		public void Validate_If_Class_Wuth_Extend_Context_Type_Are_Injectec_Correctly()
+		public void Validate_If_Class_With_Extend_Context_Type_Are_Injectec_Correctly()
 		{
 			var stateLogic = new TestUpdateLogic();
 			var state = new State(new StateID(), new[] { stateLogic });
@@ -218,6 +218,36 @@ namespace Utilities.States.Test
 
 			Assert.AreEqual(extensionClass, stateLogic.Test.BaseClass);
 		}
+
+		[Test]
+		public void Validate_If_State_Marked_As_Static_Is_Ignored_When_State_Machine_Enter_That_State_Again()
+		{
+			var stateLogic = new TestUpdateLogic();
+			var state = new State(new StateID(), new[] { stateLogic })
+			{
+				IsStatic = true,
+			};
+
+			var stateA = new State(new StateID(), Array.Empty<IStateLogic>());
+
+			m_gameObject = new GameObject("TestObject", typeof(TextExtensionClass));
+			var extensionClass = m_gameObject.GetComponent<TextExtensionClass>();
+
+			m_contexts = new[] { new Context(extensionClass) };
+			m_stateMachine = new StateMachine(new[] { new StateLogicExecutor() }, Array.Empty<IStateTransition>(), m_contexts);
+			m_stateMachine.EnterState(state);
+
+			Assert.AreEqual(extensionClass, stateLogic.Test.BaseClass);
+		
+			stateLogic.Test.BaseClass = null;
+
+			m_stateMachine.EnterState(stateA);
+			m_stateMachine.EnterState(state);
+
+			Assert.AreEqual(stateLogic.Test.BaseClass, null);
+
+		}
+
 
 		[TearDown]
 		public void TearDown()

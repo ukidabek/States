@@ -7,6 +7,8 @@ namespace Utilities.States
 {
 	public class ContextHandler
 	{
+		private HashSet<IState> m_handledStaticStates = new HashSet<IState>();
+
 		private const BindingFlags Binding_Flags = BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.FlattenHierarchy | BindingFlags.Instance;
 
 		private bool ValidateType(Context context, MemberInfo member)
@@ -35,6 +37,11 @@ namespace Utilities.States
 
 		public void FillState(IState state, IEnumerable<Context> contexts)
 		{
+			if (m_handledStaticStates.Contains(state)) return;
+
+			if (state.IsStatic)
+				m_handledStaticStates.Add(state);
+
 			var contextDestinations = state.GetContextDestination();
 			foreach (var logic in contextDestinations)
 			{
