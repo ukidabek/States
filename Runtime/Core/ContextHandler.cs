@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using UnityEngine;
 
 namespace Utilities.States
 {
@@ -10,21 +11,38 @@ namespace Utilities.States
 		private HashSet<IState> m_handledStaticStates = new HashSet<IState>();
 
 		private const BindingFlags Binding_Flags = BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.FlattenHierarchy | BindingFlags.Instance;
+		private static readonly Dictionary<Type, MemberInfo[]> ContextFieldsByTypeDictionary = new();
+		
+		[RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
+		private static void GenerateStateLogicCache()
+		{
+			var interfaceType = typeof(IStateLogic);
+			var assemblies = AppDomain.CurrentDomain.GetAssemblies();
+			var types = assemblies.SelectMany(assembly => assembly.GetTypes())
+				.Where(type => interfaceType.IsAssignableFrom(type) && !type.IsAbstract);
 
+			foreach (var type in types)
+			{
+				var members = type.GetMembers(Binding_Flags);
+				
+				var contextMembers = members
+					.Where(member =>member.GetCustomAttribute<ContextField>() != null)
+					.ToArray();
+				
+				if (!contextMembers.Any()) continue;
+				ContextFieldsByTypeDictionary.Add(type, contextMembers);
+			}
+		}
+		
 		private bool ValidateType(Context context, MemberInfo member)
 		{
 			var contextType = context.Type;
-			Type memberType = default;
-
-			switch (member)
+			var memberType = member switch
 			{
-				case FieldInfo fieldInfo:
-					memberType = fieldInfo.FieldType;
-					break;
-				case PropertyInfo propertyInfo:
-					memberType = propertyInfo.PropertyType;
-					break;
-			}
+				FieldInfo fieldInfo => fieldInfo.FieldType,
+				PropertyInfo propertyInfo => propertyInfo.PropertyType,
+				_ => default
+			};
 
 			if (memberType.IsInterface)
 			{
@@ -46,7 +64,17 @@ namespace Utilities.States
 			foreach (var logic in contextDestinations)
 			{
 				var logicType = logic.GetType();
-				var members = logicType.GetMembers(Binding_Flags);
+
+				IEnumerable<MemberInfo> members = default;
+				if (ContextFieldsByTypeDictionary.TryGetValue(logicType, out var memberInfos))
+				{
+					members = memberInfos;
+				}
+				else
+				{
+					members = logicType.GetMembers(Binding_Flags)
+						.Where(member => member.GetCustomAttribute<ContextField>() != null);
+				}
 
 				foreach (var member in members)
 				{
@@ -55,18 +83,12 @@ namespace Utilities.States
 
 					Context context = default;
 					var attributeID = attribute.ID;
-					if (string.IsNullOrEmpty(attributeID))
-					{
-						context = contexts.FirstOrDefault(context => ValidateType(context, member));
-						if (context == null)
-							continue;
-					}
-					else
-					{
-						context = contexts.FirstOrDefault(context => ValidateType(context, member) && context.Id == attributeID);
-						if (context == null)
-							continue;
-					}
+					context = string.IsNullOrEmpty(attributeID) ? 
+						contexts.FirstOrDefault(context => ValidateType(context, member)) : 
+						contexts.FirstOrDefault(context => ValidateType(context, member) && context.Id == attributeID);
+
+					if (context == null)
+						continue;
 
 					switch (member)
 					{

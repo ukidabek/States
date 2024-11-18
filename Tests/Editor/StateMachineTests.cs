@@ -2,6 +2,7 @@ using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using UnityEngine;
 
 namespace Utilities.States.Test
@@ -70,9 +71,18 @@ namespace Utilities.States.Test
 
 		private IEnumerable<Context> GenerateContext(params UnityEngine.Object[] components) => components.Select(component => new Context(component));
 
-		[Test]
-		public void Validate_If_References_Form_Context_Are_Injected_Correctly()
+		[TestCase(false)]
+		[TestCase(true)]
+		public void Validate_If_References_Form_Context_Are_Injected_Correctly(bool cacheContext)
 		{
+			if (cacheContext)
+			{
+				var type = typeof(ContextHandler);
+				var bindingFlags = BindingFlags.Static | BindingFlags.NonPublic;
+				var cacheLogic = type.GetMethod("GenerateStateLogicCache", bindingFlags);
+				cacheLogic.Invoke(null, null);
+			}
+			
 			var stateLogic = new StateLogic();
 			var state = new State(new StateID(), new[] { stateLogic });
 
