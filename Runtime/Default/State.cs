@@ -1,5 +1,4 @@
-﻿using Object = UnityEngine.Object;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
@@ -11,8 +10,8 @@ namespace Utilities.States.Default
         [SerializeField] private StateID m_stateID;
 		public IStateID ID => m_stateID;
 
-        [SerializeField] private Object[] m_logic = null;
-        public IEnumerable<IStateLogic> Logic => m_logic.OfType<IStateLogic>();
+        [SerializeReference] private List<IStateLogic> m_logic = new List<IStateLogic>();
+        public IEnumerable<IStateLogic> Logic => m_logic;
 
         public bool CanExit => Logic.All(_logic => _logic.CanBeDeactivated);
 

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Reflection;
 using UnityEditor;
 using UnityEditor.Experimental.GraphView;
+using UnityEditorInternal;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
@@ -13,22 +14,35 @@ namespace Utilities.States.Default
 	public class StateEditor : Editor, ISearchWindowProvider
 	{
 		private static Type[] m_stateLogicTypes;
-		private static List<SearchTreeEntry> m_entries = new List<SearchTreeEntry>();
+		private static List<SearchTreeEntry> m_stateLogicEntries = new List<SearchTreeEntry>();
 
 		private State m_state = null;
 		private FieldInfo m_stateLogicList = null;
 
 		private BindingFlags m_bindingFlags = BindingFlags.Instance | BindingFlags.NonPublic;
+		private Type[] stateLogicTypes;
+
+		private ReorderableList list = null;
+		private SerializedProperty m_stateIDSerializedProperty = null;
+		private SerializedProperty m_isStaticSerializedProperty = null;
+		private SerializedProperty m_logicSerialziedProperty = null;
 
 		static StateEditor()
 		{
+			var interfaceType = typeof(IStateLogic);
+			var objectType = typeof(Object);
 			m_stateLogicTypes = AppDomain.CurrentDomain
 				.GetAssemblies()
 				.SelectMany(assembly => assembly.GetTypes())
-				.Where(type => !type.IsAbstract && !type.IsInterface && type.GetInterface(nameof(IStateLogic)) != null)
+				.Where(type => !type.IsAbstract && !type.IsInterface && interfaceType.IsAssignableFrom(type) && !type.IsSubclassOf(objectType))
 				.ToArray();
 		
-			m_entries.Add(new SearchTreeGroupEntry(new GUIContent("State logic"), 0));
+			GenerateStateLogicEntities();
+		}
+
+		private static void GenerateStateLogicEntities()
+		{
+			m_stateLogicEntries.Add(new SearchTreeGroupEntry(new GUIContent("State logic"), 0));
 
 			var groupDictionary = new Dictionary<string, List<Type>>();
 
@@ -65,12 +79,12 @@ namespace Utilities.States.Default
 				{
 					var path = item.Key.Split("/");
 					foreach (var pathItem in path)
-						m_entries.Add(new SearchTreeGroupEntry(new GUIContent(pathItem), i++));
+						m_stateLogicEntries.Add(new SearchTreeGroupEntry(new GUIContent(pathItem), i++));
 				}
 
 				foreach (var type in item.Value)
 				{
-					m_entries.Add(new SearchTreeEntry(new GUIContent(type.Name))
+					m_stateLogicEntries.Add(new SearchTreeEntry(new GUIContent(type.Name))
 					{
 						level = i,
 						userData = type
@@ -82,60 +96,70 @@ namespace Utilities.States.Default
 		private void OnEnable()
 		{
 			m_state = target as State;
+			
+			m_stateIDSerializedProperty = serializedObject.FindProperty("m_stateID");
+			m_isStaticSerializedProperty = serializedObject.FindProperty("m_isStatic");
+			m_logicSerialziedProperty = serializedObject.FindProperty("m_logic");
+			list = new ReorderableList(serializedObject, m_logicSerialziedProperty, true, true, true, true);
+			list.drawElementCallback = DrawElementCallback;
+			list.elementHeightCallback = ElementHeightCallback;
+			list.onAddCallback = OnAddCallback;
+			list.onRemoveCallback = OnRemoveCallback;
 		}
 
+		private void OnRemoveCallback(ReorderableList reorderableList)
+		{
+			m_logicSerialziedProperty.DeleteArrayElementAtIndex(reorderableList.index);
+			serializedObject.ApplyModifiedProperties();
+		}
+
+		private void OnAddCallback(ReorderableList reorderableList)
+		{
+			var mousePosition = GUIUtility.GUIToScreenPoint(Event.current.mousePosition);
+			var content = new SearchWindowContext(mousePosition);
+			SearchWindow.Open(content, this);
+		}
+
+		private float ElementHeightCallback(int index)
+		{
+			var element = list.serializedProperty.GetArrayElementAtIndex(index);
+			return EditorGUI.GetPropertyHeight(element, element.isExpanded);
+		}
+
+		private void DrawElementCallback(Rect rect, int index, bool isActive, bool isFocused)
+		{
+			var element = list.serializedProperty.GetArrayElementAtIndex(index);
+			rect.x += 8;
+			rect.width -= 8;
+			var typeName = $"{element.managedReferenceValue.GetType().Name} {index}";
+			EditorGUI.PropertyField(rect, element, new GUIContent(typeName), element.isExpanded);
+			serializedObject.ApplyModifiedProperties();
+		}
+		
 		public override void OnInspectorGUI()
 		{
-			base.OnInspectorGUI();
-			if (GUILayout.Button($"Get all {nameof(IStateLogic)}"))
-			{
-				GetAllStateLogic();
-			}
-
-			if (GUILayout.Button("Add state logic"))
-			{
-				var mousePosition = GUIUtility.GUIToScreenPoint(Event.current.mousePosition);
-				var content = new SearchWindowContext(mousePosition);
-				SearchWindow.Open(content, this);
-			}
+			EditorGUILayout.PropertyField(m_stateIDSerializedProperty);
+			EditorGUILayout.PropertyField(m_isStaticSerializedProperty);
+			list.DoLayoutList();
+			serializedObject.UpdateIfRequiredOrScript();
 		}
 
-		private void GetAllStateLogic()
+		private void AddSwitchStateLogic(Type type)
 		{
-			var stateLogic = m_state
-				.GetComponents<IStateLogic>()
-				.OfType<Object>();
-
-			if (m_stateLogicList == null)
-			{
-				m_stateLogicList = target
-					.GetType()
-					.GetField("m_logic", m_bindingFlags);
-			}
-
-			var stateLogicListObject = m_stateLogicList.GetValue(m_state) as Object[] ?? Array.Empty<Object>();
-			var currentStateLogicSet = stateLogicListObject.Where(stateLogic => stateLogic != null);
-			var exception = stateLogic.Except(currentStateLogicSet);
-			var newList = currentStateLogicSet.Concat(exception).OfType<Object>().ToArray();
-
-			m_stateLogicList.SetValue(m_state, newList);
-			EditorUtility.SetDirty(m_state);
+			var index = m_logicSerialziedProperty.arraySize;
+			m_logicSerialziedProperty.InsertArrayElementAtIndex(index);
+			var element = m_logicSerialziedProperty.GetArrayElementAtIndex(index);
+			element.managedReferenceValue = (IStateLogic)Activator.CreateInstance(type);
+			serializedObject.ApplyModifiedProperties();
 		}
 
-		private void AddSwitchStateLogic(Type type) => m_state.gameObject.AddComponent(type);
-
-		public List<SearchTreeEntry> CreateSearchTree(SearchWindowContext context) => m_entries;
+		public List<SearchTreeEntry> CreateSearchTree(SearchWindowContext context) => m_stateLogicEntries;
 
 		public bool OnSelectEntry(SearchTreeEntry SearchTreeEntry, SearchWindowContext context)
 		{
-			if (SearchTreeEntry.userData != null && SearchTreeEntry.userData is Type type)
-			{
-				AddSwitchStateLogic(type);
-				GetAllStateLogic();
-				return true;
-			}
-
-			return false;
+			if (SearchTreeEntry.userData is not Type type) return false;
+			AddSwitchStateLogic(type);
+			return true;
 		}
 	}
 }
