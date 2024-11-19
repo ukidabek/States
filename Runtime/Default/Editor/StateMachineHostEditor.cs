@@ -8,9 +8,8 @@ using UnityEngine;
 namespace Utilities.States.Default
 {
 	[CustomEditor(typeof(StateMachineHost), true)]
-	public class StateMachineHostEditor : Editor, ISearchWindowProvider
+	public class StateMachineHostEditor : Editor
 	{
-		private static List<SearchTreeEntry> m_entries = new List<SearchTreeEntry>();
 		public static Type[] m_executorsTypes = new Type[]
 		{
 			typeof(OnUpdateStateLogicExecutor),
@@ -19,37 +18,7 @@ namespace Utilities.States.Default
 		};
 
 		private StateMachineHost m_stateMachineManager = null;
-		private FieldInfo m_defaultStateSetterProperty = null;
-		private IEnumerable<StateSetter> m_stateSetters = null;
-		private bool[] m_statePreProcessorSelection = Array.Empty<bool>();
-
-		protected virtual void OnEnable()
-		{
-			m_stateMachineManager = (StateMachineHost)target;
-
-			var targetType = typeof(StateMachineHost);
-			var bindingsFlags = BindingFlags.NonPublic | BindingFlags.Instance;
-			m_defaultStateSetterProperty = targetType.GetField("m_defaultStateSetter", bindingsFlags);
-
-			var components = target as Component;
-			var root = components.transform.root.gameObject;
-			m_stateSetters = root.GetComponentsInChildren<StateSetter>();
-
-			m_entries.Clear();
-			m_entries.Add(new SearchTreeGroupEntry(new GUIContent($"{nameof(StateSetter)}'s"), 0));
-			foreach (var setter in m_stateSetters)
-			{
-				var name = setter.gameObject.GetFullName();
-				if (setter.State != null)
-					name = $"{name}/{setter.State.Name}";
-
-				m_entries.Add(new SearchTreeEntry(new GUIContent(name))
-				{
-					level = 1,
-					userData = setter,
-				});
-			}
-		}
+		protected virtual void OnEnable() => m_stateMachineManager = (StateMachineHost)target;
 
 		public override void OnInspectorGUI()
 		{
@@ -75,24 +44,7 @@ namespace Utilities.States.Default
 				}
 			}
 
-			if (GUILayout.Button($"Select {nameof(StateSetter)}"))
-			{
-				var mousePosition = GUIUtility.GUIToScreenPoint(Event.current.mousePosition);
-				var content = new SearchWindowContext(mousePosition);
-				SearchWindow.Open(content, this);
-			}
 		}
-
-		public List<SearchTreeEntry> CreateSearchTree(SearchWindowContext context) => m_entries;
-
-		public bool OnSelectEntry(SearchTreeEntry SearchTreeEntry, SearchWindowContext context)
-		{
-			if (!(SearchTreeEntry.userData is StateSetter setter)) return false;
-
-			m_defaultStateSetterProperty.SetValue(target, setter);
-			serializedObject.UpdateIfRequiredOrScript();
-
-			return true;
-		}
+		
 	}
 }

@@ -23,7 +23,6 @@ namespace Utilities.States.Default
 				case LogicExecutorHandlingMode.AddRemove:
 					if (m_stateMachine == null) break;
 					m_stateMachine.CurrentState?.Enter();
-					m_stateMachine.SetStateLogic();
 					break;
 				case LogicExecutorHandlingMode.EnableDisable:
 					foreach (var executor in m_stateLogicExecutors)
@@ -39,7 +38,6 @@ namespace Utilities.States.Default
 				case LogicExecutorHandlingMode.AddRemove:
 					if (m_stateMachine == null) break;
 					m_stateMachine.CurrentState?.Exit();
-					m_stateMachine.RemoveStateLogic();
 					break;
 				case LogicExecutorHandlingMode.EnableDisable:
 					foreach (var executor in m_stateLogicExecutors)
