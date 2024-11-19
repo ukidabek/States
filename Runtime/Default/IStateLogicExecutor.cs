@@ -3,7 +3,7 @@
     public interface IStateLogicExecutor
     {
         bool Enabled { get; set; }
-        void SetLogicToExecute(IState state);
-		void RemoveLogicToExecute(IState state);
+        
+        public void ProvideStateMachine(IStateMachine stateMachine);
 	}
 }

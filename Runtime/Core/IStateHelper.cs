@@ -19,5 +19,12 @@ namespace Utilities.States
 			foreach (var logicToSetItem in logicToSet)
 				listToFill.Add(logicToSetItem);
 		}
+		
+		public static void Process(this IEnumerable<IStateProcessor> processors, IState state)
+		{
+			if (processors == null) return;
+			foreach (var preProcessor in processors)
+				preProcessor.Process(state);
+		}
 	}
 }

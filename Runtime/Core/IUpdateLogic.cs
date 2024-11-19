@@ -1,4 +1,6 @@
 ﻿namespace Utilities.States
 {
-	public interface IUpdateLogic { }
+	public interface IUpdateLogic
+	{
+	}
 }
