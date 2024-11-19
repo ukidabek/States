@@ -100,11 +100,13 @@ namespace Utilities.States.Default
 			m_stateIDSerializedProperty = serializedObject.FindProperty("m_stateID");
 			m_isStaticSerializedProperty = serializedObject.FindProperty("m_isStatic");
 			m_logicSerialziedProperty = serializedObject.FindProperty("m_logic");
-			list = new ReorderableList(serializedObject, m_logicSerialziedProperty, true, true, true, true);
-			list.drawElementCallback = DrawElementCallback;
-			list.elementHeightCallback = ElementHeightCallback;
-			list.onAddCallback = OnAddCallback;
-			list.onRemoveCallback = OnRemoveCallback;
+			list = new ReorderableList(serializedObject, m_logicSerialziedProperty, true, true, true, true)
+			{
+				drawElementCallback = DrawElementCallback,
+				elementHeightCallback = ElementHeightCallback,
+				onAddCallback = OnAddCallback,
+				onRemoveCallback = OnRemoveCallback
+			};
 		}
 
 		private void OnRemoveCallback(ReorderableList reorderableList)
@@ -138,9 +140,18 @@ namespace Utilities.States.Default
 		
 		public override void OnInspectorGUI()
 		{
-			EditorGUILayout.PropertyField(m_stateIDSerializedProperty);
-			EditorGUILayout.PropertyField(m_isStaticSerializedProperty);
-			list.DoLayoutList();
+			var iterator = serializedObject.GetIterator();
+			iterator.NextVisible(true);
+			do
+			{
+				if (iterator.name == "m_logic")
+				{
+					list.DoLayoutList();
+					continue;
+				}
+				EditorGUILayout.PropertyField(iterator);
+			} 
+			while (iterator.NextVisible(false));
 			serializedObject.UpdateIfRequiredOrScript();
 		}
 
