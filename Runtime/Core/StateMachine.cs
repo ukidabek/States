@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Unity.Profiling;
+using UnityEngine.Profiling;
 
 namespace Utilities.States
 {
@@ -17,6 +19,8 @@ namespace Utilities.States
         public string Name { get; private set; }
         public IState PreviousState { get; private set; }
 
+        private ProfilerMarker m_updateMarker, m_fixedUpdateMarker, m_lateUpdateMarker;
+        
         public StateMachine(
             IEnumerable<Context> context,
             IEnumerable<IStatePreProcessor> statePreProcessor = null,
@@ -29,13 +33,17 @@ namespace Utilities.States
         public StateMachine(
             string name,
             IEnumerable<Context> context,
-            IEnumerable<IStatePreProcessor> statePreProcessor,
-            IEnumerable<IStatePostProcessor> statePostProcessor)
+            IEnumerable<IStatePreProcessor> statePreProcessor = null,
+            IEnumerable<IStatePostProcessor> statePostProcessor = null)
         {
             Name = name;
             m_context = context;
             m_statePreProcessors = statePreProcessor;
             m_statePostProcessors = statePostProcessor;
+
+            m_updateMarker = new ProfilerMarker($"{name} - {nameof(OnUpdate)}");
+            m_fixedUpdateMarker = new ProfilerMarker($"{name} - {nameof(OnFixedUpdate)}");
+            m_lateUpdateMarker = new ProfilerMarker($"{name} - {nameof(OnLateUpdate)}");
         }
 
         public void EnterState(IState statToEnter)
@@ -65,6 +73,7 @@ namespace Utilities.States
 
         public void OnUpdate(float deltaTime, float timeScale)
         {
+            m_updateMarker.Auto();
             if (CurrentState == null) return;
             
             var transitions = CurrentState.Transitions;
@@ -78,9 +87,17 @@ namespace Utilities.States
             CurrentState.OnUpdate(deltaTime, timeScale);
         }
 
-        public void OnFixedUpdate(float deltaTime, float timeScale) => CurrentState?.OnFixedUpdate(deltaTime, timeScale);
+        public void OnFixedUpdate(float deltaTime, float timeScale)
+        {
+            m_fixedUpdateMarker.Auto();
+            CurrentState?.OnFixedUpdate(deltaTime, timeScale);
+        }
 
-        public void OnLateUpdate(float deltaTime, float timeScale) => CurrentState?.OnLateUpdate(deltaTime, timeScale);
+        public void OnLateUpdate(float deltaTime, float timeScale)
+        {
+            m_lateUpdateMarker.Auto();
+            CurrentState?.OnLateUpdate(deltaTime, timeScale);
+        }
 
         public void Dispose()
         {
