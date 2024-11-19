@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using UnityEditorInternal;
 
 namespace Utilities.States
 {
@@ -7,9 +9,7 @@ namespace Utilities.States
     {
         private ContextHandler m_contextHandler = new ContextHandler();
         public event Action<IState> OnStateChanged;
-
-        private readonly IEnumerable<IStateLogicExecutor> m_stateLogicExecutor = null;
-        private readonly IEnumerable<IStateTransition> m_transitions = null;
+        
         private readonly IEnumerable<Context> m_context = null;
         private readonly IEnumerable<IStatePreProcessor> m_statePreProcessors = null;
         private readonly IEnumerable<IStatePostProcessor> m_statePostProcessors = null;
@@ -19,27 +19,21 @@ namespace Utilities.States
         public IState PreviousState { get; private set; }
 
         public StateMachine(
-            IEnumerable<IStateLogicExecutor> stateLogicExecutor,
-            IEnumerable<IStateTransition> transitions,
             IEnumerable<Context> context,
             IEnumerable<IStatePreProcessor> statePreProcessor = null,
             IEnumerable<IStatePostProcessor> statePostProcessor = null)
-            : this(nameof(StateMachine), stateLogicExecutor, transitions, context, statePreProcessor,
+            : this(nameof(StateMachine), context, statePreProcessor,
                 statePostProcessor)
         {
         }
 
         public StateMachine(
             string name,
-            IEnumerable<IStateLogicExecutor> stateLogicExecutor,
-            IEnumerable<IStateTransition> transitions,
             IEnumerable<Context> context,
             IEnumerable<IStatePreProcessor> statePreProcessor,
             IEnumerable<IStatePostProcessor> statePostProcessor)
         {
             Name = name;
-            m_stateLogicExecutor = stateLogicExecutor;
-            m_transitions = transitions;
             m_context = context;
             m_statePreProcessors = statePreProcessor;
             m_statePostProcessors = statePostProcessor;
@@ -55,15 +49,8 @@ namespace Utilities.States
 
             PreviousState = CurrentState;
 
-            foreach (var transition in m_transitions)
-            {
-                transition.Cancel();
-                transition.Perform(CurrentState, statToEnter);
-            }
-
             if (currentStateNotNull)
             {
-                RemoveStateLogic();
                 CurrentState.Exit();
                 m_statePostProcessors.Process(CurrentState);
             }
@@ -75,21 +62,26 @@ namespace Utilities.States
             m_statePreProcessors.Process(CurrentState);
             CurrentState?.Enter();
             OnStateChanged?.Invoke(CurrentState);
-
-            SetStateLogic();
         }
 
-        public void SetStateLogic()
+        public void OnUpdate(float deltaTime, float timeScale)
         {
-            foreach (var stateLogicExecutor in m_stateLogicExecutor)
-                stateLogicExecutor.SetLogicToExecute(CurrentState);
+            if (CurrentState == null) return;
+            
+            var transitions = CurrentState.Transitions;
+            if (transitions != null && transitions.Any())
+            {
+                var validTransition = transitions.FirstOrDefault(transitions => transitions.Validate());
+                if (validTransition != null)
+                    EnterState(validTransition.StateToEnter);
+            }
+
+            CurrentState.OnUpdate(deltaTime, timeScale);
         }
 
-        public void RemoveStateLogic()
-        {
-            foreach (var stateLogicExecutor in m_stateLogicExecutor)
-                stateLogicExecutor.RemoveLogicToExecute(CurrentState);
-        }
+        public void OnFixedUpdate(float deltaTime, float timeScale) => CurrentState?.OnFixedUpdate(deltaTime, timeScale);
+
+        public void OnLateUpdate(float deltaTime, float timeScale) => CurrentState?.OnLateUpdate(deltaTime, timeScale);
 
         public void Dispose()
         {

@@ -2,6 +2,7 @@
 
 namespace Utilities.States
 {
+	[AttributeUsage(AttributeTargets.Field | AttributeTargets.Property)]
 	public class ContextField : Attribute
 	{
 		private string m_id = String.Empty;

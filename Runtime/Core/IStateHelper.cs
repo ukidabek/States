@@ -8,9 +8,16 @@ namespace Utilities.States
 		public static IEnumerable<IContextDestination> GetContextDestination(this IState state)
 		{
 			var logic = state.Logic;
-			var contextDestination = logic.OfType<IContextDestination>();
-			var otherContextDestination = logic.SelectMany(logic => logic.ContextDestinations);
-			return contextDestination.Concat(otherContextDestination).Distinct();
+			var transitions = state.Transitions;
+			return logic.OfType<IContextDestination>().Concat(transitions).Distinct();
+		}
+		
+		public static void FillList<T>(this IEnumerable<IStateLogic> logic,  IList<T> listToFill) where T : IUpdateLogic
+		{
+			if(listToFill.Any()) return;
+			var logicToSet = logic.OfType<T>();
+			foreach (var logicToSetItem in logicToSet)
+				listToFill.Add(logicToSetItem);
 		}
 	}
 }

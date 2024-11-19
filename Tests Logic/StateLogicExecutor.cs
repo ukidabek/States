@@ -29,7 +29,7 @@ namespace Utilities.States.Test
 		{
 			m_updateLogic.ForEach(logic => logic.OnUpdate(1f, 1f));
 			m_lateUpdateLogic.ForEach(logic => logic.OnLateUpdate(1f, 1f));
-			m_fixUpdateLogic.ForEach(logic => logic.OnFixUpdate(1f, 1f));
+			m_fixUpdateLogic.ForEach(logic => logic.OnFixexUpdate(1f, 1f));
 		}
 	}
 }

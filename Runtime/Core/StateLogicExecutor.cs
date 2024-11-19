@@ -15,7 +15,7 @@ namespace Utilities.States
 
         public abstract void RemoveLogicToExecute(IState state);
 
-        protected virtual (float, float) GetTimeInfo() => (Time.deltaTime, Time.timeScale);
+        protected virtual (float deltaTime, float timeScale) GetTimeInfo() => (Time.deltaTime, Time.timeScale);
     }
 
 	public abstract class StateLogicExecutor<T> : StateLogicExecutor where T : IUpdateLogic

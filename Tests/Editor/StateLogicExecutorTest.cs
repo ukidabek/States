@@ -1,4 +1,5 @@
-﻿using NUnit.Framework;
+﻿using System.Linq;
+using NUnit.Framework;
 using UnityEngine;
 
 namespace Utilities.States.Test
@@ -13,7 +14,7 @@ namespace Utilities.States.Test
 		{
 			var gameObject = new GameObject("TextExecutor", typeof(TestStateLogicExecutor));
 			m_executor = gameObject.GetComponent<TestStateLogicExecutor>();
-			m_state = new State(null, new[] { new TestUpdateLogic() });
+			m_state = new State(null, new[] { new TestUpdateLogic() }, Enumerable.Empty<IStateTransition>());
 		}
 
 		[Test]

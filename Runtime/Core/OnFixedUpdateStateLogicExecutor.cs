@@ -12,7 +12,7 @@ namespace Utilities.States
         {
 			var timeInfo = GetTimeInfo();
 			for (int i = 0; i < m_logic.Count; i++)
-				m_logic[i].OnFixUpdate(timeInfo.Item1, timeInfo.Item2);
+				m_logic[i].OnFixexUpdate(timeInfo.Item1, timeInfo.Item2);
 		}
 	}
 }

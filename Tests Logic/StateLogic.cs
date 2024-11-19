@@ -45,7 +45,7 @@ namespace Utilities.States.Test
 			UpdateCount += deltaTime;
 		}
 
-		public void OnFixUpdate(float deltaTime, float timeScale)
+		public void OnFixexUpdate(float deltaTime, float timeScale)
 		{
 			Assert.AreEqual(1f, timeScale);
 			FixUpdateCount += deltaTime;

@@ -8,7 +8,7 @@ namespace Utilities.States
 {
 	public class ContextHandler
 	{
-		private HashSet<IState> m_handledStaticStates = new HashSet<IState>();
+		private HashSet<IState> m_staticStates = new HashSet<IState>();
 
 		private const BindingFlags Binding_Flags = BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.FlattenHierarchy | BindingFlags.Instance;
 		private static readonly Dictionary<Type, MemberInfo[]> ContextFieldsByTypeDictionary = new();
@@ -16,6 +16,8 @@ namespace Utilities.States
 		[RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
 		private static void GenerateStateLogicCache()
 		{
+			ContextFieldsByTypeDictionary.Clear();
+			
 			var interfaceType = typeof(IStateLogic);
 			var assemblies = AppDomain.CurrentDomain.GetAssemblies();
 			var types = assemblies.SelectMany(assembly => assembly.GetTypes())
@@ -55,10 +57,9 @@ namespace Utilities.States
 
 		public void FillState(IState state, IEnumerable<Context> contexts)
 		{
-			if (m_handledStaticStates.Contains(state)) return;
+			if (m_staticStates.Contains(state)) return;
 
-			if (state.IsStatic)
-				m_handledStaticStates.Add(state);
+			if (state.IsStatic) m_staticStates.Add(state);
 
 			var contextDestinations = state.GetContextDestination();
 			foreach (var logic in contextDestinations)
@@ -87,19 +88,23 @@ namespace Utilities.States
 						contexts.FirstOrDefault(context => ValidateType(context, member)) : 
 						contexts.FirstOrDefault(context => ValidateType(context, member) && context.Id == attributeID);
 
-					if (context == null)
-						continue;
+					if (context == null) continue;
 
-					switch (member)
-					{
-						case FieldInfo fieldInfo:
-							fieldInfo.SetValue(logic, context.Object);
-							break;
-						case PropertyInfo propertyInfo:
-							propertyInfo.SetValue(logic, context.Object);
-							break;
-					}
+					InjectStateReference(member, logic, context.Object);
 				}
+			}
+		}
+
+		private static void InjectStateReference(MemberInfo member, object target, object value)
+		{
+			switch (member)
+			{
+				case FieldInfo fieldInfo:
+					fieldInfo.SetValue(target, value);
+					break;
+				case PropertyInfo propertyInfo:
+					propertyInfo.SetValue(target, value);
+					break;
 			}
 		}
 	}
