@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace Utilities.States.Default
 {
@@ -11,9 +10,11 @@ namespace Utilities.States.Default
         [SerializeField] private StateID m_stateID;
 		public IStateID ID => m_stateID;
 
-        [SerializeReference] private List<IStateLogic> m_logic = new List<IStateLogic>();
+        [SerializeReference] private IStateLogic[] m_logic = null;
         public IEnumerable<IStateLogic> Logic => m_logic;
-        public IEnumerable<IStateTransition> Transitions { get; }
+
+        [SerializeReference] private IStateTransition[] m_transition = null;
+        public IEnumerable<IStateTransition> Transitions => m_transition;
 
         public bool CanExit => Logic.All(_logic => _logic.CanBeDeactivated);
 
@@ -36,7 +37,7 @@ namespace Utilities.States.Default
             foreach (var subState in m_subStates) 
                 subState.SetContext(contexts);
             
-            m_stateMachine = new StateMachine(contexts);
+            m_stateMachine = new StateMachine(name, contexts);
         }
         
 		public void Enter()
@@ -47,6 +48,9 @@ namespace Utilities.States.Default
             
             foreach (var stateLogic in Logic) 
                 stateLogic.Activate();
+            
+            if (!m_subStates.Any()) return;
+            m_stateMachine.EnterState(m_subStates.First());
         }
 
         public void Exit()

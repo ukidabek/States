@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using UnityEditor;
 using UnityEditor.Experimental.GraphView;
 using UnityEditorInternal;
@@ -13,40 +12,48 @@ namespace Utilities.States.Default
 	[CustomEditor(typeof(State))]
 	public class StateEditor : Editor, ISearchWindowProvider
 	{
-		private static Type[] m_stateLogicTypes;
+		private enum Types
+		{
+			Transitions,
+			StateLogic,
+		}
+		private Types m_typesToReturn = Types.StateLogic;
+		
+		private static Type[] m_stateLogicTypes = null;
+		private static Type[] m_stateTransitionsTypes = null;
+		
 		private static List<SearchTreeEntry> m_stateLogicEntries = new List<SearchTreeEntry>();
-
-		private State m_state = null;
-		private FieldInfo m_stateLogicList = null;
-
-		private BindingFlags m_bindingFlags = BindingFlags.Instance | BindingFlags.NonPublic;
-		private Type[] stateLogicTypes;
-
-		private ReorderableList list = null;
-		private SerializedProperty m_stateIDSerializedProperty = null;
-		private SerializedProperty m_isStaticSerializedProperty = null;
-		private SerializedProperty m_logicSerialziedProperty = null;
+		private static List<SearchTreeEntry> m_stateTransitionsEntries = new List<SearchTreeEntry>();
+		
+		private SerializedProperty m_logicSerializedProperty = null;
+		private ReorderableList m_statesLogicList = null;
+		private ReorderableList m_stateTransitionsList = null;
+		private SerializedProperty m_stateTransitionsProperty;
 
 		static StateEditor()
 		{
-			var interfaceType = typeof(IStateLogic);
-			var objectType = typeof(Object);
-			m_stateLogicTypes = AppDomain.CurrentDomain
-				.GetAssemblies()
-				.SelectMany(assembly => assembly.GetTypes())
-				.Where(type => !type.IsAbstract && !type.IsInterface && interfaceType.IsAssignableFrom(type) && !type.IsSubclassOf(objectType))
-				.ToArray();
-		
-			GenerateStateLogicEntities();
+			var allTypes = AppDomain.CurrentDomain.GetAssemblies().SelectMany(assembly => assembly.GetTypes());
+			m_stateLogicTypes = allTypes.Where(ValidateType<IStateLogic>).ToArray();
+			m_stateTransitionsTypes = allTypes.Where(ValidateType<IStateTransition>).ToArray();
+			GenerateStateLogicEntities(m_stateLogicEntries, m_stateLogicTypes, "State logic");
+			GenerateStateLogicEntities(m_stateTransitionsEntries, m_stateTransitionsTypes, "State tramsitions");
 		}
 
-		private static void GenerateStateLogicEntities()
+		private static bool ValidateType<T>(Type type)
 		{
-			m_stateLogicEntries.Add(new SearchTreeGroupEntry(new GUIContent("State logic"), 0));
-
+			if (type.IsAbstract) return false;
+			if (type.IsInterface) return false;
+			if (!typeof(T).IsAssignableFrom(type)) return false;
+			if(type.IsSubclassOf(typeof(Object))) return false;
+			return true;
+		}
+		
+		private static void GenerateStateLogicEntities(IList<SearchTreeEntry> entries, IEnumerable<Type> types, string title)
+		{
+			entries.Add(new SearchTreeGroupEntry(new GUIContent(title), 0));
 			var groupDictionary = new Dictionary<string, List<Type>>();
 
-			foreach (var type in m_stateLogicTypes)
+			foreach (var type in types)
 			{
 				var path = string.Empty;
 
@@ -79,12 +86,12 @@ namespace Utilities.States.Default
 				{
 					var path = item.Key.Split("/");
 					foreach (var pathItem in path)
-						m_stateLogicEntries.Add(new SearchTreeGroupEntry(new GUIContent(pathItem), i++));
+						entries.Add(new SearchTreeGroupEntry(new GUIContent(pathItem), i++));
 				}
 
 				foreach (var type in item.Value)
 				{
-					m_stateLogicEntries.Add(new SearchTreeEntry(new GUIContent(type.Name))
+					entries.Add(new SearchTreeEntry(new GUIContent(type.Name))
 					{
 						level = i,
 						userData = type
@@ -95,81 +102,130 @@ namespace Utilities.States.Default
 
 		private void OnEnable()
 		{
-			m_state = target as State;
+			m_logicSerializedProperty = serializedObject.FindProperty("m_logic");
+			m_stateTransitionsProperty = serializedObject.FindProperty("m_transition");
 			
-			m_stateIDSerializedProperty = serializedObject.FindProperty("m_stateID");
-			m_isStaticSerializedProperty = serializedObject.FindProperty("m_isStatic");
-			m_logicSerialziedProperty = serializedObject.FindProperty("m_logic");
-			list = new ReorderableList(serializedObject, m_logicSerialziedProperty, true, true, true, true)
+			m_statesLogicList = new ReorderableList(serializedObject, m_logicSerializedProperty, true, true, true, true)
 			{
-				drawElementCallback = DrawElementCallback,
-				elementHeightCallback = ElementHeightCallback,
-				onAddCallback = OnAddCallback,
-				onRemoveCallback = OnRemoveCallback
+				drawHeaderCallback = rect => EditorGUI.LabelField(rect, "States"),
+				drawElementCallback = (rect, index, _, _) =>
+				{
+					var element = m_statesLogicList.serializedProperty.GetArrayElementAtIndex(index);
+					rect.x += 8;
+					rect.width -= 8;
+					var typeName = $"{element.managedReferenceValue.GetType().Name} {index}";
+					EditorGUI.PropertyField(rect, element, new GUIContent(typeName), element.isExpanded);
+					serializedObject.ApplyModifiedProperties();
+				},
+				elementHeightCallback = index =>
+				{
+					var element = m_statesLogicList.serializedProperty.GetArrayElementAtIndex(index);
+					return EditorGUI.GetPropertyHeight(element, element.isExpanded);
+				},
+				onAddCallback = reorderableList =>
+				{
+					m_typesToReturn = Types.StateLogic;
+					OpenSearchWindow();
+				},
+				onRemoveCallback = RemoveItem,
+			};
+			
+			m_stateTransitionsList = new ReorderableList(serializedObject, m_stateTransitionsProperty, true, true, true, true)
+			{
+				drawHeaderCallback = rect => EditorGUI.LabelField(rect, "Transitions"),
+				drawElementCallback = (rect, index, _, _) =>
+				{
+					var element = m_stateTransitionsList.serializedProperty.GetArrayElementAtIndex(index);
+					rect.x += 8;
+					rect.width -= 8;
+					var typeName = $"{element.managedReferenceValue.GetType().Name} {index}";
+					EditorGUI.PropertyField(rect, element, new GUIContent(typeName), element.isExpanded);
+					serializedObject.ApplyModifiedProperties();
+				},
+				elementHeightCallback = index =>
+				{
+					var element = m_stateTransitionsList.serializedProperty.GetArrayElementAtIndex(index);
+					return EditorGUI.GetPropertyHeight(element, element.isExpanded);
+				},
+				onAddCallback = _ =>
+				{
+					m_typesToReturn = Types.Transitions;
+					OpenSearchWindow();
+				},
+				onRemoveCallback = RemoveItem,
 			};
 		}
 
-		private void OnRemoveCallback(ReorderableList reorderableList)
-		{
-			m_logicSerialziedProperty.DeleteArrayElementAtIndex(reorderableList.index);
-			serializedObject.ApplyModifiedProperties();
-		}
-
-		private void OnAddCallback(ReorderableList reorderableList)
+		private void OpenSearchWindow()
 		{
 			var mousePosition = GUIUtility.GUIToScreenPoint(Event.current.mousePosition);
 			var content = new SearchWindowContext(mousePosition);
 			SearchWindow.Open(content, this);
 		}
 
-		private float ElementHeightCallback(int index)
+		private void RemoveItem(ReorderableList list)
 		{
-			var element = list.serializedProperty.GetArrayElementAtIndex(index);
-			return EditorGUI.GetPropertyHeight(element, element.isExpanded);
-		}
-
-		private void DrawElementCallback(Rect rect, int index, bool isActive, bool isFocused)
-		{
-			var element = list.serializedProperty.GetArrayElementAtIndex(index);
-			rect.x += 8;
-			rect.width -= 8;
-			var typeName = $"{element.managedReferenceValue.GetType().Name} {index}";
-			EditorGUI.PropertyField(rect, element, new GUIContent(typeName), element.isExpanded);
+			list.serializedProperty.DeleteArrayElementAtIndex(list.index);
 			serializedObject.ApplyModifiedProperties();
 		}
-		
+
+
 		public override void OnInspectorGUI()
 		{
 			var iterator = serializedObject.GetIterator();
 			iterator.NextVisible(true);
 			do
 			{
-				if (iterator.name == "m_logic")
+				switch (iterator.name)
 				{
-					list.DoLayoutList();
-					continue;
+					case "m_logic":
+						m_statesLogicList.DoLayoutList();
+						continue;
+					case "m_transition":
+						m_stateTransitionsList.DoLayoutList();
+						continue;
+					default:
+						EditorGUILayout.PropertyField(iterator);
+						serializedObject.ApplyModifiedProperties();
+						continue;
 				}
-				EditorGUILayout.PropertyField(iterator);
-			} 
-			while (iterator.NextVisible(false));
+			} while (iterator.NextVisible(false));
+
 			serializedObject.UpdateIfRequiredOrScript();
 		}
 
-		private void AddSwitchStateLogic(Type type)
+		private void AddSwitchStateLogic<T>(Type type, SerializedProperty property)
 		{
-			var index = m_logicSerialziedProperty.arraySize;
-			m_logicSerialziedProperty.InsertArrayElementAtIndex(index);
-			var element = m_logicSerialziedProperty.GetArrayElementAtIndex(index);
-			element.managedReferenceValue = (IStateLogic)Activator.CreateInstance(type);
+			var index = property.arraySize;
+			property.InsertArrayElementAtIndex(index);
+			var element = property.GetArrayElementAtIndex(index);
+			element.managedReferenceValue = (T)Activator.CreateInstance(type);
 			serializedObject.ApplyModifiedProperties();
 		}
 
-		public List<SearchTreeEntry> CreateSearchTree(SearchWindowContext context) => m_stateLogicEntries;
+		public List<SearchTreeEntry> CreateSearchTree(SearchWindowContext context) =>
+			m_typesToReturn switch
+			{
+				Types.Transitions => m_stateTransitionsEntries,
+				Types.StateLogic => m_stateLogicEntries,
+			};
 
 		public bool OnSelectEntry(SearchTreeEntry SearchTreeEntry, SearchWindowContext context)
 		{
 			if (SearchTreeEntry.userData is not Type type) return false;
-			AddSwitchStateLogic(type);
+
+			switch (m_typesToReturn)
+			{
+				case Types.Transitions:
+					AddSwitchStateLogic<IStateTransition>(type, m_stateTransitionsProperty);
+					break;
+				case Types.StateLogic:
+					AddSwitchStateLogic<IStateLogic>(type, m_logicSerializedProperty);
+					break;
+				default:
+					return false;
+			}
+			
 			return true;
 		}
 	}

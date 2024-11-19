@@ -30,6 +30,10 @@ namespace Utilities.States.Default
 		private void Awake()
 		{
 			var executors = GetComponents<IStateLogicExecutor>();
+			
+			foreach (var executor in executors)
+				executor.ProvideStateMachine(this);
+			
 			var preProcessors = GetComponents<IStatePreProcessor>();
 			var postProcessors = GetComponents<IStatePostProcessor>();
 			var context = m_externalContext.SelectMany(_context => _context.Context).ToArray();
@@ -47,5 +51,11 @@ namespace Utilities.States.Default
 		private void OnEnable() => EnterState(m_states.First());
 
 		public void EnterState(IState statToEnter) => m_stateMachine.EnterState(statToEnter);
+		
+		public void OnUpdate(float deltaTime, float timeScale) => m_stateMachine.OnUpdate(deltaTime, timeScale);
+
+		public void OnFixedUpdate(float deltaTime, float timeScale) => m_stateMachine.OnFixedUpdate(deltaTime, timeScale);
+
+		public void OnLateUpdate(float deltaTime, float timeScale) => m_stateMachine.OnLateUpdate(deltaTime, timeScale);
 	}
 }
