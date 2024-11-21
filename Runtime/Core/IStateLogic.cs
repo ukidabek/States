@@ -1,4 +1,6 @@
-﻿namespace States.Core
+﻿using States.Core;
+
+namespace States.Default
 {
     public interface IStateLogic : IContextDestination
     {

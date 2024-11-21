@@ -1,22 +1,24 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using States.Core;
 using UnityEngine;
+using UnityEngine.Serialization;
 
-namespace States.Core.Default
+namespace States.Default
 {
     [AddComponentMenu("States/Core/State")]
 	public class State : MonoBehaviour, IState
     {
-        [SerializeField] private StateID m_stateID;
-		public IStateID ID => m_stateID;
+        [FormerlySerializedAs("m_id")] [SerializeField] private StateID m_stateID;
+		public IID StateID => m_stateID;
 
         [SerializeReference] private IStateLogic[] m_logic = null;
-        public IEnumerable<IStateLogic> Logic => m_logic;
+        public IEnumerable<IContextDestination> ContextDestinations => m_logic;
 
         [SerializeReference] private IStateTransition[] m_transition = null;
         public IEnumerable<IStateTransition> Transitions => m_transition;
 
-        public bool CanExit => Logic.All(_logic => _logic.CanBeDeactivated);
+        public bool CanExit => m_logic.All(_logic => _logic.CanBeDeactivated);
 
 		public string Name => gameObject.name;
 
@@ -30,14 +32,18 @@ namespace States.Core.Default
         [SerializeField] private List<State> m_subStates = new List<State>();
         
         private StateMachine m_stateMachine = null;
-        public void SetContext(IEnumerable<Context> contexts)
+        
+        public void Initialize(IEnumerable<Context> contexts,
+            Blackboard blackboard,
+            IEnumerable<IStatePreProcessor> statePreProcessor = null,
+            IEnumerable<IStatePostProcessor> statePostProcessor = null)
         {
             if (!m_subStates.Any()) return;
             
             foreach (var subState in m_subStates) 
-                subState.SetContext(contexts);
+                subState.Initialize(contexts, blackboard, statePreProcessor, statePostProcessor);
             
-            m_stateMachine = new StateMachine(name, contexts);
+            m_stateMachine = new StateMachine(name, contexts, blackboard, statePreProcessor, statePostProcessor);
         }
         
 		public void Enter()
@@ -46,39 +52,40 @@ namespace States.Core.Default
             m_logic.FillList(m_onFixedUpdateLogic);
             m_logic.FillList(m_onLateUpdateLogic);
             
-            foreach (var stateLogic in Logic) 
+            foreach (var stateLogic in m_logic) 
                 stateLogic.Activate();
             
             if (!m_subStates.Any()) return;
+            
             m_stateMachine.EnterState(m_subStates.First());
         }
 
         public void Exit()
         {
-            foreach (var stateLogic in Logic) 
+            foreach (var stateLogic in m_logic) 
                 stateLogic.Deactivate();
         }
 
-        public void OnUpdate(float deltaTime, float timeScale)
+        public void OnUpdate(float deltaTime, float timeScale, Blackboard blackboard)
         {
             foreach (var update in m_onUpdateLogic) 
-                update.OnUpdate(deltaTime, timeScale);
+                update.OnUpdate(deltaTime, timeScale, blackboard);
             
             m_stateMachine?.OnUpdate(deltaTime, timeScale);
         }
 
-        public void OnFixedUpdate(float deltaTime, float timeScale)
+        public void OnFixedUpdate(float deltaTime, float timeScale, Blackboard blackboard)
         {
             foreach (var update in m_onFixedUpdateLogic) 
-                update.OnFixexUpdate(deltaTime, timeScale);
+                update.OnFixedUpdate(deltaTime, timeScale, blackboard);
             
             m_stateMachine?.OnFixedUpdate(deltaTime, timeScale);
         }
         
-        public void OnLateUpdate(float deltaTime, float timeScale)
+        public void OnLateUpdate(float deltaTime, float timeScale, Blackboard blackboard)
         {
             foreach (var update in m_onLateUpdateLogic) 
-                update.OnLateUpdate(deltaTime, timeScale);
+                update.OnLateUpdate(deltaTime, timeScale, blackboard);
             
             m_stateMachine?.OnLateUpdate(deltaTime, timeScale);
         }

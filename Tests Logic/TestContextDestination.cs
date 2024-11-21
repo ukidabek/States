@@ -5,14 +5,18 @@ using UnityEngine.Assertions;
 
 namespace States.Core.Test
 {
-	public class ExtendedStateLogic : StateLogic { }
-	public class StateLogic : IStateLogic, IOnUpdateLogic, IOnFixedUpdateLogic, IOnLateUpdateLogic
+	public class ExtendedTestContextDestination : TestContextDestination { }
+	public class TestContextDestination : IContextDestination
 	{
 		[ContextField] protected BoxCollider m_boxCollider = null;
 		public BoxCollider BoxCollider => m_boxCollider;
 
 		[ContextField] protected Rigidbody m_rigidbody = null;
-		public Rigidbody Rigidbody => m_rigidbody;
+		public Rigidbody Rigidbody
+		{
+			get => m_rigidbody;
+			set => m_rigidbody = value;
+		}
 
 		[ContextField("Test")] private Rigidbody m_rigidbodyWithID = null;
 		public Rigidbody RigidbodyWithID => m_rigidbodyWithID;

@@ -5,6 +5,7 @@ namespace States.Core
     public interface IStateMachine
     {
         event Action<IState> OnStateChanged;
+        Blackboard Blackboard { get; }
         string Name { get; }
         IState CurrentState { get; }
         IState PreviousState { get; }

@@ -9,6 +9,6 @@ namespace States.Core.Test
         public IState StateToEnter { get; set; }
         public bool Result { get; set; } = false;
         
-        public bool Validate() => Result;
+        public bool Validate(Blackboard blackboard) => Result;
     }
 }

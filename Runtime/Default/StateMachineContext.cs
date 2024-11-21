@@ -1,7 +1,8 @@
 ﻿using System.Collections.Generic;
+using States.Core;
 using UnityEngine;
 
-namespace States.Core.Default
+namespace States.Default
 {
 	public class StateMachineContext : MonoBehaviour
 	{

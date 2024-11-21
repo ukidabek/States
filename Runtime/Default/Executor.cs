@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace States.Core
+namespace States.Default
 {
 	[Flags]
 	public enum Executor

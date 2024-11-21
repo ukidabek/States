@@ -18,7 +18,7 @@ namespace States.Core
 		{
 			ContextFieldsByTypeDictionary.Clear();
 			
-			var interfaceType = typeof(IStateLogic);
+			var interfaceType = typeof(IContextDestination);
 			var assemblies = AppDomain.CurrentDomain.GetAssemblies();
 			var types = assemblies.SelectMany(assembly => assembly.GetTypes())
 				.Where(type => interfaceType.IsAssignableFrom(type) && !type.IsAbstract);

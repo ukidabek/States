@@ -16,6 +16,7 @@ namespace States.Core
         private readonly IEnumerable<IStatePostProcessor> m_statePostProcessors = null;
 
         public IState CurrentState { get; private set; }
+        public Blackboard Blackboard { get; private set; }
         public string Name { get; private set; }
         public IState PreviousState { get; private set; }
 
@@ -23,9 +24,10 @@ namespace States.Core
         
         public StateMachine(
             IEnumerable<Context> context,
+            Blackboard blackboard,
             IEnumerable<IStatePreProcessor> statePreProcessor = null,
             IEnumerable<IStatePostProcessor> statePostProcessor = null)
-            : this(nameof(StateMachine), context, statePreProcessor,
+            : this(nameof(StateMachine), context, blackboard, statePreProcessor,
                 statePostProcessor)
         {
         }
@@ -33,11 +35,13 @@ namespace States.Core
         public StateMachine(
             string name,
             IEnumerable<Context> context,
+            Blackboard blackboard,
             IEnumerable<IStatePreProcessor> statePreProcessor = null,
             IEnumerable<IStatePostProcessor> statePostProcessor = null)
         {
             Name = name;
             m_context = context;
+            Blackboard = blackboard;
             m_statePreProcessors = statePreProcessor;
             m_statePostProcessors = statePostProcessor;
 
@@ -79,24 +83,24 @@ namespace States.Core
             var transitions = CurrentState.Transitions;
             if (transitions != null && transitions.Any())
             {
-                var validTransition = transitions.FirstOrDefault(transitions => transitions.Validate());
+                var validTransition = transitions.FirstOrDefault(transitions => transitions.Validate(Blackboard));
                 if (validTransition != null)
                     EnterState(validTransition.StateToEnter);
             }
 
-            CurrentState.OnUpdate(deltaTime, timeScale);
+            CurrentState.OnUpdate(deltaTime, timeScale, Blackboard);
         }
 
         public void OnFixedUpdate(float deltaTime, float timeScale)
         {
             m_fixedUpdateMarker.Auto();
-            CurrentState?.OnFixedUpdate(deltaTime, timeScale);
+            CurrentState?.OnFixedUpdate(deltaTime, timeScale, Blackboard);
         }
 
         public void OnLateUpdate(float deltaTime, float timeScale)
         {
             m_lateUpdateMarker.Auto();
-            CurrentState?.OnLateUpdate(deltaTime, timeScale);
+            CurrentState?.OnLateUpdate(deltaTime, timeScale, Blackboard);
         }
 
         public void Dispose()

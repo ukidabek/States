@@ -1,7 +1,8 @@
-﻿using UnityEngine;
+﻿using States.Core;
+using UnityEngine;
 
-namespace States.Core.Default
+namespace States.Default
 {
 	[CreateAssetMenu(menuName = "States/StateID", fileName = "StateID")]
-	public class StateID : ScriptableObject, IStateID { }
+	public class StateID : Key, IID { }
 }

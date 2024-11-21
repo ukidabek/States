@@ -1,13 +1,14 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using States.Core;
 using UnityEditor;
 using UnityEditor.Experimental.GraphView;
 using UnityEditorInternal;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
-namespace States.Core.Default
+namespace States.Default
 {
 	[CustomEditor(typeof(State))]
 	public class StateEditor : Editor, ISearchWindowProvider

@@ -1,22 +1,24 @@
-﻿using UnityEngine;
+﻿using States.Core;
+using UnityEngine;
 using UnityEngine.Events;
 
-namespace States.Core.Default
+namespace States.Default
 {
 	[StateLogicPath("States/StateLogic")]
-	public class UnityEventStateLogic : StateLogic
+	public class UnityEventStateLogic : IStateLogic
 	{
 		[SerializeField] private UnityEvent OnActivate = null;
 		[SerializeField] private UnityEvent OnDeactivate = null;
-		public override void Activate()
+		
+		public bool CanBeDeactivated => true;
+
+		public void Activate()
 		{
-			base.Activate();
 			OnActivate.Invoke();
 		}
 
-		public override void Deactivate()
+		public void Deactivate()
 		{
-			base.Deactivate();
 			OnDeactivate.Invoke();
 		}
 	}

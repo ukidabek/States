@@ -1,6 +1,7 @@
-﻿using UnityEngine;
+﻿using States.Core;
+using UnityEngine;
 
-namespace States.Core
+namespace States.Default
 {
     public abstract class StateLogicExecutor : MonoBehaviour, IStateLogicExecutor
     {

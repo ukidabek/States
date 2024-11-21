@@ -1,8 +1,9 @@
 ﻿using System;
 using UnityEngine;
 
-namespace States.Core.Default
+namespace States.Core
 {
+	[Serializable]
 	public abstract class StatusHandler
 	{
 		[SerializeField] protected bool m_status = false;

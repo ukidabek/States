@@ -1,11 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Reflection;
 using UnityEditor;
-using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 
-namespace States.Core.Default
+namespace States.Default
 {
 	[CustomEditor(typeof(StateMachineHost), true)]
 	public class StateMachineHostEditor : Editor

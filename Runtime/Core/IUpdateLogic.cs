@@ -1,4 +1,4 @@
-﻿namespace States.Core
+﻿namespace States.Default
 {
 	public interface IUpdateLogic
 	{

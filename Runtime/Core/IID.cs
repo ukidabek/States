@@ -1,6 +1,6 @@
 ﻿namespace States.Core
 {
-	public interface IStateID
+	public interface IID
     {
     }
 }
