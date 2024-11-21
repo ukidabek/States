@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Utilities.States
+namespace States.Core
 {
 	public class StateLogicPath : Attribute
     {

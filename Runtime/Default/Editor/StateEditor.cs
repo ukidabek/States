@@ -7,7 +7,7 @@ using UnityEditorInternal;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
-namespace Utilities.States.Default
+namespace States.Core.Default
 {
 	[CustomEditor(typeof(State))]
 	public class StateEditor : Editor, ISearchWindowProvider

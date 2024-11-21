@@ -1,4 +1,4 @@
-﻿namespace Utilities.States.Default
+﻿namespace States.Core.Default
 {
 	internal enum LogicExecutorHandlingMode
 	{

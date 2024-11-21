@@ -1,7 +1,7 @@
 ﻿using System;
 using UnityEngine;
 
-namespace Utilities.States.Default
+namespace States.Core.Default
 {
 	public abstract class StatusHandler
 	{

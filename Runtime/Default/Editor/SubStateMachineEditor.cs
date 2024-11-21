@@ -1,6 +1,6 @@
 ﻿using UnityEditor;
 
-namespace Utilities.States.Default
+namespace States.Core.Default
 {
 	[CustomEditor(typeof(SubStateMachine))]
 	public class SubStateMachineEditor : StateMachineHostEditor

@@ -4,7 +4,7 @@ using System.Linq;
 using Unity.Profiling;
 using UnityEngine.Profiling;
 
-namespace Utilities.States
+namespace States.Core
 {
     public class StateMachine : IStateMachine, IDisposable
     {

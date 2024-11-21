@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace Utilities.States.Test
+namespace States.Core.Test
 {
     public class TestStateTransition : IStateTransition
     {

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Assertions;
 
-namespace Utilities.States.Test
+namespace States.Core.Test
 {
 	public class ExtendedStateLogic : StateLogic { }
 	public class StateLogic : IStateLogic, IOnUpdateLogic, IOnFixedUpdateLogic, IOnLateUpdateLogic

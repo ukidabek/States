@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Utilities.States
+namespace States.Core
 {
 	public static class IStateHelper
 	{

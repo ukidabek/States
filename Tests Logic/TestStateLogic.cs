@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace Utilities.States.Test
+namespace States.Core.Test
 {
 	public class TestUpdateLogic : IStateLogic, IUpdateLogic
 	{

@@ -5,7 +5,7 @@ using UnityEditor;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 
-namespace Utilities.States.Default
+namespace States.Core.Default
 {
 	[CustomEditor(typeof(StateMachineHost), true)]
 	public class StateMachineHostEditor : Editor

@@ -5,7 +5,7 @@ using System.Linq;
 using System.Reflection;
 using UnityEngine;
 
-namespace Utilities.States.Test
+namespace States.Core.Test
 {
 	public class StateMachineTests
 	{

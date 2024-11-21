@@ -1,8 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using Default;
 using UnityEngine;
 
-namespace Utilities.States
+namespace States.Core
 {
     public abstract class StateLogicExecutor : MonoBehaviour, IStateLogicExecutor
     {

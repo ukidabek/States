@@ -1,6 +1,6 @@
-﻿using Utilities.States.Default;
+﻿using States.Core.Default;
 
-namespace Utilities.States.Test
+namespace States.Core.Test
 {
 	public class TestInterface : StateLogicScriptableObject, ITestInterface, ITestInterface1 { }
 }

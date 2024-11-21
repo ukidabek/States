@@ -1,7 +1,7 @@
 ﻿using UnityEditor;
 using UnityEngine;
 
-namespace Utilities.States.Default
+namespace States.Core.Default
 {
 	[CustomEditor (typeof(StateDictionary))]
 	public class StateDictionaryEditor : Editor

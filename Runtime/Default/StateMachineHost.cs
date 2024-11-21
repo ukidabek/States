@@ -1,9 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Default;
 using UnityEngine;
 
-namespace Utilities.States.Default
+namespace States.Core.Default
 {
 	[AddComponentMenu("States/Core/StateMachineHost")]
 	public class StateMachineHost : MonoBehaviour, IStateMachine

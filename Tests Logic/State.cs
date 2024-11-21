@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 
-namespace Utilities.States.Test
+namespace States.Core.Test
 {
 	public class State : IState
 	{

@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 
-namespace Utilities.States.Default
+namespace States.Core.Default
 {
 	[StateLogicPath("States/StateLogic")]
 	public class StatusHandlingStateLogic : StateLogic

@@ -1,4 +1,4 @@
-﻿namespace Utilities.States
+﻿namespace States.Core
 {
 	public interface IStateID
     {

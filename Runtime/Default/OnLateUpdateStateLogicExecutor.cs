@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace Utilities.States
+namespace States.Core
 {
 	[AddComponentMenu("States/Executors/OnLateUpdateStateLogicExecutor")]
 	[DisallowMultipleComponent]

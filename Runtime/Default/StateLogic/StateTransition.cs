@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-namespace Utilities.States.Default
+namespace States.Core.Default
 {
     [Serializable]
     public abstract class StateTransition : IStateTransition

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Utilities.States
+namespace States.Core
 {
 	[AttributeUsage(AttributeTargets.Field | AttributeTargets.Property)]
 	public class ContextField : Attribute

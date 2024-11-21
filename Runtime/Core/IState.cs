@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Utilities.States
+namespace States.Core
 {
     public interface IState
     {
