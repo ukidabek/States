@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using Default;
 using UnityEngine;
 
 namespace States.Core.Default
