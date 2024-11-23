@@ -12,8 +12,8 @@ namespace States.Core
         void Enter();
         bool CanExit { get; }
         void Exit();
-        void OnUpdate(float deltaTime, float timeScale, Blackboard blackboard);
-        void OnFixedUpdate(float deltaTime, float timeScale, Blackboard blackboard);
-        void OnLateUpdate(float deltaTime, float timeScale, Blackboard blackboard);
+        void OnUpdate(float deltaTime, float timeScale, IBlackboard blackboard);
+        void OnFixedUpdate(float deltaTime, float timeScale, IBlackboard blackboard);
+        void OnLateUpdate(float deltaTime, float timeScale, IBlackboard blackboard);
     }
 }

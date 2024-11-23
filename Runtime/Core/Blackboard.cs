@@ -2,7 +2,7 @@ using System.Collections.Generic;
 
 namespace States.Core
 {
-    public class Blackboard
+    public class Blackboard : IBlackboard
     {
         public Blackboard() { }
 

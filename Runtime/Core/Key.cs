@@ -4,6 +4,7 @@ using UnityEngine;
 
 namespace States.Core
 {
+    [CreateAssetMenu(fileName = "NewKey", menuName = "States/Blackboard/Key")]
     public class Key : ScriptableObject, IEquatable<Key>
     {
         private static Dictionary<int, Key> m_registeredKeys = new Dictionary<int, Key>();

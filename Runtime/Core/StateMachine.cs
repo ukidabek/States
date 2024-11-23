@@ -16,15 +16,14 @@ namespace States.Core
         private readonly IEnumerable<IStatePostProcessor> m_statePostProcessors = null;
 
         public IState CurrentState { get; private set; }
-        public Blackboard Blackboard { get; private set; }
+        public IBlackboard Blackboard { get; private set; }
         public string Name { get; private set; }
         public IState PreviousState { get; private set; }
 
         private ProfilerMarker m_updateMarker, m_fixedUpdateMarker, m_lateUpdateMarker;
         
-        public StateMachine(
-            IEnumerable<Context> context,
-            Blackboard blackboard,
+        public StateMachine(IEnumerable<Context> context,
+            IBlackboard blackboard,
             IEnumerable<IStatePreProcessor> statePreProcessor = null,
             IEnumerable<IStatePostProcessor> statePostProcessor = null)
             : this(nameof(StateMachine), context, blackboard, statePreProcessor,
@@ -32,10 +31,9 @@ namespace States.Core
         {
         }
 
-        public StateMachine(
-            string name,
+        public StateMachine(string name,
             IEnumerable<Context> context,
-            Blackboard blackboard,
+            IBlackboard blackboard,
             IEnumerable<IStatePreProcessor> statePreProcessor = null,
             IEnumerable<IStatePostProcessor> statePostProcessor = null)
         {

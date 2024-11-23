@@ -4,6 +4,6 @@ namespace States.Default
 {
     public interface IOnUpdateLogic : IUpdateLogic
 	{
-        void OnUpdate(float deltaTime, float timeScale, Blackboard blackboard);
+        void OnUpdate(float deltaTime, float timeScale, IBlackboard blackboard);
     }
 }

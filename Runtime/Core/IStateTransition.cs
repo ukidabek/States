@@ -3,6 +3,6 @@
     public interface IStateTransition : IContextDestination
     {
         IState StateToEnter { get; }
-        bool Validate(Blackboard blackboard);
+        bool Validate(IBlackboard blackboard);
     }
 }

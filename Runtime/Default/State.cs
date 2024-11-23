@@ -34,7 +34,7 @@ namespace States.Default
         private StateMachine m_stateMachine = null;
         
         public void Initialize(IEnumerable<Context> contexts,
-            Blackboard blackboard,
+            IBlackboard blackboard,
             IEnumerable<IStatePreProcessor> statePreProcessor = null,
             IEnumerable<IStatePostProcessor> statePostProcessor = null)
         {
@@ -66,7 +66,7 @@ namespace States.Default
                 stateLogic.Deactivate();
         }
 
-        public void OnUpdate(float deltaTime, float timeScale, Blackboard blackboard)
+        public void OnUpdate(float deltaTime, float timeScale, IBlackboard blackboard)
         {
             foreach (var update in m_onUpdateLogic) 
                 update.OnUpdate(deltaTime, timeScale, blackboard);
@@ -74,7 +74,7 @@ namespace States.Default
             m_stateMachine?.OnUpdate(deltaTime, timeScale);
         }
 
-        public void OnFixedUpdate(float deltaTime, float timeScale, Blackboard blackboard)
+        public void OnFixedUpdate(float deltaTime, float timeScale, IBlackboard blackboard)
         {
             foreach (var update in m_onFixedUpdateLogic) 
                 update.OnFixedUpdate(deltaTime, timeScale, blackboard);
@@ -82,7 +82,7 @@ namespace States.Default
             m_stateMachine?.OnFixedUpdate(deltaTime, timeScale);
         }
         
-        public void OnLateUpdate(float deltaTime, float timeScale, Blackboard blackboard)
+        public void OnLateUpdate(float deltaTime, float timeScale, IBlackboard blackboard)
         {
             foreach (var update in m_onLateUpdateLogic) 
                 update.OnLateUpdate(deltaTime, timeScale, blackboard);

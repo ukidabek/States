@@ -18,6 +18,7 @@ namespace States.Default
 			Transitions,
 			StateLogic,
 		}
+		
 		private Types m_typesToReturn = Types.StateLogic;
 		
 		private static Type[] m_stateLogicTypes = null;
@@ -170,7 +171,6 @@ namespace States.Default
 			serializedObject.ApplyModifiedProperties();
 		}
 
-
 		public override void OnInspectorGUI()
 		{
 			var iterator = serializedObject.GetIterator();
@@ -203,14 +203,16 @@ namespace States.Default
 			element.managedReferenceValue = (T)Activator.CreateInstance(type);
 			serializedObject.ApplyModifiedProperties();
 		}
-
+		
+#pragma warning disable CS8524 
 		public List<SearchTreeEntry> CreateSearchTree(SearchWindowContext context) =>
 			m_typesToReturn switch
 			{
 				Types.Transitions => m_stateTransitionsEntries,
 				Types.StateLogic => m_stateLogicEntries,
 			};
-
+#pragma warning restore CS8524
+		
 		public bool OnSelectEntry(SearchTreeEntry SearchTreeEntry, SearchWindowContext context)
 		{
 			if (SearchTreeEntry.userData is not Type type) return false;

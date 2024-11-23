@@ -9,12 +9,13 @@ namespace States.Default
 	[AddComponentMenu("States/Core/StateMachineHost")]
 	public class StateMachineHost : MonoBehaviour, IStateMachine
 	{	
+		[SerializeField] private BlackboardFactory m_blackboardFactory;
 		[SerializeField] private StateMachineContext[] m_externalContext = null;
 		[SerializeField] private List<State> m_states = new List<State>();
 		[SerializeField] private Executor m_executors = 0;
 		public Executor Executor => m_executors;
 
-		public Blackboard Blackboard => m_stateMachine.Blackboard;
+		public IBlackboard Blackboard => m_stateMachine.Blackboard;
 		
 		public string Name => name;
 		
@@ -36,14 +37,14 @@ namespace States.Default
 			
 			foreach (var executor in executors)
 				executor.ProvideStateMachine(this);
-			
+
 			var preProcessors = GetComponents<IStatePreProcessor>();
 			var postProcessors = GetComponents<IStatePostProcessor>();
 			var context = m_externalContext.SelectMany(_context => _context.Context).ToArray();
-var blackboard = new Blackboard();
-			m_stateMachine = new StateMachine(name, context,  blackboard, preProcessors, postProcessors);
+			var blackboard = m_blackboardFactory.CreateBlackboard();
+			m_stateMachine = new StateMachine(name, context, blackboard, preProcessors, postProcessors);
 
-			foreach (var state in m_states) 
+			foreach (var state in m_states)
 				state.Initialize(context, blackboard, preProcessors, postProcessors);
 		}
 
