@@ -17,7 +17,7 @@ namespace States.Core.Test
 
 		public bool IsStatic { get; set; }
 
-		public Blackboard Blackboard { get; private set; }
+		public IBlackboard Blackboard { get; private set; }
 		
 		public State(
 			string name, 
@@ -50,19 +50,19 @@ namespace States.Core.Test
 
 		public void Exit() { }
 
-		public void OnUpdate(float deltaTime, float timeScale, Blackboard blackboard)
+		public void OnUpdate(float deltaTime, float timeScale, IBlackboard blackboard)
 		{
 			Blackboard = blackboard;
 			UpdateCount++;
 		}
 
-		public void OnFixedUpdate(float deltaTime, float timeScale, Blackboard blackboard)
+		public void OnFixedUpdate(float deltaTime, float timeScale, IBlackboard blackboard)
 		{
 			Blackboard = blackboard;
 			FixUpdateCount++;
 		}
 
-		public void OnLateUpdate(float deltaTime, float timeScale, Blackboard blackboard)
+		public void OnLateUpdate(float deltaTime, float timeScale, IBlackboard blackboard)
 		{
 			Blackboard = blackboard;
 			LateUpdateCount++;

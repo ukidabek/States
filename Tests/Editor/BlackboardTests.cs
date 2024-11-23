@@ -15,7 +15,7 @@ namespace States.Core.Test
         
         private Key m_keyA = null;
         
-        private Blackboard m_blackboard = null;
+        private IBlackboard m_blackboard = null;
         
         [SetUp]
         public void Setup()
