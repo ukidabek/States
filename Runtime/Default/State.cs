@@ -12,10 +12,10 @@ namespace States.Default
         [FormerlySerializedAs("m_id")] [SerializeField] private StateID m_stateID;
 		public IID StateID => m_stateID;
 
-        [SerializeReference] private IStateLogic[] m_logic = null;
+        [SerializeReference, ReferenceList] private IStateLogic[] m_logic = null;
         public IEnumerable<IContextDestination> ContextDestinations => m_logic;
 
-        [SerializeReference] private IStateTransition[] m_transition = null;
+        [SerializeReference, ReferenceList] private IStateTransition[] m_transition = null;
         public IEnumerable<IStateTransition> Transitions => m_transition;
 
         public bool CanExit => m_logic.All(_logic => _logic.CanBeDeactivated);

@@ -10,7 +10,7 @@ using Object = UnityEngine.Object;
 
 namespace States.Default
 {
-	[CustomEditor(typeof(State))]
+	// [CustomEditor(typeof(State))]
 	public class StateEditor : Editor, ISearchWindowProvider
 	{
 		private enum Types
