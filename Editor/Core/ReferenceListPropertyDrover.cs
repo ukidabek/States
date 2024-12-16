@@ -187,6 +187,9 @@ namespace States.Core
                 rect.width -= Margin;
                 var elementType = elementManagedReferenceValue.GetType();
                 EditorGUI.PropertyField(rect, element, new GUIContent(elementType.Name), element.isExpanded);
+                var elementSerializedObject = element.serializedObject;
+                elementSerializedObject.ApplyModifiedProperties();
+                elementSerializedObject.UpdateIfRequiredOrScript();
                 return;
             }
            
