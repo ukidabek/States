@@ -8,9 +8,9 @@ using UnityEngine;
 
 namespace States.Core
 {
-    #if UNITY_2023_1_OR_NEWER
+#if UNITY_2023_1_OR_NEWER
     [CustomPropertyDrawer(typeof(ReferenceListAttribute))]
-    #endif
+#endif
     public class ReferenceListPropertyDrover : PropertyDrawer
     {
         private class TypeProvider : ScriptableObject, ISearchWindowProvider
@@ -28,8 +28,15 @@ namespace States.Core
                     if (type.IsAbstract) return false;
                     if (type.IsInterface) return false;
                     if (type.IsSubclassOf(typeof(UnityEngine.Object))) return false;
-                    Func<Type, bool> typeFilter = baseType.IsInterface ? baseType.IsAssignableFrom : type.IsSubclassOf;
-                    if (!typeFilter(type)) return false;
+                    if (baseType.IsInterface)
+                    {
+                        if (!baseType.IsAssignableFrom(type)) return false;
+                    }
+                    else
+                    {
+                        if (!type.IsSubclassOf(baseType)) return false;
+                    }
+                 
                     return true;
                 }
                 
@@ -119,9 +126,16 @@ namespace States.Core
                 if (m_isTypeInvalid.Value)
                     return base.GetPropertyHeight(property, label);
             }
-            else if(m_isTypeInvalid.Value)
+            
+            if(m_isTypeInvalid.Value)
                 return base.GetPropertyHeight(property, label);
 
+            if (m_typeProvider == null)
+            {
+                m_typeProvider = ScriptableObject.CreateInstance<TypeProvider>();
+                m_typeProvider.GenerateTreeEntries(m_baseType);
+            }
+            
             m_reorderableList ??= new ReorderableList(
                 property.serializedObject, 
                 property, 
@@ -136,25 +150,8 @@ namespace States.Core
                 drawElementCallback = DrawElementCallback,
                 elementHeightCallback = ElementHeightCallback,
             };
-
-            if (m_typeProvider == null)
-            {
-                m_typeProvider = ScriptableObject.CreateInstance<TypeProvider>();
-                m_typeProvider.GenerateTreeEntries(m_baseType);
-            }
             
-            var propertiesEnumerator = property.GetEnumerator();
-            var propertiesToDisplayCount = 0f;
-            while (propertiesEnumerator.MoveNext())
-            {
-                var element = propertiesEnumerator.Current as SerializedProperty;
-                propertiesToDisplayCount += EditorGUI.GetPropertyHeight( element, true);
-            }
-            
-            return m_reorderableList.headerHeight +
-                   m_reorderableList.elementHeight +
-                   m_reorderableList.footerHeight +
-                   propertiesToDisplayCount;
+            return m_reorderableList.GetHeight();
         }
 
         private void DrawHeaderCallback(Rect rect)
