@@ -2,10 +2,17 @@
 
 namespace States.Core
 {
-    public class ReferenceListAttribute : PropertyCollectionAttribute
+    public class ReferenceListAttribute :
+#if UNITY_2023
+        PropertyCollectionAttribute
+#else
+        PropertyAttribute
+#endif
     {
-        // public ReferenceListAttribute() : base(true)
-        // {
-        // }
+#if UNITY_6000
+        public ReferenceListAttribute() : base(true)
+        {
+        }
+#endif
     }
 }

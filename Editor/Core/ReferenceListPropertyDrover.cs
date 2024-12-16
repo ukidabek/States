@@ -8,7 +8,9 @@ using UnityEngine;
 
 namespace States.Core
 {
+    #if UNITY_2023_1_OR_NEWER
     [CustomPropertyDrawer(typeof(ReferenceListAttribute))]
+    #endif
     public class ReferenceListPropertyDrover : PropertyDrawer
     {
         private class TypeProvider : ScriptableObject, ISearchWindowProvider
@@ -20,15 +22,21 @@ namespace States.Core
             {
                 m_searchTreeEntry.Clear();
                 m_searchTreeEntry.Add(new SearchTreeGroupEntry(new GUIContent(baseType.Name)));
+
+                bool TypeValidateLogic(Type type)
+                {
+                    if (type.IsAbstract) return false;
+                    if (type.IsInterface) return false;
+                    if (type.IsSubclassOf(typeof(UnityEngine.Object))) return false;
+                    Func<Type, bool> typeFilter = baseType.IsInterface ? baseType.IsAssignableFrom : type.IsSubclassOf;
+                    if (!typeFilter(type)) return false;
+                    return true;
+                }
                 
                 var selectedTypes = AppDomain.CurrentDomain
                     .GetAssemblies()
                     .SelectMany(assembly => assembly.GetTypes())
-                    .Where(type => 
-                        type.IsSubclassOf(baseType) &&
-                        !type.IsSubclassOf(typeof(UnityEngine.Object)) &&
-                        !type.IsAbstract && 
-                        !type.IsInterface);
+                    .Where(TypeValidateLogic);
                 
                 foreach (var type in selectedTypes)
                     m_searchTreeEntry.Add(new SearchTreeEntry(new GUIContent(type.Name))
@@ -60,6 +68,13 @@ namespace States.Core
                 return true;
             }
         }
+
+        private const float Margin =
+#if UNITY_6000
+            10f;
+#else
+            0f;
+#endif
         
         private ReorderableList m_reorderableList = null;
         private TypeProvider m_typeProvider = null;
@@ -72,7 +87,6 @@ namespace States.Core
         {
             if (m_isTypeInvalid.Value)
             {
-                var name = m_baseType == null ? fieldInfo.FieldType.Name : m_baseType.Name; 
                 EditorGUI.LabelField(position, $"{m_baseType} is invalid!");
                 return;
             }
@@ -130,23 +144,24 @@ namespace States.Core
             }
             
             var propertiesEnumerator = property.GetEnumerator();
-            var propertiesToDisplayCount = 0;
+            var propertiesToDisplayCount = 0f;
             while (propertiesEnumerator.MoveNext())
             {
                 var element = propertiesEnumerator.Current as SerializedProperty;
-                propertiesToDisplayCount += element.CountInProperty();
+                propertiesToDisplayCount += EditorGUI.GetPropertyHeight( element, true);
             }
-
-            propertiesToDisplayCount = propertiesToDisplayCount == 0 ? 1 : propertiesToDisplayCount;
-
+            
             return m_reorderableList.headerHeight +
-                   m_reorderableList.elementHeight * propertiesToDisplayCount +
+                   m_reorderableList.elementHeight +
                    m_reorderableList.footerHeight +
-                   base.GetPropertyHeight(property, label);
+                   propertiesToDisplayCount;
         }
 
-        private void DrawHeaderCallback(Rect rect) => 
-            EditorGUI.LabelField(rect, m_reorderableList.serializedProperty.displayName);
+        private void DrawHeaderCallback(Rect rect)
+        {
+            var serializedPropertyDisplayName = m_reorderableList.serializedProperty.displayName;
+            EditorGUI.LabelField(rect, serializedPropertyDisplayName);
+        }
 
         private void OnRemoveCallback(ReorderableList list)
         {
@@ -159,16 +174,34 @@ namespace States.Core
         private float ElementHeightCallback(int index)
         {
             var element = m_reorderableList.serializedProperty.GetArrayElementAtIndex(index);
-            return EditorGUI.GetPropertyHeight(element, element.isExpanded);
+            var elementHeight = EditorGUI.GetPropertyHeight(element, element.isExpanded);
+            return elementHeight;
         }
 
         private void DrawElementCallback(Rect rect, int index, bool isActive, bool isFocused)
         {
             if (isActive) m_activeIndex = index;
-            rect.x += 10f;
             var element = m_reorderableList.serializedProperty.GetArrayElementAtIndex(index);
-            var elementType = element.managedReferenceValue.GetType();
-            EditorGUI.PropertyField(rect, element, new GUIContent(elementType.Name), element.isExpanded);
+            var elementManagedReferenceValue = element.managedReferenceValue;
+            
+            if (elementManagedReferenceValue != null)
+            {
+                rect.x += Margin;
+                rect.width -= Margin;
+                var elementType = elementManagedReferenceValue.GetType();
+                EditorGUI.PropertyField(rect, element, new GUIContent(elementType.Name), element.isExpanded);
+                return;
+            }
+           
+            var warningStyle = new GUIStyle(EditorStyles.label)
+            {
+                normal =
+                {
+                    textColor = Color.red
+                },
+                fontStyle = FontStyle.Bold
+            };
+            EditorGUI.LabelField(rect, $"This clas is null! Maybe clas name where changes use [MovedFrom] attribute!", warningStyle);
         }
 
         private void OnAddCallback(ReorderableList list)
