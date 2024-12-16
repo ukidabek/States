@@ -201,7 +201,7 @@ namespace States.Core
                 },
                 fontStyle = FontStyle.Bold
             };
-            EditorGUI.LabelField(rect, $"This clas is null! Maybe clas name where changes use [MovedFrom] attribute!", warningStyle);
+            EditorGUI.LabelField(rect, "This class is null! Maybe the class name was changed. Use the [MovedFrom] attribute!", warningStyle);
         }
 
         private void OnAddCallback(ReorderableList list)
