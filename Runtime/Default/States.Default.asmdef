@@ -2,7 +2,8 @@
     "name": "States.Default",
     "rootNamespace": "",
     "references": [
-        "GUID:e269b547776695b45aff55f83014d8f3"
+        "GUID:e269b547776695b45aff55f83014d8f3",
+        "GUID:4acc7160c80847e48b157260c1e4510a"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
