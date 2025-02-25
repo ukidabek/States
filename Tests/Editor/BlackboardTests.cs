@@ -1,4 +1,5 @@
 using NUnit.Framework;
+using Utilities.General;
 
 namespace States.Core.Test
 {

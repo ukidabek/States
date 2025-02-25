@@ -1,5 +1,6 @@
 using NUnit.Framework;
 using UnityEngine;
+using Utilities.General;
 
 namespace States.Core.Test
 {
@@ -7,6 +8,7 @@ namespace States.Core.Test
     {
         private Key m_keyA = null;
         private Key m_keyB = null;
+        
         public static Key BuildKey(string keyName)
         {
             var instance = ScriptableObject.CreateInstance<Key>();

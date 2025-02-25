@@ -1,3 +1,5 @@
+using Utilities.General;
+
 namespace States.Core
 {
     public interface IBlackboard
