@@ -1,8 +1,10 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using States.Core;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace States.Default
 {
@@ -11,7 +13,8 @@ namespace States.Default
 	{	
 		[SerializeField] private BlackboardFactory m_blackboardFactory;
 		[SerializeField] private StateMachineContext[] m_externalContext = null;
-		[SerializeField] private List<State> m_states = new List<State>();
+		[SerializeField] private List<State> m_states = new List<State>(30);
+		[FormerlySerializedAs("m_backedStated")] [SerializeField, HideInInspector] private List<State> m_backedStates = new List<State>(30);
 		[SerializeField] private Executor m_executors = 0;
 		public Executor Executor => m_executors;
 
@@ -41,8 +44,9 @@ namespace States.Default
 			var preProcessors = GetComponents<IStatePreProcessor>();
 			var postProcessors = GetComponents<IStatePostProcessor>();
 			var context = m_externalContext.SelectMany(_context => _context.Context).ToArray();
+			var contextHandler = new ContextHandler(m_backedStates);
 			var blackboard = m_blackboardFactory.CreateBlackboard();
-			m_stateMachine = new StateMachine(name, context, blackboard, preProcessors, postProcessors);
+			m_stateMachine = new StateMachine(name, context, contextHandler, blackboard, preProcessors, postProcessors);
 
 			foreach (var state in m_states)
 				state.Initialize(context, blackboard, preProcessors, postProcessors);
@@ -57,5 +61,21 @@ namespace States.Default
 		public void OnFixedUpdate(float deltaTime, float timeScale) => m_stateMachine.OnFixedUpdate(deltaTime, timeScale);
 
 		public void OnLateUpdate(float deltaTime, float timeScale) => m_stateMachine.OnLateUpdate(deltaTime, timeScale);
+
+		[Conditional("UNITY_EDITOR")]
+		public void BakeReferences()
+		{
+			var contextHandler = new ContextHandler();
+			var context = m_externalContext.SelectMany(_context => _context.Context);
+			m_backedStates.Clear();
+			m_backedStates.AddRange(m_states
+				.Where(state => state.IsStatic)
+				.Select(state =>
+				{
+					contextHandler.FillState(state, context);
+					return state;
+				})
+			);
+		}
 	}
 }

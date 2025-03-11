@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using Unity.Profiling;
-using UnityEngine.Profiling;
 
 namespace States.Core
 {
@@ -26,7 +25,10 @@ namespace States.Core
             IBlackboard blackboard,
             IEnumerable<IStatePreProcessor> statePreProcessor = null,
             IEnumerable<IStatePostProcessor> statePostProcessor = null)
-            : this(nameof(StateMachine), context, blackboard, statePreProcessor,
+            : this(nameof(StateMachine), 
+                context, 
+                blackboard, 
+                statePreProcessor,
                 statePostProcessor)
         {
         }
@@ -36,9 +38,25 @@ namespace States.Core
             IBlackboard blackboard,
             IEnumerable<IStatePreProcessor> statePreProcessor = null,
             IEnumerable<IStatePostProcessor> statePostProcessor = null)
+            : this(name,
+                context, 
+                new ContextHandler(),
+                blackboard, 
+                statePreProcessor,
+                statePostProcessor)
+        {
+        }
+
+        public StateMachine(string name,
+            IEnumerable<Context> context,
+            ContextHandler contextHandler,
+            IBlackboard blackboard,
+            IEnumerable<IStatePreProcessor> statePreProcessor = null,
+            IEnumerable<IStatePostProcessor> statePostProcessor = null)
         {
             Name = name;
             m_context = context;
+            m_contextHandler =  contextHandler;
             Blackboard = blackboard;
             m_statePreProcessors = statePreProcessor;
             m_statePostProcessors = statePostProcessor;
@@ -48,13 +66,13 @@ namespace States.Core
             m_lateUpdateMarker = new ProfilerMarker($"{name} - {nameof(OnLateUpdate)}");
         }
 
-        public void EnterState(IState statToEnter)
+        public void EnterState(IState stateToEnter)
         {
             var currentStateNotNull = CurrentState != null;
 
 			if (currentStateNotNull && !CurrentState.CanExit) return;
 
-			if (CurrentState == statToEnter) return;
+			if (CurrentState == stateToEnter) return;
 
             PreviousState = CurrentState;
 
@@ -64,7 +82,7 @@ namespace States.Core
                 m_statePostProcessors.Process(CurrentState);
             }
 
-            CurrentState = statToEnter;
+            CurrentState = stateToEnter;
 
             m_contextHandler.FillState(CurrentState, m_context);
 

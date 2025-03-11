@@ -8,8 +8,6 @@ namespace States.Core
 {
 	public class ContextHandler
 	{
-		private HashSet<IState> m_staticStates = new HashSet<IState>();
-
 		private const BindingFlags Binding_Flags = BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.FlattenHierarchy | BindingFlags.Instance;
 		private static readonly Dictionary<Type, MemberInfo[]> ContextFieldsByTypeDictionary = new();
 		
@@ -34,6 +32,18 @@ namespace States.Core
 				if (!contextMembers.Any()) continue;
 				ContextFieldsByTypeDictionary.Add(type, contextMembers);
 			}
+		}
+		
+		private HashSet<IState> m_staticStates = new HashSet<IState>();
+		
+		public ContextHandler()
+		{
+		}
+
+		public ContextHandler(IEnumerable<IState> staticStates)
+		{
+			foreach (var state in staticStates)
+				m_staticStates.Add(state);
 		}
 		
 		private bool ValidateType(Context context, MemberInfo member)
