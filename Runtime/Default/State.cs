@@ -26,9 +26,9 @@ namespace States.Default
         [SerializeField] private bool m_isStatic = false;
         public bool IsStatic => m_isStatic;
 
-        private List<IOnUpdateLogic> m_onUpdateLogic = new List<IOnUpdateLogic>(10);
-        private List<IOnFixedUpdateLogic> m_onFixedUpdateLogic = new List<IOnFixedUpdateLogic>(10);
-        private List<IOnLateUpdateLogic> m_onLateUpdateLogic = new List<IOnLateUpdateLogic>(10);
+        private readonly List<IOnUpdateLogic> m_onUpdateLogic = new List<IOnUpdateLogic>(10);
+        private readonly List<IOnFixedUpdateLogic> m_onFixedUpdateLogic = new List<IOnFixedUpdateLogic>(10);
+        private readonly List<IOnLateUpdateLogic> m_onLateUpdateLogic = new List<IOnLateUpdateLogic>(10);
 
         [SerializeField] private List<State> m_subStates = new List<State>();
         
