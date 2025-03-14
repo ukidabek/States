@@ -9,6 +9,6 @@
   },
   "unity": "2023.1",
   "dependencies": {
-    "com.cooki.utilities": "https://github.com/ukidabek/Utilities.git"
+    "com.cooki.utilities": "1.0.0"
   }
 }
