@@ -78,14 +78,10 @@ namespace States.Core
 
 				IEnumerable<MemberInfo> members = default;
 				if (ContextFieldsByTypeDictionary.TryGetValue(logicType, out var memberInfos))
-				{
 					members = memberInfos;
-				}
 				else
-				{
 					members = logicType.GetMembers(Binding_Flags)
 						.Where(member => member.GetCustomAttribute<ContextField>() != null);
-				}
 
 				foreach (var member in members)
 				{

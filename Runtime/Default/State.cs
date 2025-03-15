@@ -47,8 +47,9 @@ namespace States.Default
             
             foreach (var subState in m_subStates) 
                 subState.Initialize(contexts, blackboard, statePreProcessor, statePostProcessor);
-            
-            m_stateMachine = new StateMachine(name, contexts, blackboard, statePreProcessor, statePostProcessor);
+
+            var contextHandler = new ContextHandler(BackedStates);
+            m_stateMachine = new StateMachine(name, contexts, contextHandler, blackboard, statePreProcessor, statePostProcessor);
         }
         
 		public void Enter()
