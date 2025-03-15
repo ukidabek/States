@@ -9,12 +9,12 @@ using UnityEngine.Serialization;
 namespace States.Default
 {
 	[AddComponentMenu("States/Core/StateMachineHost")]
-	public class StateMachineHost : MonoBehaviour, IStateMachine
+	public class StateMachineHost : MonoBehaviour, IStateMachine, IReferenceBaker
 	{	
 		[SerializeField] private BlackboardFactory m_blackboardFactory;
 		[SerializeField] private StateMachineContext[] m_externalContext = null;
 		[SerializeField] private List<State> m_states = new List<State>(30);
-		[FormerlySerializedAs("m_backedStated")] [SerializeField, HideInInspector] private List<State> m_backedStates = new List<State>(30);
+		[SerializeField, HideInInspector] private List<State> m_backedStates = new List<State>(30);
 		[SerializeField] private Executor m_executors = 0;
 		public Executor Executor => m_executors;
 
@@ -65,17 +65,14 @@ namespace States.Default
 		[Conditional("UNITY_EDITOR")]
 		public void BakeReferences()
 		{
-			var contextHandler = new ContextHandler();
 			var context = m_externalContext.SelectMany(_context => _context.Context);
-			m_backedStates.Clear();
-			m_backedStates.AddRange(m_states
-				.Where(state => state.IsStatic)
-				.Select(state =>
-				{
-					contextHandler.FillState(state, context);
-					return state;
-				})
-			);
+			(this as IReferenceBaker).Bake(context);
+			foreach (var baker in StateToBake.OfType<IReferenceBaker>())
+				baker.Bake(context);
 		}
+
+		public IList<State> BackedStates => m_backedStates;
+
+		public IEnumerable<State> StateToBake => m_states;
 	}
 }

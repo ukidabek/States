@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using States.Core;
 using UnityEngine;
@@ -8,8 +9,10 @@ using Utilities.General;
 namespace States.Default
 {
     [AddComponentMenu("States/Core/State")]
-	public class State : MonoBehaviour, IState
+	public class State : MonoBehaviour, IState, IReferenceBaker
     {
+        [SerializeField, HideInInspector] private List<State> m_backedStates = new List<State>(30);
+        public IList<State> BackedStates => m_backedStates;
         [FormerlySerializedAs("m_id")] [SerializeField] private StateID m_stateID;
 		public IID StateID => m_stateID;
 
@@ -31,6 +34,7 @@ namespace States.Default
         private readonly List<IOnLateUpdateLogic> m_onLateUpdateLogic = new List<IOnLateUpdateLogic>(10);
 
         [SerializeField] private List<State> m_subStates = new List<State>();
+        public IEnumerable<State> StateToBake => m_subStates;
         
         private StateMachine m_stateMachine = null;
         
@@ -90,5 +94,8 @@ namespace States.Default
             
             m_stateMachine?.OnLateUpdate(deltaTime, timeScale);
         }
+        
+    
+        
     }
 }
