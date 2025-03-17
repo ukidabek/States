@@ -4,7 +4,6 @@ using System.Diagnostics;
 using System.Linq;
 using States.Core;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace States.Default
 {
@@ -47,7 +46,7 @@ namespace States.Default
 			var contextHandler = new ContextHandler(m_backedStates);
 			var blackboard = m_blackboardFactory.CreateBlackboard();
 			m_stateMachine = new StateMachine(name, context, contextHandler, blackboard, preProcessors, postProcessors);
-
+			
 			foreach (var state in m_states)
 				state.Initialize(context, blackboard, preProcessors, postProcessors);
 		}

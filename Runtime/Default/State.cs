@@ -1,5 +1,5 @@
-﻿using System.Collections.Generic;
-using System.Diagnostics;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using States.Core;
 using UnityEngine;
@@ -9,7 +9,8 @@ using Utilities.General;
 namespace States.Default
 {
     [AddComponentMenu("States/Core/State")]
-	public class State : MonoBehaviour, IState, IReferenceBaker
+    [DisallowMultipleComponent]
+	public class State : MonoBehaviour, IState, IStateMachine, IReferenceBaker
     {
         [SerializeField, HideInInspector] private List<State> m_backedStates = new List<State>(30);
         public IList<State> BackedStates => m_backedStates;
@@ -24,7 +25,18 @@ namespace States.Default
 
         public bool CanExit => m_logic.All(_logic => _logic.CanBeDeactivated);
 
-		public string Name => gameObject.name;
+        public event Action<IState> OnStateChanged
+        {
+            add => m_stateMachine.OnStateChanged += value;
+            remove => m_stateMachine.OnStateChanged -= value;
+        }
+        
+        public IBlackboard Blackboard => m_stateMachine.Blackboard;
+        public string Name => gameObject.name;
+        
+        public IState CurrentState => m_stateMachine.CurrentState;
+        
+        public IState PreviousState => m_stateMachine.PreviousState;
 
         [SerializeField] private bool m_isStatic = false;
         public bool IsStatic => m_isStatic;
@@ -52,6 +64,8 @@ namespace States.Default
             m_stateMachine = new StateMachine(name, contexts, contextHandler, blackboard, statePreProcessor, statePostProcessor);
         }
         
+        public void EnterState(IState statToEnter) => m_stateMachine.EnterState(statToEnter);
+        
 		public void Enter()
         {
             m_logic.FillList(m_onUpdateLogic);
@@ -77,26 +91,28 @@ namespace States.Default
             foreach (var update in m_onUpdateLogic) 
                 update.OnUpdate(deltaTime, timeScale, blackboard);
             
-            m_stateMachine?.OnUpdate(deltaTime, timeScale);
+            OnUpdate(deltaTime, timeScale);
         }
+        
+        public void OnUpdate(float deltaTime, float timeScale) => m_stateMachine?.OnUpdate(deltaTime, timeScale);
 
         public void OnFixedUpdate(float deltaTime, float timeScale, IBlackboard blackboard)
         {
             foreach (var update in m_onFixedUpdateLogic) 
                 update.OnFixedUpdate(deltaTime, timeScale, blackboard);
-            
-            m_stateMachine?.OnFixedUpdate(deltaTime, timeScale);
+            OnFixedUpdate(deltaTime, timeScale);
         }
+        
+        public void OnFixedUpdate(float deltaTime, float timeScale) => m_stateMachine?.OnFixedUpdate(deltaTime, timeScale);
+      
         
         public void OnLateUpdate(float deltaTime, float timeScale, IBlackboard blackboard)
         {
             foreach (var update in m_onLateUpdateLogic) 
                 update.OnLateUpdate(deltaTime, timeScale, blackboard);
-            
-            m_stateMachine?.OnLateUpdate(deltaTime, timeScale);
+            OnLateUpdate(deltaTime, timeScale);
         }
         
-    
-        
+        public void OnLateUpdate(float deltaTime, float timeScale) => m_stateMachine?.OnLateUpdate(deltaTime, timeScale);
     }
 }
