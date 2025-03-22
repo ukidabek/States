@@ -12,6 +12,12 @@ namespace States.Default
     [DisallowMultipleComponent]
 	public class State : MonoBehaviour, IState, IStateMachine, IReferenceBaker
     {
+        [SerializeField] private bool m_isStatic = false;
+        public bool IsStatic => m_isStatic;
+        
+        [FormerlySerializedAs("m_clearCurrentStateOnExit")] [SerializeField] private bool m_resetStateMachine = false;
+        [SerializeField, Range(0, 100)] private int m_defaultStateIndex = 0;
+        
         [SerializeField, HideInInspector] private List<State> m_backedStates = new List<State>(30);
         public IList<State> BackedStates => m_backedStates;
         [FormerlySerializedAs("m_id")] [SerializeField] private StateID m_stateID;
@@ -38,8 +44,6 @@ namespace States.Default
         
         public IState PreviousState => m_stateMachine.PreviousState;
 
-        [SerializeField] private bool m_isStatic = false;
-        public bool IsStatic => m_isStatic;
 
         private readonly List<IOnUpdateLogic> m_onUpdateLogic = new List<IOnUpdateLogic>(10);
         private readonly List<IOnFixedUpdateLogic> m_onFixedUpdateLogic = new List<IOnFixedUpdateLogic>(10);
@@ -77,13 +81,18 @@ namespace States.Default
             
             if (!m_subStates.Any()) return;
             
-            m_stateMachine.EnterState(m_subStates.First());
+            m_stateMachine.EnterState(m_subStates[m_defaultStateIndex]);
         }
 
         public void Exit()
         {
             foreach (var stateLogic in m_logic) 
                 stateLogic.Deactivate();
+
+            if (!m_subStates.Any()) return;
+            if (!m_resetStateMachine) return;
+            
+            m_stateMachine.Reset();
         }
 
         public void OnUpdate(float deltaTime, float timeScale, IBlackboard blackboard)

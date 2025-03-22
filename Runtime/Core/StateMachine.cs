@@ -119,6 +119,12 @@ namespace States.Core
             CurrentState?.OnLateUpdate(deltaTime, timeScale, Blackboard);
         }
 
+        public void Reset()
+        {
+            CurrentState = null;
+            PreviousState = null;
+        }
+        
         public void Dispose()
         {
             OnStateChanged = null;
