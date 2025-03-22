@@ -121,6 +121,7 @@ namespace States.Core
 
         public void Reset()
         {
+            CurrentState?.Exit();
             CurrentState = null;
             PreviousState = null;
         }
