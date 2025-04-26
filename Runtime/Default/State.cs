@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using States.Core;
+using Unity.Profiling;
 using UnityEngine;
 using UnityEngine.Serialization;
 using Utilities.General;
@@ -53,12 +54,18 @@ namespace States.Default
         public IEnumerable<State> StateToBake => m_subStates;
         
         private StateMachine m_stateMachine = null;
+
+        private ProfilerMarker m_updateMarker, m_fixedUpdateMarker, m_lateUpdateMarker;
         
         public void Initialize(IEnumerable<Context> contexts,
             IBlackboard blackboard,
             IEnumerable<IStatePreProcessor> statePreProcessor = null,
             IEnumerable<IStatePostProcessor> statePostProcessor = null)
         {
+            m_updateMarker = new ProfilerMarker($"{name} - {nameof(OnUpdate)}");
+            m_fixedUpdateMarker = new ProfilerMarker($"{name} - {nameof(OnFixedUpdate)}");
+            m_lateUpdateMarker = new ProfilerMarker($"{name} - {nameof(OnLateUpdate)}");
+            
             if (!m_subStates.Any()) return;
             
             foreach (var subState in m_subStates) 
@@ -97,9 +104,9 @@ namespace States.Default
 
         public void OnUpdate(float deltaTime, float timeScale, IBlackboard blackboard)
         {
+            m_updateMarker.Auto();
             foreach (var update in m_onUpdateLogic) 
                 update.OnUpdate(deltaTime, timeScale, blackboard);
-            
             OnUpdate(deltaTime, timeScale);
         }
         
@@ -107,16 +114,17 @@ namespace States.Default
 
         public void OnFixedUpdate(float deltaTime, float timeScale, IBlackboard blackboard)
         {
+            m_fixedUpdateMarker.Auto();
             foreach (var update in m_onFixedUpdateLogic) 
                 update.OnFixedUpdate(deltaTime, timeScale, blackboard);
             OnFixedUpdate(deltaTime, timeScale);
         }
         
         public void OnFixedUpdate(float deltaTime, float timeScale) => m_stateMachine?.OnFixedUpdate(deltaTime, timeScale);
-      
         
         public void OnLateUpdate(float deltaTime, float timeScale, IBlackboard blackboard)
         {
+            m_lateUpdateMarker.Auto();
             foreach (var update in m_onLateUpdateLogic) 
                 update.OnLateUpdate(deltaTime, timeScale, blackboard);
             OnLateUpdate(deltaTime, timeScale);
