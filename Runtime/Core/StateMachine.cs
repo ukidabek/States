@@ -20,7 +20,9 @@ namespace States.Core
         public string Name { get; private set; }
         public IState PreviousState { get; private set; }
 
-        private ProfilerMarker m_updateMarker, m_fixedUpdateMarker, m_lateUpdateMarker, m_transitionUpdateMarker;
+        private ProfilerMarker m_onStateEnter,
+            m_updateMarker, m_fixedUpdateMarker, 
+            m_lateUpdateMarker, m_transitionUpdateMarker;
         
         public StateMachine(IEnumerable<Context> context,
             IBlackboard blackboard,
@@ -61,7 +63,6 @@ namespace States.Core
             Blackboard = blackboard;
             m_statePreProcessors = statePreProcessor;
             m_statePostProcessors = statePostProcessor;
-
             m_updateMarker = new ProfilerMarker($"{name} - {nameof(OnUpdate)}");
             m_fixedUpdateMarker = new ProfilerMarker($"{name} - {nameof(OnFixedUpdate)}");
             m_lateUpdateMarker = new ProfilerMarker($"{name} - {nameof(OnLateUpdate)}");
@@ -70,6 +71,7 @@ namespace States.Core
 
         public void EnterState(IState stateToEnter)
         {
+            Profiler.BeginSample($"EnterState: {stateToEnter.Name}");
             var currentStateNotNull = CurrentState != null;
 
 			if (currentStateNotNull && !CurrentState.CanExit) return;
@@ -80,17 +82,22 @@ namespace States.Core
 
             if (currentStateNotNull)
             {
+                Profiler.BeginSample($"Exit: {CurrentState.Name}");
                 CurrentState.Exit();
                 m_statePostProcessors.Process(CurrentState);
+                Profiler.EndSample();
             }
 
             CurrentState = stateToEnter;
 
             m_contextHandler.FillState(CurrentState, m_context);
 
+            Profiler.BeginSample($"Enter: {CurrentState.Name}");
             m_statePreProcessors.Process(CurrentState);
             CurrentState?.Enter();
             OnStateChanged?.Invoke(CurrentState);
+            Profiler.EndSample();
+            Profiler.EndSample();
         }
 
         public void OnUpdate(float deltaTime, float timeScale)
