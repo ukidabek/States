@@ -108,8 +108,8 @@ namespace States.Core
                         EnterState(validTransition.StateToEnter);
                 }
             }
-           
-            
+
+            if (CurrentState == null) return;
             Profiler.BeginSample($"Updating state - {CurrentState.Name}");
             CurrentState.OnUpdate(deltaTime, timeScale, Blackboard);
             Profiler.EndSample();
@@ -118,16 +118,18 @@ namespace States.Core
         public void OnFixedUpdate(float deltaTime, float timeScale)
         {
             m_fixedUpdateMarker.Auto();
+            if (CurrentState == null) return;
             Profiler.BeginSample($"FixUpdating state - {CurrentState.Name}");
-            CurrentState?.OnFixedUpdate(deltaTime, timeScale, Blackboard);
+            CurrentState.OnFixedUpdate(deltaTime, timeScale, Blackboard);
             Profiler.EndSample();
         }
 
         public void OnLateUpdate(float deltaTime, float timeScale)
         {
             m_lateUpdateMarker.Auto();
+            if (CurrentState == null) return;
             Profiler.BeginSample($"LateUpdating state - {CurrentState.Name}");
-            CurrentState?.OnLateUpdate(deltaTime, timeScale, Blackboard);
+            CurrentState.OnLateUpdate(deltaTime, timeScale, Blackboard);
             Profiler.EndSample();
         }
 
