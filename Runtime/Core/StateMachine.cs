@@ -2,12 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using Unity.Profiling;
+using UnityEngine.Profiling;
 
 namespace States.Core
 {
     public class StateMachine : IStateMachine, IDisposable
     {
-        private ContextHandler m_contextHandler = new ContextHandler();
+        private readonly ContextHandler m_contextHandler = new ContextHandler();
         public event Action<IState> OnStateChanged;
         
         private readonly IEnumerable<Context> m_context = null;
@@ -19,7 +20,7 @@ namespace States.Core
         public string Name { get; private set; }
         public IState PreviousState { get; private set; }
 
-        private ProfilerMarker m_updateMarker, m_fixedUpdateMarker, m_lateUpdateMarker;
+        private ProfilerMarker m_updateMarker, m_fixedUpdateMarker, m_lateUpdateMarker, m_transitionUpdateMarker;
         
         public StateMachine(IEnumerable<Context> context,
             IBlackboard blackboard,
@@ -64,6 +65,7 @@ namespace States.Core
             m_updateMarker = new ProfilerMarker($"{name} - {nameof(OnUpdate)}");
             m_fixedUpdateMarker = new ProfilerMarker($"{name} - {nameof(OnFixedUpdate)}");
             m_lateUpdateMarker = new ProfilerMarker($"{name} - {nameof(OnLateUpdate)}");
+            m_transitionUpdateMarker=  new ProfilerMarker($"{name} - OnTransitionUpdate ");
         }
 
         public void EnterState(IState stateToEnter)
@@ -95,28 +97,38 @@ namespace States.Core
         {
             m_updateMarker.Auto();
             if (CurrentState == null) return;
-            
-            var transitions = CurrentState.Transitions;
-            if (transitions != null && transitions.Any())
-            {
-                var validTransition = transitions.FirstOrDefault(transitions => transitions.Validate(Blackboard));
-                if (validTransition != null)
-                    EnterState(validTransition.StateToEnter);
-            }
 
+            using (m_transitionUpdateMarker.Auto())
+            {
+                var transitions = CurrentState.Transitions;
+                if (transitions != null && transitions.Any())
+                {
+                    var validTransition = transitions.FirstOrDefault(transitions => transitions.Validate(Blackboard));
+                    if (validTransition != null)
+                        EnterState(validTransition.StateToEnter);
+                }
+            }
+           
+            
+            Profiler.BeginSample($"Updating state - {CurrentState.Name}");
             CurrentState.OnUpdate(deltaTime, timeScale, Blackboard);
+            Profiler.EndSample();
         }
 
         public void OnFixedUpdate(float deltaTime, float timeScale)
         {
             m_fixedUpdateMarker.Auto();
+            Profiler.BeginSample($"FixUpdating state - {CurrentState.Name}");
             CurrentState?.OnFixedUpdate(deltaTime, timeScale, Blackboard);
+            Profiler.EndSample();
         }
 
         public void OnLateUpdate(float deltaTime, float timeScale)
         {
             m_lateUpdateMarker.Auto();
+            Profiler.BeginSample($"LateUpdating state - {CurrentState.Name}");
             CurrentState?.OnLateUpdate(deltaTime, timeScale, Blackboard);
+            Profiler.EndSample();
         }
 
         public void Reset()
