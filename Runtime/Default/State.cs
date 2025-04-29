@@ -118,9 +118,12 @@ namespace States.Default
 
         public void OnUpdate(float deltaTime, float timeScale, IBlackboard blackboard)
         {
-            m_updateMarker.Auto();
-            foreach (var update in m_onUpdateLogic) 
+            foreach (var update in m_onUpdateLogic)
+            {
+                Profiler.BeginSample($"Updating: {update.GetType().Name}");
                 update.OnUpdate(deltaTime, timeScale, blackboard);
+                Profiler.EndSample();
+            }
             OnUpdate(deltaTime, timeScale);
         }
         
@@ -128,9 +131,12 @@ namespace States.Default
 
         public void OnFixedUpdate(float deltaTime, float timeScale, IBlackboard blackboard)
         {
-            m_fixedUpdateMarker.Auto();
-            foreach (var update in m_onFixedUpdateLogic) 
+            foreach (var update in m_onFixedUpdateLogic)
+            {
+                Profiler.BeginSample($"Fix updating: {update.GetType().Name}");
                 update.OnFixedUpdate(deltaTime, timeScale, blackboard);
+                Profiler.EndSample();
+            }
             OnFixedUpdate(deltaTime, timeScale);
         }
         
@@ -138,9 +144,12 @@ namespace States.Default
         
         public void OnLateUpdate(float deltaTime, float timeScale, IBlackboard blackboard)
         {
-            m_lateUpdateMarker.Auto();
-            foreach (var update in m_onLateUpdateLogic) 
+            foreach (var update in m_onLateUpdateLogic)
+            {
+                Profiler.BeginSample($"Late updating: {update.GetType().Name}");
                 update.OnLateUpdate(deltaTime, timeScale, blackboard);
+                Profiler.EndSample();
+            }
             OnLateUpdate(deltaTime, timeScale);
         }
         
