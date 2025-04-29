@@ -56,8 +56,7 @@ namespace States.Default
         
         private StateMachine m_stateMachine = null;
 
-        private ProfilerMarker m_enterState, m_exitState,
-            m_updateMarker, m_fixedUpdateMarker, m_lateUpdateMarker;
+        private ProfilerMarker m_enterState, m_exitState;
         
         public void Initialize(IEnumerable<Context> contexts,
             IBlackboard blackboard,
@@ -66,9 +65,6 @@ namespace States.Default
         {
             m_enterState = new ProfilerMarker($"{name} - {nameof(Enter)}");
             m_exitState = new ProfilerMarker($"{name} - {nameof(Exit)}");
-            m_updateMarker = new ProfilerMarker($"{name} - {nameof(OnUpdate)}");
-            m_fixedUpdateMarker = new ProfilerMarker($"{name} - {nameof(OnFixedUpdate)}");
-            m_lateUpdateMarker = new ProfilerMarker($"{name} - {nameof(OnLateUpdate)}");
             
             if (!m_subStates.Any()) return;
             
@@ -83,37 +79,41 @@ namespace States.Default
         
 		public void Enter()
         {
-            m_enterState.Auto();
-            m_logic.FillList(m_onUpdateLogic);
-            m_logic.FillList(m_onFixedUpdateLogic);
-            m_logic.FillList(m_onLateUpdateLogic);
-
-            foreach (var stateLogic in m_logic)
+            using (m_enterState.Auto())
             {
-                Profiler.BeginSample($"Activating: {stateLogic.GetType().Name}");
-                stateLogic.Activate();
-                Profiler.EndSample();
+                m_logic.FillList(m_onUpdateLogic);
+                m_logic.FillList(m_onFixedUpdateLogic);
+                m_logic.FillList(m_onLateUpdateLogic);
+
+                foreach (var stateLogic in m_logic)
+                {
+                    Profiler.BeginSample($"Activating: {stateLogic.GetType().Name}");
+                    stateLogic.Activate();
+                    Profiler.EndSample();
+                }
+                
+                if (!m_subStates.Any()) return;
+                
+                m_stateMachine.EnterState(m_subStates[m_defaultStateIndex]);
             }
-            
-            if (!m_subStates.Any()) return;
-            
-            m_stateMachine.EnterState(m_subStates[m_defaultStateIndex]);
         }
 
         public void Exit()
         {
-            m_exitState.Auto();
-            foreach (var stateLogic in m_logic)
+            using (m_exitState.Auto())
             {
-                Profiler.BeginSample($"Deactivate: {stateLogic.GetType().Name}");
-                stateLogic.Deactivate();
-                Profiler.EndSample();
-            }
+                foreach (var stateLogic in m_logic)
+                {
+                    Profiler.BeginSample($"Deactivate: {stateLogic.GetType().Name}");
+                    stateLogic.Deactivate();
+                    Profiler.EndSample();
+                }
 
-            if (!m_subStates.Any()) return;
-            if (!m_resetStateMachine) return;
-            
-            m_stateMachine.Reset();
+                if (!m_subStates.Any()) return;
+                if (!m_resetStateMachine) return;
+
+                m_stateMachine.Reset();
+            }
         }
 
         public void OnUpdate(float deltaTime, float timeScale, IBlackboard blackboard)
