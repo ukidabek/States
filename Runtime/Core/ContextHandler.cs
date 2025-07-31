@@ -65,6 +65,21 @@ namespace States.Core
 			return memberType.IsAssignableFrom(contextType);
 		}
 
+		private IEnumerable<MemberInfo> GetMemberInfos(Type logicType)
+		{
+			IEnumerable<MemberInfo> members = default;
+			if (ContextFieldsByTypeDictionary.TryGetValue(logicType, out var memberInfos))
+				members = memberInfos;
+			else
+			{
+				members = logicType
+					.GetMembers(Binding_Flags)
+					.Where(member => member.GetCustomAttribute<ContextField>() != null);
+			}
+
+			return members;
+		}
+		
 		public void FillState(IState state, IEnumerable<Context> contexts)
 		{
 			if (m_staticStates.Contains(state)) return;
@@ -76,18 +91,14 @@ namespace States.Core
 			{
 				var logicType = logic.GetType();
 
-				IEnumerable<MemberInfo> members = default;
-				if (ContextFieldsByTypeDictionary.TryGetValue(logicType, out var memberInfos))
-					members = memberInfos;
-				else
-					members = logicType.GetMembers(Binding_Flags)
-						.Where(member => member.GetCustomAttribute<ContextField>() != null);
+				var members = GetMemberInfos(logicType);
 
 				foreach (var member in members)
 				{
 					var attribute = member.GetCustomAttribute<ContextField>();
+					
 					if (attribute == null) continue;
-
+					
 					Context context = default;
 					var attributeID = attribute.ID;
 					context = string.IsNullOrEmpty(attributeID) ? 
@@ -96,12 +107,32 @@ namespace States.Core
 
 					if (context == null) continue;
 
-					InjectStateReference(member, logic, context.Object);
+					InjectReference(member, logic, context.Object);
 				}
 			}
 		}
+		
+		public void ClearState(IState state)
+		{
+			var contextDestinations = state.GetContextDestination();
+			foreach (var logic in contextDestinations)
+			{
+				var logicType = logic.GetType();
 
-		private static void InjectStateReference(MemberInfo member, object target, object value)
+				var members = GetMemberInfos(logicType);
+				foreach (var member in members)
+				{
+					var attribute = member.GetCustomAttribute<ContextField>();
+					
+					if (attribute == null) continue;
+					ClearReference(member, logic);
+				}
+			}
+
+			m_staticStates.Remove(state);
+		}
+
+		private void InjectReference(MemberInfo member, object target, object value)
 		{
 			switch (member)
 			{
@@ -110,6 +141,21 @@ namespace States.Core
 					break;
 				case PropertyInfo propertyInfo:
 					propertyInfo.SetValue(target, value);
+					break;
+			}
+		}
+		
+		private void ClearReference(MemberInfo member, object target)
+		{
+			object GetDefaultValue(Type type) => type.IsValueType ? Activator.CreateInstance(type) : null;
+			
+			switch (member)
+			{
+				case FieldInfo fieldInfo:
+					fieldInfo.SetValue(target, GetDefaultValue(fieldInfo.FieldType));
+					break;
+				case PropertyInfo propertyInfo:
+					propertyInfo.SetValue(target, GetDefaultValue(propertyInfo.PropertyType));
 					break;
 			}
 		}

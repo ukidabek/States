@@ -70,6 +70,14 @@ namespace States.Default
 				baker.Bake(context);
 		}
 
+		[Conditional("UNITY_EDITOR")]
+		public void ClearReferences()
+		{
+			(this as IReferenceBaker).Clear();
+			foreach (var baker in StateToBake.OfType<IReferenceBaker>())
+				baker.Clear();
+		}
+		
 		public IList<State> BackedStates => m_backedStates;
 
 		public IEnumerable<State> StateToBake => m_states;

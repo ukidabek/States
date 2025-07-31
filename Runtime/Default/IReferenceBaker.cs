@@ -25,5 +25,21 @@ namespace States.Default
 			
             foreach (var _ in backedStates) { }
         }
+
+        public void Clear()
+        {
+            var contextHandler = new ContextHandler();
+            var statesToClear = StateToBake
+                .Where(state => state.IsStatic)
+                .Select(state =>
+                {
+                    (state as IReferenceBaker)?.Clear();
+                    contextHandler.ClearState(state);
+                    return state;
+                });
+            
+            foreach (var _ in statesToClear) { }
+            BackedStates.Clear();
+        }
     }
 }

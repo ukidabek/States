@@ -24,11 +24,21 @@ namespace States.Default
 			
 			GUILayout.Space(EditorGUIUtility.singleLineHeight +  EditorGUIUtility.standardVerticalSpacing);
 			
+			EditorGUILayout.BeginHorizontal();
+			
 			if (GUILayout.Button("Bake references"))
 			{
 				m_stateMachineManager.BakeReferences();
 				EditorUtility.SetDirty(target);
 			}
+			
+			if (GUILayout.Button("Clear references"))
+			{
+				m_stateMachineManager.ClearReferences();
+				EditorUtility.SetDirty(target);
+			}
+			
+			EditorGUILayout.EndHorizontal();
 			
 			if (!EditorGUI.EndChangeCheck()) return;
 			
