@@ -8,8 +8,8 @@ namespace States.Core
 		public static IEnumerable<IContextDestination> GetContextDestination(this IState state)
 		{
 			var logic = state.ContextDestinations;
-			var transitions = state.Transitions;
-			return logic.OfType<IContextDestination>().Concat(transitions).Distinct();
+			// var transitions = state.Transitions;
+			return logic.OfType<IContextDestination>().Distinct();
 		}
 		
 		public static void Process(this IEnumerable<IStateProcessor> processors, IState state)

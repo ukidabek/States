@@ -106,6 +106,7 @@ namespace States.Core.Test
 
 			Assert.AreEqual(contextDestination.BoxCollider, boxCollider);
 			Assert.AreEqual(contextDestination.Rigidbody, rigidbody);
+			Assert.AreEqual(contextDestination.InnerTestContextDestination.Rigidbody, rigidbody);
 		}
 		
 		[Test]

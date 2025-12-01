@@ -2,7 +2,7 @@
 
 namespace States.Core
 {
-    public interface IState
+    public interface IState : IContextDestinationHolder
     {
         public bool IsStatic { get; }
         string Name { get; }

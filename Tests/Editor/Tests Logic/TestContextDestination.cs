@@ -1,12 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Assertions;
 
 namespace States.Core.Test
 {
+	public class InnerTestContextDestination : IContextDestination
+	{
+		[ContextField]
+		public Rigidbody Rigidbody { get; set; }
+	}
+	
 	public class ExtendedTestContextDestination : TestContextDestination { }
-	public class TestContextDestination : IContextDestination
+	public class TestContextDestination : IContextDestination, IContextDestinationHolder
 	{
 		[ContextField] protected BoxCollider m_boxCollider = null;
 		public BoxCollider BoxCollider => m_boxCollider;
@@ -17,6 +22,9 @@ namespace States.Core.Test
 			get => m_rigidbody;
 			set => m_rigidbody = value;
 		}
+		
+		public InnerTestContextDestination InnerTestContextDestination = new  InnerTestContextDestination();
+		
 
 		[ContextField("Test")] private Rigidbody m_rigidbodyWithID = null;
 		public Rigidbody RigidbodyWithID => m_rigidbodyWithID;
@@ -35,7 +43,7 @@ namespace States.Core.Test
 		public float FixUpdateCount = 0;
 		public float LateUpdateCount = 0;
 
-		public virtual IEnumerable<IContextDestination> ContextDestinations { get; protected set; } = Array.Empty<IContextDestination>();
+		public IEnumerable<IContextDestination> ContextDestinations => new IContextDestination[] { InnerTestContextDestination };
 
 		public bool CanBeDeactivated { get; set; }
 

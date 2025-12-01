@@ -26,7 +26,10 @@ namespace States.Default
 		public IID StateID => m_stateID;
 
         [SerializeReference, ReferenceList] private IStateLogic[] m_logic = null;
-        public IEnumerable<IContextDestination> ContextDestinations => m_logic;
+        public IEnumerable<IContextDestination> ContextDestinations =>
+            m_logic
+                .Concat(m_logic.OfType<IContextDestinationHolder>().SelectMany(holder => holder.ContextDestinations))
+                .Concat(m_transition);
 
         [SerializeReference, ReferenceList] private IStateTransition[] m_transition = null;
         public IEnumerable<IStateTransition> Transitions => m_transition;
@@ -45,7 +48,6 @@ namespace States.Default
         public IState CurrentState => m_stateMachine.CurrentState;
         
         public IState PreviousState => m_stateMachine.PreviousState;
-
 
         private readonly List<IOnUpdateLogic> m_onUpdateLogic = new List<IOnUpdateLogic>(10);
         private readonly List<IOnFixedUpdateLogic> m_onFixedUpdateLogic = new List<IOnFixedUpdateLogic>(10);
