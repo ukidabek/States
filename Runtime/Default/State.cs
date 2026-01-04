@@ -93,9 +93,15 @@ namespace States.Default
                     stateLogic.Activate();
                     Profiler.EndSample();
                 }
+
+                foreach (var transition in m_transition)
+                {
+                    Profiler.BeginSample($"Activate: {transition.GetType().Name}");
+                    transition.Activate();
+                    Profiler.EndSample();
+                }
                 
                 if (!m_subStates.Any()) return;
-                
                 m_stateMachine.EnterState(m_subStates[m_defaultStateIndex]);
             }
         }
@@ -108,6 +114,13 @@ namespace States.Default
                 {
                     Profiler.BeginSample($"Deactivate: {stateLogic.GetType().Name}");
                     stateLogic.Deactivate();
+                    Profiler.EndSample();
+                }
+
+                foreach (var transition in m_transition)
+                {
+                    Profiler.BeginSample($"Deactivate: {transition.GetType().Name}");
+                    transition.Deactivate();
                     Profiler.EndSample();
                 }
 

@@ -4,5 +4,7 @@
     {
         IState StateToEnter { get; }
         bool Validate(IBlackboard blackboard);
+        void Activate();
+        void Deactivate();
     }
 }

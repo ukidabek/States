@@ -10,5 +10,8 @@ namespace States.Core.Test
         public bool Result { get; set; } = false;
         
         public bool Validate(IBlackboard blackboard) => Result;
+        public void Activate() { }
+
+        public void Deactivate() { }
     }
 }

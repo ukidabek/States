@@ -10,5 +10,8 @@ namespace States.Default
         [SerializeField] private State m_stateToEnter = null;
         public IState StateToEnter => m_stateToEnter;
         public abstract bool Validate(IBlackboard blackboard);
+        public virtual void Activate() { }
+
+        public virtual void Deactivate() { }
     }
 }
