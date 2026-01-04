@@ -7,7 +7,6 @@ namespace States.Core
         public bool IsStatic { get; }
         string Name { get; }
         IID StateID { get; }
-        IEnumerable<IContextDestination> ContextDestinations { get; }
         IEnumerable<IStateTransition> Transitions { get; }
         bool CanExit { get; }
         void Enter();

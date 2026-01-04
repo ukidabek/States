@@ -45,7 +45,15 @@ namespace States.Core
 					body.isKinematic = !status;
 					break;
 				case Rigidbody2D body:
+#if UNITY_6000_1_OR_NEWER
+					body.bodyType = status switch
+					{
+						true => RigidbodyType2D.Kinematic,
+						false => RigidbodyType2D.Dynamic
+					};
+#else
 					body.isKinematic = !status;
+#endif
 					break;
 			}
 		}
