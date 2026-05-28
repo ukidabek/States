@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Unity.Profiling;
+using UnityEngine;
 using UnityEngine.Profiling;
 
 namespace States.Core
@@ -20,9 +21,7 @@ namespace States.Core
         public string Name { get; private set; }
         public IState PreviousState { get; private set; }
 
-        private ProfilerMarker m_onStateEnter,
-            m_updateMarker, m_fixedUpdateMarker, 
-            m_lateUpdateMarker, m_transitionUpdateMarker;
+        private ProfilerMarker m_onStateEnter, m_updateMarker, m_fixedUpdateMarker, m_lateUpdateMarker, m_transitionUpdateMarker;
         
         public StateMachine(IEnumerable<Context> context,
             IBlackboard blackboard,
@@ -83,7 +82,7 @@ namespace States.Core
             if (currentStateNotNull)
             {
                 Profiler.BeginSample($"Exit: {CurrentState.Name}");
-                CurrentState.Exit();
+                CurrentState.Exit(Blackboard);
                 m_statePostProcessors.Process(CurrentState);
                 Profiler.EndSample();
             }
@@ -94,7 +93,7 @@ namespace States.Core
 
             Profiler.BeginSample($"Enter: {CurrentState.Name}");
             m_statePreProcessors.Process(CurrentState);
-            CurrentState?.Enter();
+            CurrentState?.Enter(Blackboard);
             OnStateChanged?.Invoke(CurrentState);
             Profiler.EndSample();
             Profiler.EndSample();
@@ -134,14 +133,11 @@ namespace States.Core
 
         public void Reset()
         {
-            CurrentState?.Exit();
+            CurrentState?.Exit(Blackboard);
             CurrentState = null;
             PreviousState = null;
         }
         
-        public void Dispose()
-        {
-            OnStateChanged = null;
-        }
+        public void Dispose() => OnStateChanged = null;
     }
 }

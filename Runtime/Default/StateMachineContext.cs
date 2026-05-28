@@ -1,12 +1,17 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Collections.Generic;
 using States.Core;
 using UnityEngine;
 
 namespace States.Default
 {
-	public class StateMachineContext : MonoBehaviour
+	public class StateMachineContext : MonoBehaviour, IEnumerable<Context>
 	{
 		[SerializeField] private List<Context> m_context = new List<Context>();
-		public IEnumerable<Context> Context => m_context;
+		public IReadOnlyList<Context> Context => m_context;
+		
+		public IEnumerator<Context> GetEnumerator() => m_context.GetEnumerator();
+
+		IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 	}
 }

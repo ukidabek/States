@@ -5,7 +5,7 @@ namespace States.Default
     public interface IStateLogic : IContextDestination
     {
         bool CanBeDeactivated { get; }
-		void Activate();
-        void Deactivate();
+		void Activate(IBlackboard blackboard);
+        void Deactivate(IBlackboard blackboard);
     }
 }

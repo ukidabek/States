@@ -10,7 +10,6 @@ namespace States.Default
         [SerializeField] protected List<Key> m_initialKeys = new List<Key>();
         public abstract IBlackboard CreateBlackboard();
 
-        protected virtual void OnEnable()
-        { }
+        protected virtual void OnEnable() { }
     }
 }

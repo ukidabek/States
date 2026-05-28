@@ -13,7 +13,7 @@ namespace States.Core
 		[SerializeField] private Object m_object = null;
 		public Object Object => m_object;
 
-		public Type Type => m_object.GetType();
+		public Type Type => m_object == null ? null : m_object.GetType();
 
 		public Context() { }
 

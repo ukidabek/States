@@ -12,12 +12,12 @@ namespace States.Default
 		
 		public bool CanBeDeactivated => true;
 
-		public void Activate()
+		public void Activate(IBlackboard blackboard)
 		{
 			OnActivate.Invoke();
 		}
 
-		public void Deactivate()
+		public void Deactivate(IBlackboard blackboard)
 		{
 			OnDeactivate.Invoke();
 		}

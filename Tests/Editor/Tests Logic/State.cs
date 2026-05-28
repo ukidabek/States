@@ -49,11 +49,11 @@ namespace States.Core.Test
 
         public float LateUpdateCount { get; private set; }
 
-        public void Enter()
+        public void Enter(IBlackboard blackboard)
         {
         }
 
-        public void Exit()
+        public void Exit(IBlackboard blackboard)
         {
         }
 

@@ -9,7 +9,7 @@ namespace States.Core
 	public class ContextHandler
 	{
 		private const BindingFlags Binding_Flags = BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.FlattenHierarchy | BindingFlags.Instance;
-		private static readonly Dictionary<Type, MemberInfo[]> ContextFieldsByTypeDictionary = new();
+		private static readonly Dictionary<Type, MemberInfo[]> ContextFieldsByTypeDictionary = new(200);
 		
 		[RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
 		private static void GenerateStateLogicCache()

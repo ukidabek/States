@@ -4,11 +4,12 @@
   "displayName": "States",
   "description": "This package provides a implementation a generic state machine.",
   "author": {
-    "name": "\u0141ukasz D\u0105bek",
+    "name": "Łukasz Dąbek",
     "email": "ukidabek@gmail.com"
   },
   "unity": "2023.1",
   "dependencies": {
     "com.cooki.utilities": "1.0.0"
-  }
+  },
+  "_fingerprint": "d3d720d5019771009db574a87c01d443811e0ba2"
 }

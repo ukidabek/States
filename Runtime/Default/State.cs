@@ -79,7 +79,7 @@ namespace States.Default
         
         public void EnterState(IState statToEnter) => m_stateMachine.EnterState(statToEnter);
         
-		public void Enter()
+		public void Enter(IBlackboard blackboard)
         {
             using (m_enterState.Auto())
             {
@@ -90,7 +90,7 @@ namespace States.Default
                 foreach (var stateLogic in m_logic)
                 {
                     Profiler.BeginSample($"Activating: {stateLogic.GetType().Name}");
-                    stateLogic.Activate();
+                    stateLogic.Activate(blackboard);
                     Profiler.EndSample();
                 }
 
@@ -106,14 +106,14 @@ namespace States.Default
             }
         }
 
-        public void Exit()
+        public void Exit(IBlackboard blackboard)
         {
             using (m_exitState.Auto())
             {
                 foreach (var stateLogic in m_logic)
                 {
                     Profiler.BeginSample($"Deactivate: {stateLogic.GetType().Name}");
-                    stateLogic.Deactivate();
+                    stateLogic.Deactivate(blackboard);
                     Profiler.EndSample();
                 }
 

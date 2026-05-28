@@ -161,7 +161,7 @@ namespace States.Core.Test
 		{
 			var state = GenerateStateWitchContextDestination<TestContextDestination>(out var contextDestination);
 
-			m_gameObject = new GameObject("TestObject", typeof(SphereCollider));
+			m_gameObject = new GameObject("TestObject", typeof(SphereCollider), typeof(Animator));
 			var animator = m_gameObject.GetComponent<Animator>();
 
 			m_contexts = new[] { new Context("Test_3", animator) };
